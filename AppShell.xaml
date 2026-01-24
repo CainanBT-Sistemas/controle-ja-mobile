@@ -3,13 +3,38 @@
     x:Class="controle_ja_mobile.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:controle_ja_mobile"
+    xmlns:local="clr-namespace:controle_ja_mobile.Views.Privates"
+    Title="Controle Já"
     Shell.FlyoutBehavior="Disabled"
-    Title="controle_ja_mobile">
+    Shell.BackgroundColor="#0F172A"
+    Shell.ForegroundColor="White"
+    Shell.TitleColor="White"
+    Shell.NavBarIsVisible="False">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    
+    <Shell.TabBarBackgroundColor>#1E293B</Shell.TabBarBackgroundColor>
+    <Shell.TabBarForegroundColor>#94A3B8</Shell.TabBarForegroundColor>
+    <Shell.TabBarTitleColor>#00E676</Shell.TabBarTitleColor>
+    <Shell.TabBarUnselectedColor>#94A3B8</Shell.TabBarUnselectedColor>
+
+    <TabBar>
+        <ShellContent
+        Title="Início"
+        Icon="home_icon.png" 
+        ContentTemplate="{DataTemplate local:DashboardPage}"
+        Route="DashboardPage" />
+
+        <ShellContent
+        Title="Cartões"
+        Icon="card_icon.png" 
+        ContentTemplate="{DataTemplate local:CreditCardsPage}"
+        Route="CreditCardsPage" />
+
+        <ShellContent
+        Title="Veículos"
+        Icon="car_icon.png" 
+        ContentTemplate="{DataTemplate local:VehicleListPage}"
+        Route="VehicleListPage" />
+    </TabBar>
 
 </Shell>

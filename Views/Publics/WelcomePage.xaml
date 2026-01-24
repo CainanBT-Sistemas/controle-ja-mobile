@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="controle_ja_mobile.Views.Publics.WelcomePage"
+             NavigationPage.HasNavigationBar="False">
+
+    <ContentPage.Background>
+        <RadialGradientBrush Center="0.5, 0.2" Radius="0.8">
+            <GradientStop Color="#1E293B" Offset="0.0" />
+
+            <GradientStop Color="#0F172A" Offset="0.4" />
+
+            <GradientStop Color="#002118" Offset="1.0" />
+        </RadialGradientBrush>
+    </ContentPage.Background>
+
+    <Grid RowDefinitions="*, Auto">
+
+        <VerticalStackLayout Grid.Row="0" 
+                             VerticalOptions="Center" 
+                             Spacing="15" 
+                             Padding="30">
+
+            <Grid HeightRequest="240" WidthRequest="240" HorizontalOptions="Center">
+
+                <Ellipse WidthRequest="200" HeightRequest="200" 
+                         HorizontalOptions="Center" VerticalOptions="Center" 
+                         Opacity="0.6">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush Center="0.5,0.5" Radius="0.5">
+                            <GradientStop Color="{StaticResource Primary}" Offset="0" />
+                            <GradientStop Color="Transparent" Offset="1" />
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <Image Source="logo_controle.png" 
+                       HeightRequest="150" 
+                       Aspect="AspectFit"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Grid>
+
+            <Label Text="ASSUMA O CONTROLE"
+                   TextColor="{StaticResource TextPrimaryDark}"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   CharacterSpacing="1.2"
+                   HorizontalTextAlignment="Center"/>
+
+            <Label Text="Gestão financeira inteligente e controle veicular."
+                   TextColor="{StaticResource TextSecondaryDark}"
+                   FontSize="16"
+                   HorizontalTextAlignment="Center"
+                   Opacity="0.8"
+                   Margin="0,5,0,0"/>
+
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1" 
+                             Spacing="15" 
+                             Padding="30,0,30,50">
+
+            <Button Text="CRIAR MINHA CONTA"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="#000000"
+                    FontAttributes="Bold"
+                    CornerRadius="12"
+                    HeightRequest="55"
+                    FontSize="15"
+                    Clicked="OnRegisterClicked"/>
+
+            <Button Text="JÁ TENHO ACESSO"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource TextPrimaryDark}"
+                    BorderColor="{StaticResource TextSecondaryDark}"
+                    BorderWidth="1"
+                    CornerRadius="12"
+                    HeightRequest="55"
+                    FontSize="15"
+                    Clicked="OnLoginClicked"/>
+
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

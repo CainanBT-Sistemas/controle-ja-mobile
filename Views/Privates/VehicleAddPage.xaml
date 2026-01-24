@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             x:Class="controle_ja_mobile.Views.Privates.VehicleAddPage"
+             x:DataType="vm:VehiclesViewModel"
+             Title="Novo Veículo"
+             BackgroundColor="{StaticResource PageBackgroundColorDark}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="25" Spacing="20">
+            <Label Text="Dados do Veículo" TextColor="{StaticResource Primary}" FontSize="18" FontAttributes="Bold"/>
+
+            <Border BackgroundColor="{StaticResource CardBackgroundDark}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="15,5">
+                <Entry Placeholder="Apelido (ex: Meu Fusca)" Text="{Binding NewName}" TextColor="White" PlaceholderColor="#64748B"/>
+            </Border>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                <Border Grid.Column="0" BackgroundColor="{StaticResource CardBackgroundDark}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="15,5">
+                    <Entry Placeholder="Marca (ex: VW)" Text="{Binding NewBrand}" TextColor="White" PlaceholderColor="#64748B"/>
+                </Border>
+                <Border Grid.Column="1" BackgroundColor="{StaticResource CardBackgroundDark}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="15,5">
+                    <Entry Placeholder="Modelo (ex: Gol)" Text="{Binding NewModel}" TextColor="White" PlaceholderColor="#64748B"/>
+                </Border>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                <Border Grid.Column="0" BackgroundColor="{StaticResource CardBackgroundDark}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="15,5">
+                    <Entry Placeholder="Ano" Keyboard="Numeric" Text="{Binding NewYear}" TextColor="White" PlaceholderColor="#64748B"/>
+                </Border>
+                <Border Grid.Column="1" BackgroundColor="{StaticResource CardBackgroundDark}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="15,5">
+                    <Entry Placeholder="Placa" Text="{Binding NewPlate}" TextColor="White" PlaceholderColor="#64748B"/>
+                </Border>
+            </Grid>
+
+            <Label Text="Quilometragem Inicial" TextColor="{StaticResource Primary}" FontSize="18" FontAttributes="Bold" Margin="0,10,0,0"/>
+            <Border BackgroundColor="{StaticResource CardBackgroundDark}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="15,5">
+                <Entry Placeholder="KM Atual (ex: 50000)" Keyboard="Numeric" Text="{Binding NewOdometer}" TextColor="White" PlaceholderColor="#64748B"/>
+            </Border>
+
+            <Button Text="SALVAR VEÍCULO" 
+                    Command="{Binding SaveVehicleCommand}"
+                    Margin="0,30,0,0"
+                    HeightRequest="55"
+                    FontSize="16"
+                    FontAttributes="Bold"/>
+
+            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="{StaticResource Primary}"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

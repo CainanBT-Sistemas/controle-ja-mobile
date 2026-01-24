@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             xmlns:models="clr-namespace:controle_ja_mobile.Models"
+             x:Class="controle_ja_mobile.Views.Privates.CreditCardsPage"
+             x:DataType="vm:CreditCardsViewModel"
+             Title="Meus Cartões"
+             BackgroundColor="{StaticResource PageBackgroundColorDark}">
+
+    <Grid RowDefinitions="*, Auto">
+        <RefreshView Grid.Row="0" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCardsCommand}" RefreshColor="{StaticResource Primary}">
+            <CollectionView ItemsSource="{Binding Cards}" Margin="20">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="20"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10" Opacity="0.6">
+                        <Label Text="Nenhum cartão encontrado" TextColor="White"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:CreditCard">
+                        <Border StrokeShape="RoundRectangle 15" StrokeThickness="0" HeightRequest="200">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#2D3A4F" Offset="0.0" />
+                                    <GradientStop Color="#1E293B" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+
+                            <Grid RowDefinitions="Auto, *, Auto, Auto" Padding="20">
+                                <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                                    <Border BackgroundColor="#E2E8F0" HeightRequest="30" WidthRequest="40" StrokeShape="RoundRectangle 5" HorizontalOptions="Start" Opacity="0.8"/>
+                                    <Label Grid.Column="1" Text="{Binding Name}" TextColor="White" FontAttributes="Bold" FontSize="18"/>
+                                </Grid>
+
+                                <Label Grid.Row="1" Text="**** **** **** 0000" TextColor="#94A3B8" FontSize="22" VerticalOptions="Center" CharacterSpacing="2"/>
+
+                                <Grid Grid.Row="2" ColumnDefinitions="*, *">
+                                    <VerticalStackLayout>
+                                        <Label Text="Disponível" TextColor="#94A3B8" FontSize="10"/>
+                                        <Label Text="{Binding FormattedAvailable}" TextColor="{StaticResource Primary}" FontAttributes="Bold" FontSize="16"/>
+                                    </VerticalStackLayout>
+
+                                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                        <Label Text="Vencimento" TextColor="#94A3B8" FontSize="10" HorizontalTextAlignment="End"/>
+                                        <Label Text="{Binding CloseDay, StringFormat='Dia {0}'}" TextColor="White" FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="End"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <VerticalStackLayout Grid.Row="3" Margin="0,15,0,0" Spacing="5">
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <Label Text="{Binding FormattedTotalLimit}" TextColor="#94A3B8" FontSize="10"/>
+                                        <Label Text="{Binding UsedPercentageText}" TextColor="{StaticResource Error}" FontSize="10" Grid.Column="1"/>
+                                    </Grid>
+                                    <ProgressBar Progress="{Binding LimitProgress}" ProgressColor="{StaticResource Error}" ScaleY="2"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <Button Grid.Row="0" Text="+" Command="{Binding GoToAddCardCommand}" 
+                BackgroundColor="{StaticResource Primary}" TextColor="Black"
+                CornerRadius="30" HeightRequest="60" WidthRequest="60"
+                HorizontalOptions="End" VerticalOptions="End" Margin="25"
+                Shadow="{Shadow Radius=10, Offset='0,5', Brush='#00E676'}"/>
+    </Grid>
+</ContentPage>

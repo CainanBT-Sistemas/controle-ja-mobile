@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:micro="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"             
+             x:Class="controle_ja_mobile.Views.Privates.DashboardPage"
+             x:DataType="vm:DashboardViewModel"
+             Title="Visão Geral"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource PageBackgroundColorDark}">
+
+    <Grid RowDefinitions="Auto, *">
+
+        <Grid Grid.Row="0" RowDefinitions="Auto, Auto" Padding="25,15,25,10">
+
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                <VerticalStackLayout>
+                    <Label Text="Bem-vindo," TextColor="{StaticResource TextSecondaryDark}" FontSize="14"/>
+                    <Label Text="{Binding UserName}" TextColor="{StaticResource TextPrimaryDark}" FontSize="20" FontAttributes="Bold"/>
+                </VerticalStackLayout>
+                <Border Grid.Column="1" Stroke="Transparent" HeightRequest="45" WidthRequest="45" StrokeShape="RoundRectangle 25">
+                    <Image Source="logo_controle.png" Aspect="AspectFit"/>
+                </Border>
+            </Grid>
+
+            <Border Grid.Row="1" Margin="0,15,0,0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="5">
+                <Grid ColumnDefinitions="40, *, 40">
+                    <ImageButton Grid.Column="0" Source="arrow_left.png" Command="{Binding PreviousMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
+                    <Label Grid.Column="1" Text="{Binding CurrentMonthDisplay}" 
+                           TextColor="{StaticResource TextPrimaryDark}" FontAttributes="Bold" 
+                           HorizontalOptions="Center" VerticalOptions="Center" TextTransform="Uppercase"/>
+
+                    <ImageButton Grid.Column="2" Source="arrow_right.png" Command="{Binding NextMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <ScrollView Grid.Row="1" Padding="0,0,0,80">
+            <VerticalStackLayout Spacing="20">
+
+                <Border Margin="25,5" StrokeThickness="0" StrokeShape="RoundRectangle 24" HeightRequest="130">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#00E676" Offset="0.0" />
+                            <GradientStop Color="#00A854" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.Shadow>
+                        <Shadow Brush="#00E676" Offset="0,8" Radius="20" Opacity="0.3"/>
+                    </Border.Shadow>
+
+                    <VerticalStackLayout Padding="25" VerticalOptions="Center" Spacing="2">
+                        <Label Text="Patrimônio Total" TextColor="#003300" FontSize="14" Opacity="0.8"/>
+                        <Label Text="{Binding Balance}" TextColor="#002200" FontSize="36" FontAttributes="Bold"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="15" Padding="25,0">
+                    <Border Grid.Column="0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="15" HeightRequest="90">
+                        <VerticalStackLayout Spacing="5" VerticalOptions="Center">
+                            <Label Text="Entradas" TextColor="{StaticResource TextSecondaryDark}" FontSize="12"/>
+                            <Label Text="{Binding Income}" TextColor="{StaticResource Primary}" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="15" HeightRequest="90">
+                        <VerticalStackLayout Spacing="5" VerticalOptions="Center">
+                            <Label Text="Saídas" TextColor="{StaticResource TextSecondaryDark}" FontSize="12"/>
+                            <Label Text="{Binding Expense}" TextColor="#EF4444" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <VerticalStackLayout Padding="25,0">
+                    <Label Text="Análise de Gastos" TextColor="{StaticResource TextPrimaryDark}" FontSize="18" FontAttributes="Bold" Margin="0,0,0,10"/>
+
+                    <Border BackgroundColor="#1E293B" StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="10" HeightRequest="250">
+                        <Grid>
+                            <micro:ChartView IsVisible="{Binding HasChartData}" Chart="{Binding ExpenseChart}" BackgroundColor="Transparent" />
+
+                            <VerticalStackLayout IsVisible="{Binding HasChartData, Converter={StaticResource InvertedBoolConverter}}" 
+                                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="15" Opacity="0.6">
+                                <Border HeightRequest="100" WidthRequest="100" StrokeShape="RoundRectangle 50" BackgroundColor="#2D3A4F" StrokeThickness="0">
+                                    <Label Text="!" FontSize="40" TextColor="#94A3B8" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                                <Label Text="Sem despesas neste período" TextColor="#94A3B8"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Button Grid.Row="1"
+                Text="+" 
+                Command="{Binding ShowAddOptionsCommand}"
+                BackgroundColor="{StaticResource Primary}"
+                TextColor="#002200"
+                FontSize="30"
+                CornerRadius="35"
+                HeightRequest="70"
+                WidthRequest="70"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="25"
+                Shadow="{Shadow Radius=10, Offset='0,5', Brush='#00E676'}"/>
+
+        <Grid Grid.RowSpan="2" BackgroundColor="#80000000" IsVisible="{Binding IsLoading}" ZIndex="99">
+            <ActivityIndicator IsRunning="{Binding IsLoading}" Color="{StaticResource Primary}" HeightRequest="50" WidthRequest="50" VerticalOptions="Center" HorizontalOptions="Center"/>
+        </Grid>
+    </Grid>
+</ContentPage>
