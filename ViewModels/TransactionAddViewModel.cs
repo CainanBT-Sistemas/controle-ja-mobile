@@ -234,6 +234,15 @@ namespace controle_ja_mobile.ViewModels
 
         [RelayCommand]
         public async Task Cancel() => await Shell.Current.GoToAsync("..");
+
+        partial void OnSelectedCategoryChanged(Category value)
+        {
+            if (value != null && !string.IsNullOrEmpty(value.Color))
+            {
+                // Muda a cor do tema da página para a cor da categoria (Feedback visual instantâneo)
+                ThemeColor = value.Color;
+            }
+        }
     }
 
     // Classe auxiliar para o Dropdown misto

@@ -7,106 +7,184 @@
              x:DataType="vm:DashboardViewModel"
              Title="Visão Geral"
              NavigationPage.HasNavigationBar="False"
-             BackgroundColor="{StaticResource PageBackgroundColorDark}">
+             BackgroundColor="#0F172A">
 
-    <Grid RowDefinitions="Auto, *">
+    <Grid>
 
-        <Grid Grid.Row="0" RowDefinitions="Auto, Auto" Padding="25,15,25,10">
+        <Grid RowDefinitions="Auto, *">
 
-            <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Padding="25,15,25,10">
                 <VerticalStackLayout>
-                    <Label Text="Bem-vindo," TextColor="{StaticResource TextSecondaryDark}" FontSize="14"/>
-                    <Label Text="{Binding UserName}" TextColor="{StaticResource TextPrimaryDark}" FontSize="20" FontAttributes="Bold"/>
+                    <Label Text="Bem-vindo," TextColor="#94A3B8" FontSize="14"/>
+                    <Label Text="{Binding UserName}" TextColor="White" FontSize="20" FontAttributes="Bold"/>
                 </VerticalStackLayout>
-                <Border Grid.Column="1" Stroke="Transparent" HeightRequest="45" WidthRequest="45" StrokeShape="RoundRectangle 25">
-                    <Image Source="logo_controle.png" Aspect="AspectFit"/>
-                </Border>
+
+                <HorizontalStackLayout Grid.Column="1" Spacing="15">
+                    <Border StrokeThickness="0" BackgroundColor="#1E293B" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToSettingsCommand}"/>
+                        </Border.GestureRecognizers>
+                        <Path Data="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.49l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+                              Fill="#94A3B8" Aspect="Uniform" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    <Border Stroke="Transparent" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20">
+                        <Image Source="logo_controle.png" Aspect="AspectFit"/>
+                    </Border>
+                </HorizontalStackLayout>
             </Grid>
 
-            <Border Grid.Row="1" Margin="0,15,0,0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="5">
-                <Grid ColumnDefinitions="40, *, 40">
-                    <ImageButton Grid.Column="0" Source="arrow_left.png" Command="{Binding PreviousMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
-                    <Label Grid.Column="1" Text="{Binding CurrentMonthDisplay}" 
-                           TextColor="{StaticResource TextPrimaryDark}" FontAttributes="Bold" 
-                           HorizontalOptions="Center" VerticalOptions="Center" TextTransform="Uppercase"/>
+            <ScrollView Grid.Row="1" Padding="0,0,0,120">
+                <VerticalStackLayout Spacing="20">
 
-                    <ImageButton Grid.Column="2" Source="arrow_right.png" Command="{Binding NextMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
-                </Grid>
-            </Border>
-        </Grid>
-
-        <ScrollView Grid.Row="1" Padding="0,0,0,80">
-            <VerticalStackLayout Spacing="20">
-
-                <Border Margin="25,5" StrokeThickness="0" StrokeShape="RoundRectangle 24" HeightRequest="130">
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Color="#00E676" Offset="0.0" />
-                            <GradientStop Color="#00A854" Offset="1.0" />
-                        </LinearGradientBrush>
-                    </Border.Background>
-                    <Border.Shadow>
-                        <Shadow Brush="#00E676" Offset="0,8" Radius="20" Opacity="0.3"/>
-                    </Border.Shadow>
-
-                    <VerticalStackLayout Padding="25" VerticalOptions="Center" Spacing="2">
-                        <Label Text="Patrimônio Total" TextColor="#003300" FontSize="14" Opacity="0.8"/>
-                        <Label Text="{Binding Balance}" TextColor="#002200" FontSize="36" FontAttributes="Bold"/>
-                    </VerticalStackLayout>
-                </Border>
-
-                <Grid ColumnDefinitions="*, *" ColumnSpacing="15" Padding="25,0">
-                    <Border Grid.Column="0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="15" HeightRequest="90">
-                        <VerticalStackLayout Spacing="5" VerticalOptions="Center">
-                            <Label Text="Entradas" TextColor="{StaticResource TextSecondaryDark}" FontSize="12"/>
-                            <Label Text="{Binding Income}" TextColor="{StaticResource Primary}" FontSize="16" FontAttributes="Bold"/>
-                        </VerticalStackLayout>
-                    </Border>
-                    <Border Grid.Column="1" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="15" HeightRequest="90">
-                        <VerticalStackLayout Spacing="5" VerticalOptions="Center">
-                            <Label Text="Saídas" TextColor="{StaticResource TextSecondaryDark}" FontSize="12"/>
-                            <Label Text="{Binding Expense}" TextColor="#EF4444" FontSize="16" FontAttributes="Bold"/>
-                        </VerticalStackLayout>
-                    </Border>
-                </Grid>
-
-                <VerticalStackLayout Padding="25,0">
-                    <Label Text="Análise de Gastos" TextColor="{StaticResource TextPrimaryDark}" FontSize="18" FontAttributes="Bold" Margin="0,0,0,10"/>
-
-                    <Border BackgroundColor="#1E293B" StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="10" HeightRequest="250">
-                        <Grid>
-                            <micro:ChartView IsVisible="{Binding HasChartData}" Chart="{Binding ExpenseChart}" BackgroundColor="Transparent" />
-
-                            <VerticalStackLayout IsVisible="{Binding HasChartData, Converter={StaticResource InvertedBoolConverter}}" 
-                                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="15" Opacity="0.6">
-                                <Border HeightRequest="100" WidthRequest="100" StrokeShape="RoundRectangle 50" BackgroundColor="#2D3A4F" StrokeThickness="0">
-                                    <Label Text="!" FontSize="40" TextColor="#94A3B8" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                </Border>
-                                <Label Text="Sem despesas neste período" TextColor="#94A3B8"/>
-                            </VerticalStackLayout>
+                    <Border Margin="25,0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="5">
+                        <Grid ColumnDefinitions="40, *, 40">
+                            <ImageButton Grid.Column="0" Source="arrow_left.png" Command="{Binding PreviousMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
+                            <Label Grid.Column="1" Text="{Binding CurrentMonthDisplay}" TextColor="White" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextTransform="Uppercase"/>
+                            <ImageButton Grid.Column="2" Source="arrow_right.png" Command="{Binding NextMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
                         </Grid>
                     </Border>
+
+                    <Border Margin="25,5" StrokeThickness="0" StrokeShape="RoundRectangle 24" HeightRequest="130">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#00E676" Offset="0.0" />
+                                <GradientStop Color="#00A854" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.Shadow>
+                            <Shadow Brush="#00E676" Offset="0,8" Radius="15" Opacity="0.3"/>
+                        </Border.Shadow>
+                        <VerticalStackLayout Padding="25" VerticalOptions="Center" Spacing="2">
+                            <Label Text="Patrimônio Total" TextColor="#003300" FontSize="14" Opacity="0.8"/>
+                            <Label Text="{Binding Balance}" TextColor="#002200" FontSize="36" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="0,10">
+
+                        <VerticalStackLayout Spacing="5">
+                            <Border StrokeShape="RoundRectangle 30" HeightRequest="60" WidthRequest="60" BackgroundColor="#00E676" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding GoToNewIncomeCommand}"/>
+                                </Border.GestureRecognizers>
+                                <Image Source="ic_receita.png" Aspect="AspectFit" HeightRequest="28" WidthRequest="28" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Border>
+                            <Label Text="Receita" TextColor="White" FontSize="12" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="5">
+                            <Border StrokeShape="RoundRectangle 30" HeightRequest="60" WidthRequest="60" BackgroundColor="#FF5252" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding GoToNewExpenseCommand}"/>
+                                </Border.GestureRecognizers>
+                                <Image Source="ic_despesa.png" Aspect="AspectFit" HeightRequest="28" WidthRequest="28" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Border>
+                            <Label Text="Despesa" TextColor="White" FontSize="12" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="15" Padding="25,0">
+                        <Border Grid.Column="0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="15" HeightRequest="90">
+                            <VerticalStackLayout Spacing="5" VerticalOptions="Center">
+                                <Label Text="Entradas" TextColor="#94A3B8" FontSize="12"/>
+                                <Label Text="{Binding Income}" TextColor="#00E676" FontSize="16" FontAttributes="Bold"/>
+                            </VerticalStackLayout>
+                        </Border>
+                        <Border Grid.Column="1" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="15" HeightRequest="90">
+                            <VerticalStackLayout Spacing="5" VerticalOptions="Center">
+                                <Label Text="Saídas" TextColor="#94A3B8" FontSize="12"/>
+                                <Label Text="{Binding Expense}" TextColor="#FF5252" FontSize="16" FontAttributes="Bold"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+
+                    <VerticalStackLayout Padding="25,0">
+                        <Label Text="Análise de Gastos" TextColor="White" FontSize="18" FontAttributes="Bold" Margin="0,0,0,10"/>
+                        <Border BackgroundColor="#1E293B" StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="10" HeightRequest="250">
+                            <Grid>
+                                <micro:ChartView IsVisible="{Binding HasChartData}" Chart="{Binding ExpenseChart}" BackgroundColor="Transparent" />
+
+                                <VerticalStackLayout IsVisible="{Binding HasChartData, Converter={StaticResource InvertedBoolConverter}}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="15" Opacity="0.6">
+                                    <Border HeightRequest="100" WidthRequest="100" StrokeShape="RoundRectangle 50" BackgroundColor="#2D3A4F" StrokeThickness="0">
+                                        <Label Text="!" FontSize="40" TextColor="#94A3B8" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                    </Border>
+                                    <Label Text="Sem despesas neste período" TextColor="#94A3B8"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
 
-            </VerticalStackLayout>
-        </ScrollView>
+        <Grid VerticalOptions="End" HeightRequest="80" IgnoreSafeArea="True">
 
-        <Button Grid.Row="1"
-                Text="+" 
-                Command="{Binding ShowAddOptionsCommand}"
-                BackgroundColor="{StaticResource Primary}"
-                TextColor="#002200"
-                FontSize="30"
-                CornerRadius="35"
-                HeightRequest="70"
-                WidthRequest="70"
-                HorizontalOptions="End"
-                VerticalOptions="End"
-                Margin="25"
-                Shadow="{Shadow Radius=10, Offset='0,5', Brush='#00E676'}"/>
+            <Path Fill="#1E293B" StrokeThickness="0" Aspect="Fill" VerticalOptions="Fill" HorizontalOptions="Fill">
+                <Path.Data>
+                    <GeometryGroup>
+                        <PathGeometry Figures="M 0,20 L 0,80 L 400,80 L 400,20 L 260,20 C 260,20 250,20 240,30 C 230,45 220,55 200,55 C 180,55 170,45 160,30 C 150,20 140,20 140,20 Z"/>
+                    </GeometryGroup>
+                </Path.Data>
+                <Path.Shadow>
+                    <Shadow Brush="Black" Offset="0,-2" Radius="10" Opacity="0.2"/>
+                </Path.Shadow>
+            </Path>
 
-        <Grid Grid.RowSpan="2" BackgroundColor="#80000000" IsVisible="{Binding IsLoading}" ZIndex="99">
+            <Grid ColumnDefinitions="*,*,80,*,*" Padding="0,20,0,0">
+                <Grid Grid.Column="0" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToHomeCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Path Data="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" Fill="{StaticResource Primary}" Aspect="Uniform" HeightRequest="24" WidthRequest="24"/>
+                    <Label Text="Início" TextColor="{StaticResource Primary}" FontSize="10" FontAttributes="Bold" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                </Grid>
+
+                <Grid Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToTransactionsCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Path Data="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" Fill="#64748B" Aspect="Uniform" HeightRequest="24" WidthRequest="24"/>
+                    <Label Text="Extrato" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                </Grid>
+
+                <Grid Grid.Column="2" />
+
+                <Grid Grid.Column="3" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToCardsCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Path Data="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" Fill="#64748B" Aspect="Uniform" HeightRequest="24" WidthRequest="24"/>
+                    <Label Text="Cartões" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                </Grid>
+
+                <Grid Grid.Column="4" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToCarCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Path Data="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" Fill="#64748B" Aspect="Uniform" HeightRequest="24" WidthRequest="24"/>
+                    <Label Text="Veículos" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Grid VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,35" InputTransparent="False">
+            <Button x:Name="FabButton"
+                    Command="{Binding ToggleMenuCommand}" 
+                    BackgroundColor="{StaticResource Primary}"
+                    CornerRadius="30"
+                    HeightRequest="60" WidthRequest="60">
+                <Button.Shadow>
+                    <Shadow Brush="#00E676" Offset="0,5" Radius="10" Opacity="0.5"/>
+                </Button.Shadow>
+            </Button>
+            <Path Data="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6V13z"
+                  Fill="#003300" Aspect="Uniform" HeightRequest="24" WidthRequest="24"
+                  HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+        </Grid>
+
+        <Grid BackgroundColor="#CC000000" IsVisible="{Binding IsLoading}">
             <ActivityIndicator IsRunning="{Binding IsLoading}" Color="{StaticResource Primary}" HeightRequest="50" WidthRequest="50" VerticalOptions="Center" HorizontalOptions="Center"/>
         </Grid>
+
     </Grid>
 </ContentPage>

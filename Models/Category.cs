@@ -9,16 +9,14 @@ namespace controle_ja_mobile.Models
 {
     public class Category
     {
-        [JsonPropertyName("id")]
-        public Guid Id { get; set; }
+        [JsonPropertyName("id")] public Guid Id { get; set; }
 
-        [JsonPropertyName("name")]
-        public string Name { get; set; } = string.Empty;
+        [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
 
-        [JsonPropertyName("icon")]
-        public string Icon { get; set; } = ""; // Ex: "food", "car"
+        [JsonPropertyName("categoryType")] public TransactionType Type { get; set; }
 
-        [JsonPropertyName("type")]
-        public TransactionType Type { get; set; } // RECEITA ou DESPESA
+        [JsonPropertyName("icon")] public string Icon { get; set; } = "";
+
+        public string Color { get; set; }
     }
 }

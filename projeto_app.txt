@@ -16,7 +16,7 @@ namespace controle_ja_mobile.Configs
     public static class AppConstants
     {
         public static string BaseUrl => DeviceInfo.Platform == DevicePlatform.Android
-        ? "http://10.0.2.2:8080/controle_ja_api/v1/"
+        ? "http://192.168.100.246:8080/controle_ja_api/v1/"
         : "http://localhost:8080/controle_ja_api/v1/";
 
         public const string AuthStorageKey = "AuthToken";
@@ -50,6 +50,63 @@ namespace controle_ja_mobile.Converters
         {
             return null;
         }
+    }
+}
+
+
+==========================================
+ARQUIVO: Account.cs
+CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Models\Account.cs
+==========================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+
+namespace controle_ja_mobile.Models
+{
+    public class Account
+    {
+        [JsonPropertyName("id")]
+        public Guid Id { get; set; }
+
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = string.Empty;
+
+        [JsonPropertyName("balance")]
+        public decimal Balance { get; set; }
+    }
+}
+
+
+==========================================
+ARQUIVO: Category.cs
+CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Models\Category.cs
+==========================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+
+namespace controle_ja_mobile.Models
+{
+    public class Category
+    {
+        [JsonPropertyName("id")] public Guid Id { get; set; }
+
+        [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
+
+        [JsonPropertyName("categoryType")] public TransactionType Type { get; set; }
+
+        [JsonPropertyName("icon")] public string Icon { get; set; } = "";
+
+        public string Color { get; set; }
     }
 }
 
@@ -403,6 +460,89 @@ namespace controle_ja_mobile.Models
 
 
 ==========================================
+ARQUIVO: colors.xml
+CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Platforms\Android\Resources\values\colors.xml
+==========================================
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#512BD4</color>
+    <color name="colorPrimaryDark">#2B0B98</color>
+    <color name="colorAccent">#2B0B98</color>
+</resources>
+
+
+==========================================
+ARQUIVO: AndroidManifest.xml
+CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Platforms\Android\Resources\AndroidManifest.xml
+==========================================
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.cainanbt.softwares.controle_ja_mobile">
+
+  <application android:allowBackup="true" android:icon="@mipmap/app_icon" android:supportsRtl="true" android:usesCleartextTraffic="true">
+  </application>
+
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.INTERNET" />
+
+  <queries>
+    <intent>
+      <action android:name="android.support.customtabs.action.CustomTabsService" />
+    </intent>
+  </queries>
+
+</manifest>
+
+
+==========================================
+ARQUIVO: AndroidManifest.xml
+CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Platforms\Android\AndroidManifest.xml
+==========================================
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.cainanbt.softwares.controle_ja_mobile">
+
+  <application android:allowBackup="true" android:icon="@mipmap/app_icon" android:supportsRtl="true" android:usesCleartextTraffic="true">
+  </application>
+
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.INTERNET" />
+
+  <queries>
+    <intent>
+      <action android:name="android.support.customtabs.action.CustomTabsService" />
+    </intent>
+  </queries>
+
+</manifest>
+
+
+==========================================
+ARQUIVO: GoogleAuthActivity.cs
+CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Platforms\Android\GoogleAuthActivity.cs
+==========================================
+
+using Android.App;
+using Android.Content;
+using Android.Content.PM;
+
+namespace controle_ja_mobile
+{
+    // Essa Activity só acorda quando o Google chama o link "com.googleusercontent..."
+    [Activity(NoHistory = true, LaunchMode = LaunchMode.SingleTop, Exported = true)]
+    [IntentFilter(
+        new[] { Intent.ActionView },
+        Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
+        DataScheme = "com.googleusercontent.apps.336338674705-v2hntbb10rnof4mrrkf8k03c2ot1opv9")] // SEU ID REVERSO
+    public class GoogleAuthActivity : Microsoft.Maui.Authentication.WebAuthenticatorCallbackActivity
+    {
+        // Não precisa de código. A herança já faz o trabalho de avisar o App.
+    }
+}
+
+
+==========================================
 ARQUIVO: MainActivity.cs
 CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Platforms\Android\MainActivity.cs
 ==========================================
@@ -413,10 +553,13 @@ using Android.OS;
 
 namespace controle_ja_mobile
 {
-    [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
+    [Activity(
+        Theme = "@style/Maui.SplashTheme", 
+        MainLauncher = true,
+        LaunchMode = LaunchMode.SingleTop,
+        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
     public class MainActivity : MauiAppCompatActivity
-    {
-    }
+    {}
 }
 
 
@@ -545,6 +688,28 @@ namespace controle_ja_mobile
         }
     }
 }
+
+
+==========================================
+ARQUIVO: tizen-manifest.xml
+CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Platforms\Tizen\tizen-manifest.xml
+==========================================
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="maui-application-id-placeholder" version="0.0.0" api-version="8" xmlns="http://tizen.org/ns/packages">
+  <profile name="common" />
+  <ui-application appid="maui-application-id-placeholder" exec="controle_ja_mobile.dll" multiple="false" nodisplay="false" taskmanage="true" type="dotnet" launch_mode="single">
+    <label>maui-application-title-placeholder</label>
+    <icon>maui-appicon-placeholder</icon>
+    <metadata key="http://tizen.org/metadata/prefer_dotnet_aot" value="true" />
+  </ui-application>
+  <shortcut-list />
+  <privileges>
+    <privilege>http://tizen.org/privilege/internet</privilege>
+  </privileges> 
+  <dependencies />
+  <provides-appdefined-privileges />
+</manifest>
 
 
 ==========================================
@@ -891,11 +1056,10 @@ CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Servic
 
 using controle_ja_mobile.Configs;
 using controle_ja_mobile.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Text;
-using System.Threading.Tasks;
+using System.Security.Cryptography; // Necessário para a segurança do Google
 
 namespace controle_ja_mobile.Services
 {
@@ -908,6 +1072,104 @@ namespace controle_ja_mobile.Services
             _apiService = apiService;
         }
 
+        // --- LOGIN COM GOOGLE (FLUXO SEGURO PKCE) ---
+        public async Task<bool> LoginWithGoogleAsync()
+        {
+            try
+            {
+                string clientId = "336338674705-v2hntbb10rnof4mrrkf8k03c2ot1opv9.apps.googleusercontent.com";
+                string redirectUri = "com.googleusercontent.apps.336338674705-v2hntbb10rnof4mrrkf8k03c2ot1opv9:/";
+
+                // 1. Gera chaves de segurança (PKCE)
+                string codeVerifier = GenerateCodeVerifier();
+                string codeChallenge = GenerateCodeChallenge(codeVerifier);
+
+                // 2. Monta URL pedindo CÓDIGO (response_type=code) - Isso resolve o Erro 400
+                string authUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
+                                 $"?client_id={clientId}" +
+                                 "&response_type=code" +
+                                 $"&redirect_uri={redirectUri}" +
+                                 $"&code_challenge={codeChallenge}" +
+                                 "&code_challenge_method=S256" +
+                                 "&scope=email%20profile%20openid";
+
+                // 3. Chama o navegador
+                var result = await WebAuthenticator.Default.AuthenticateAsync(
+                    new Uri(authUrl),
+                    new Uri(redirectUri));
+
+                // 4. Troca o código recebido pelo Token de Acesso
+                if (result?.Properties != null && result.Properties.ContainsKey("code"))
+                {
+                    string code = result.Properties["code"];
+                    string accessToken = await ExchangeCodeForToken(code, codeVerifier, clientId, redirectUri);
+
+                    if (!string.IsNullOrEmpty(accessToken))
+                    {
+                        return await FinalizeGoogleLogin(accessToken);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erro Google Auth: {ex.Message}");
+            }
+            return false;
+        }
+
+        private async Task<bool> FinalizeGoogleLogin(string accessToken)
+        {
+            var userInfo = await GetGoogleUserInfo(accessToken);
+            if (userInfo != null)
+            {
+                var payload = new
+                {
+                    email = userInfo.email,
+                    googleId = userInfo.id,
+                    displayName = userInfo.name,
+                    photoUrl = userInfo.picture
+                };
+
+                var apiResult = await _apiService.PostAsync<UserResponse>("auth/google", payload);
+
+                if (apiResult?.Tokens?.AccessToken != null)
+                {
+                    Preferences.Set(AppConstants.AuthStorageKey, apiResult.Tokens.AccessToken);
+                    Preferences.Set("UserName", apiResult.Username);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Troca o código pelo token (Obrigatório no fluxo PKCE)
+        private async Task<string> ExchangeCodeForToken(string code, string codeVerifier, string clientId, string redirectUri)
+        {
+            try
+            {
+                var client = new HttpClient();
+                var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("code", code),
+                    new KeyValuePair<string, string>("client_id", clientId),
+                    new KeyValuePair<string, string>("redirect_uri", redirectUri),
+                    new KeyValuePair<string, string>("grant_type", "authorization_code"),
+                    new KeyValuePair<string, string>("code_verifier", codeVerifier)
+                });
+
+                var response = await client.PostAsync("https://oauth2.googleapis.com/token", content);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var tokenData = JsonSerializer.Deserialize<GoogleTokenResponse>(json);
+                    return tokenData?.access_token;
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        // --- MÉTODOS DE SUPORTE (LOGIN NORMAL E REGISTRO) ---
         public async Task<bool> loginAsync(string email, string password)
         {
             var loginData = new LoginRequest { email = email, password = password };
@@ -919,21 +1181,52 @@ namespace controle_ja_mobile.Services
                 Preferences.Set("UserName", nameToSave);
                 return true;
             }
-
             return false;
         }
+
         public async Task<bool> RegisterAsync(string name, string email, string password)
         {
-            var registerData = new
-            {
-                username = name,
-                email = email,
-                password = password,
-                role = UserRole.USER
-            };
+            var registerData = new { username = name, email = email, password = password, role = UserRole.USER };
             var result = await _apiService.PostAsync<UserResponse>("users/register", registerData);
             return result != null;
         }
+
+        private async Task<GoogleUser> GetGoogleUserInfo(string accessToken)
+        {
+            try
+            {
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                var json = await client.GetStringAsync("https://www.googleapis.com/oauth2/v2/userinfo");
+                return JsonSerializer.Deserialize<GoogleUser>(json);
+            }
+            catch { return null; }
+        }
+
+        // CRIPTOGRAFIA PARA O GOOGLE
+        private string GenerateCodeVerifier()
+        {
+            var bytes = new byte[32];
+            using (var rng = RandomNumberGenerator.Create()) { rng.GetBytes(bytes); }
+            return Base64UrlEncode(bytes);
+        }
+
+        private string GenerateCodeChallenge(string codeVerifier)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var challengeBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier));
+                return Base64UrlEncode(challengeBytes);
+            }
+        }
+
+        private string Base64UrlEncode(byte[] bytes)
+        {
+            return Convert.ToBase64String(bytes).Replace("+", "-").Replace("/", "_").TrimEnd('=');
+        }
+
+        private class GoogleTokenResponse { public string access_token { get; set; } }
+        private class GoogleUser { public string id { get; set; } public string email { get; set; } public string name { get; set; } public string picture { get; set; } }
     }
 }
 
@@ -1110,42 +1403,98 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
+using controle_ja_mobile.Views.Privates;
 using Microcharts;
 using SkiaSharp;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace controle_ja_mobile.ViewModels
 {
     public partial class DashboardViewModel : ObservableObject
     {
         private readonly ApiService _apiService;
-        private readonly CultureInfo _culture = new CultureInfo("pt-BR"); // Força Brasil
-        
+        private readonly CultureInfo _culture = new CultureInfo("pt-BR");
+
+        // --- PROPRIEDADES ---
         [ObservableProperty] private DateTime currentDate;
         [ObservableProperty] private string currentMonthDisplay;
         [ObservableProperty] private string userName;
+
         [ObservableProperty] private string balance;
         [ObservableProperty] private string income;
         [ObservableProperty] private string expense;
-        [ObservableProperty] private Chart expenseChart;
-        [ObservableProperty] private bool isLoading;
-        [ObservableProperty] private bool hasChartData;
 
+        [ObservableProperty] private Chart expenseChart;
+        [ObservableProperty] private bool hasChartData;
+        [ObservableProperty] private bool isLoading;
+
+        // Controle do Menu
+        [ObservableProperty] private bool isMenuOpen;
 
         public DashboardViewModel(ApiService apiService)
         {
             _apiService = apiService;
-            UserName = Preferences.Get("UserName", "Usuário");
-
+            userName = Preferences.Get("UserName", "Usuário");
             currentDate = DateTime.Now;
             UpdateMonthDisplay();
         }
+
+        // --- COMANDOS DO MENU FLUTUANTE ---
+
+        [RelayCommand]
+        public void ToggleMenu()
+        {
+            IsMenuOpen = !IsMenuOpen;
+        }
+
+        [RelayCommand]
+        public async Task GoToNewIncome()
+        {
+            IsMenuOpen = false;
+            await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=RECEITA");
+        }
+
+        [RelayCommand]
+        public async Task GoToNewExpense()
+        {
+            IsMenuOpen = false;
+            await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=DESPESA");
+        }
+
+        // --- COMANDOS DA BARRA DE NAVEGAÇÃO (NOVO) ---
+
+        [RelayCommand]
+        public async Task GoToHome()
+        {
+            // Já estamos na Home, apenas recarrega
+            await LoadData();
+        }
+
+        [RelayCommand]
+        public async Task GoToTransactions()
+        {
+            await Shell.Current.DisplayAlert("Em Breve", "Extrato será implementado aqui!", "OK");
+        }
+
+        [RelayCommand]
+        public async Task GoToCards()
+        {
+            await Shell.Current.DisplayAlert("Em Breve", "Gestão de Cartões será aqui!", "OK");
+        }
+
+        [RelayCommand]
+        public async Task GoToCar()
+        {
+            await Shell.Current.DisplayAlert("Em Breve", "Gestão de Veículos será aqui!", "OK");
+        }
+
+        [RelayCommand]
+        public async Task GoToSettings()
+        {
+            await Shell.Current.DisplayAlert("Configurações", "Tela de perfil e conta.", "OK");
+        }
+
+        // --- COMANDOS DE DATA ---
 
         private void UpdateMonthDisplay()
         {
@@ -1167,6 +1516,8 @@ namespace controle_ja_mobile.ViewModels
             UpdateMonthDisplay();
         }
 
+        // --- CARREGAR DADOS ---
+
         [RelayCommand]
         public async Task LoadData()
         {
@@ -1175,15 +1526,13 @@ namespace controle_ja_mobile.ViewModels
 
             try
             {
-                // Datas (Início e Fim do Mês)
-                var now = DateTime.Now;
+                var now = CurrentDate;
                 var firstDay = new DateTime(now.Year, now.Month, 1);
                 var lastDay = firstDay.AddMonths(1).AddSeconds(-1);
 
                 long start = new DateTimeOffset(firstDay).ToUnixTimeMilliseconds();
                 long end = new DateTimeOffset(lastDay).ToUnixTimeMilliseconds();
 
-                // Chamadas API
                 var tSummary = _apiService.GetAsync<FinancialSummary>($"dashboard/summary?start={start}&end={end}");
                 var tChart = _apiService.GetAsync<List<ChartData>>($"dashboard/expenses-category?start={start}&end={end}");
 
@@ -1192,7 +1541,6 @@ namespace controle_ja_mobile.ViewModels
                 var summary = await tSummary;
                 var chartData = await tChart;
 
-                // 1. Atualiza Cards (Forçando R$)
                 if (summary != null)
                 {
                     Balance = summary.Balance.ToString("C", _culture);
@@ -1206,11 +1554,9 @@ namespace controle_ja_mobile.ViewModels
                     Expense = 0.ToString("C", _culture);
                 }
 
-                // 2. Lógica do Gráfico vs Estado Vazio
                 if (chartData != null && chartData.Any(x => x.Value > 0))
                 {
-                    hasChartData = true; // Mostra gráfico
-
+                    HasChartData = true;
                     var entries = new List<ChartEntry>();
                     var colors = new[] { "#00E676", "#2979FF", "#FFAB00", "#FF5252", "#E040FB" };
                     int i = 0;
@@ -1238,33 +1584,17 @@ namespace controle_ja_mobile.ViewModels
                 }
                 else
                 {
-                    HasChartData = false; // Mostra mensagem "Sem dados"
+                    HasChartData = false;
                     ExpenseChart = null;
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Erro: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Erro Dashboard: {ex.Message}");
             }
             finally
             {
                 IsLoading = false;
-            }
-        }
-
-        [RelayCommand]
-        public async Task ShowAddOptions()
-        {
-            string action = await App.Current.MainPage.DisplayActionSheet("Novo Lançamento", "Cancelar", null, "Nova Despesa", "Nova Receita");
-
-            if (action == "Nova Despesa")
-            {
-                // Navega passando o tipo via QueryParameter
-                await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=DESPESA");
-            }
-            else if (action == "Nova Receita")
-            {
-                await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=RECEITA");
             }
         }
     }
@@ -1340,6 +1670,34 @@ namespace controle_ja_mobile.ViewModels
         {
             var registerPage = IPlatformApplication.Current.Services.GetService<RegisterPage>();
             await Application.Current.MainPage.Navigation.PushAsync(registerPage);
+        }
+
+        [RelayCommand]
+        public async Task GoogleLogin()
+        {
+            IsLoading = true;
+            try
+            {
+
+                bool success = await _authService.LoginWithGoogleAsync();
+
+                if (success)
+                {
+                    Application.Current.MainPage = new AppShell();
+                }
+                else
+                {
+                    await App.Current.MainPage.DisplayAlert("Erro", "Falha no login com Google", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Erro", ex.Message, "OK");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
     }
 }
@@ -1429,6 +1787,268 @@ namespace controle_ja_mobile.ViewModels
             // Volta para a tela anterior na pilha de navegação
             await Application.Current.MainPage.Navigation.PopAsync();
         }
+    }
+}
+
+
+==========================================
+ARQUIVO: TransactionAddViewModel.cs
+CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\ViewModels\TransactionAddViewModel.cs
+==========================================
+
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using controle_ja_mobile.Models;
+using controle_ja_mobile.Services;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace controle_ja_mobile.ViewModels
+{
+    public partial class TransactionAddViewModel : ObservableObject, IQueryAttributable
+    {
+        private readonly ApiService _apiService;
+
+        public ObservableCollection<Category> Categories { get; } = new();
+
+        public ObservableCollection<PaymentSource> PaymentSources { get; } = new();
+
+        [ObservableProperty] private string pageTitle;
+        [ObservableProperty] private string themeColor;
+
+        [ObservableProperty] private string description;
+        [ObservableProperty] private string amount;
+        [ObservableProperty] private DateTime date = DateTime.Now;
+        [ObservableProperty] private bool isPaid = true; 
+
+        [ObservableProperty] private Category selectedCategory;
+
+        [ObservableProperty]
+        private PaymentSource selectedSource;
+
+        [ObservableProperty] private bool showInstallmentOption; // Controla visibilidade
+        [ObservableProperty] private bool isInstallment;
+        [ObservableProperty] private string installmentCount = "1";
+
+        [ObservableProperty] private bool isRecurring;
+        [ObservableProperty] private bool isLoading;
+
+        private TransactionType _currentType;
+
+        public TransactionAddViewModel(ApiService apiService)
+        {
+            _apiService = apiService;
+        }
+
+        [RelayCommand]
+        public async Task SaveAndContinue()
+        {
+            bool success = await SaveInternal();
+            if (success)
+            {
+                await App.Current.MainPage.DisplayAlert("Salvo!", "Lançamento registrado. Pode inserir o próximo.", "OK");
+
+                Amount = string.Empty;     
+                Description = string.Empty;
+            }
+        }
+
+        private async Task<bool> SaveInternal()
+        {
+            if (string.IsNullOrWhiteSpace(Description) || string.IsNullOrWhiteSpace(Amount))
+            {
+                await App.Current.MainPage.DisplayAlert("Atenção", "Preencha a Descrição e o Valor.", "OK");
+                return false;
+            }
+
+            if (SelectedCategory == null || SelectedSource == null)
+            {
+                await App.Current.MainPage.DisplayAlert("Atenção", "Selecione a Categoria e a Conta/Cartão.", "OK");
+                return false;
+            }
+            string cleanAmount = Amount.Replace("R$", "").Trim(); // Remove R$ se vier
+            if (!decimal.TryParse(cleanAmount, out decimal decimalAmount))
+            {
+                await App.Current.MainPage.DisplayAlert("Erro", "Valor inválido. Digite apenas números.", "OK");
+                return false;
+            }
+
+            IsLoading = true;
+            try
+            {
+                var transaction = new
+                {
+                    name = Description,
+                    type = _currentType.ToString(),
+                    amount = decimalAmount,
+                    date = new DateTimeOffset(Date).ToUnixTimeMilliseconds(),
+                    paid = IsPaid,
+                    categoryId = SelectedCategory.Id,
+                    accountId = SelectedSource.Type == "ACCOUNT" ? SelectedSource.Id : (Guid?)null,
+                    creditCardId = SelectedSource.Type == "CREDIT_CARD" ? SelectedSource.Id : (Guid?)null,
+                    installments = IsInstallment && int.TryParse(InstallmentCount, out int i) ? i : 1,
+                    isRecurring = IsRecurring
+                };
+
+                var result = await _apiService.PostAsync<TransactionModel>("transactions", transaction);
+
+                if (result == null)
+                {
+                    await App.Current.MainPage.DisplayAlert("Erro", "O servidor recusou o salvamento.", "OK");
+                    return false;
+                }
+
+                return true;
+            }catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Erro Crítico", ex.Message, "OK");
+                return false;
+            }
+            finally { IsLoading = false; }
+        }
+
+
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            if (query.ContainsKey("type"))
+            {
+                var typeString = query["type"].ToString();
+                if (Enum.TryParse(typeString, out TransactionType parsedType))
+                {
+                    _currentType = parsedType;
+                    SetupScreen();
+                }
+            }
+        }
+
+        partial void OnSelectedSourceChanged(PaymentSource value)
+        {
+            if (value != null && value.Type == "CREDIT_CARD" && _currentType == TransactionType.DESPESA)
+            {
+                ShowInstallmentOption = true;
+                IsPaid = false;
+            }
+            else
+            {
+                ShowInstallmentOption = false;
+                IsInstallment = false;
+            }
+        }
+
+        private async void SetupScreen()
+        {
+            if (_currentType == TransactionType.DESPESA)
+            {
+                PageTitle = "Nova Despesa";
+                ThemeColor = "#FF5252";
+            }
+            else
+            {
+                PageTitle = "Nova Receita";
+                ThemeColor = "#00E676";
+            }
+            await LoadDependencies();
+        }
+
+        private async Task LoadDependencies()
+        {
+            IsLoading = true;
+            try
+            {
+                var tCats = _apiService.GetAsync<List<Category>>("categories");
+                var tAccs = _apiService.GetAsync<List<Account>>("accounts");
+                var tCards = _apiService.GetAsync<List<CreditCard>>("cards"); // Pega cartões também
+
+                await Task.WhenAll(tCats, tAccs, tCards);
+
+                var cats = await tCats;
+                var accs = await tAccs;
+                var cards = await tCards;
+
+                // 1. Categorias
+                Categories.Clear();
+                if (cats != null)
+                {
+                    foreach (var c in cats.Where(x => x.Type == _currentType)) Categories.Add(c);
+                }
+
+                // 2. Fontes de Pagamento (Junta Contas + Cartões)
+                PaymentSources.Clear();
+                if (accs != null)
+                {
+                    foreach (var a in accs)
+                        PaymentSources.Add(new PaymentSource { Id = a.Id, Name = a.Name, Type = "ACCOUNT" });
+                }
+                // Só mostra cartões se for DESPESA
+                if (cards != null && _currentType == TransactionType.DESPESA)
+                {
+                    foreach (var c in cards)
+                        PaymentSources.Add(new PaymentSource { Id = c.Id, Name = $"Cartão: {c.Name}", Type = "CREDIT_CARD" });
+                }
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        [RelayCommand]
+        public async Task AddNewCategory()
+        {
+            string result = await App.Current.MainPage.DisplayPromptAsync("Nova Categoria", "Nome da categoria:");
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                IsLoading = true;
+                var newCat = new Category { Name = result, Type = _currentType };
+                var savedCat = await _apiService.PostAsync<Category>("categories", newCat);
+
+                if (savedCat != null)
+                {
+                    Categories.Add(savedCat);
+                    SelectedCategory = savedCat; // Já seleciona a nova
+                }
+                IsLoading = false;
+            }
+        }
+
+
+        // Botão "Salvar e Sair"
+        [RelayCommand]
+        public async Task SaveAndClose()
+        {
+            bool success = await SaveInternal();
+            if (success)
+            {
+                await Shell.Current.GoToAsync("..");
+            }
+        }
+
+        [RelayCommand]
+        public async Task Cancel() => await Shell.Current.GoToAsync("..");
+
+        partial void OnSelectedCategoryChanged(Category value)
+        {
+            if (value != null && !string.IsNullOrEmpty(value.Color))
+            {
+                // Muda a cor do tema da página para a cor da categoria (Feedback visual instantâneo)
+                ThemeColor = value.Color;
+            }
+        }
+    }
+
+    // Classe auxiliar para o Dropdown misto
+    public class PaymentSource
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Type { get; set; } // "ACCOUNT" ou "CREDIT_CARD"
     }
 }
 
@@ -1805,105 +2425,193 @@ CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Views\
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="{StaticResource PageBackgroundColorDark}">
 
-    <Grid RowDefinitions="Auto, *">
+    <Grid>
+        <Grid RowDefinitions="Auto, *">
 
-        <Grid Grid.Row="0" RowDefinitions="Auto, Auto" Padding="25,15,25,10">
-
-            <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Padding="25,15,25,10">
                 <VerticalStackLayout>
                     <Label Text="Bem-vindo," TextColor="{StaticResource TextSecondaryDark}" FontSize="14"/>
                     <Label Text="{Binding UserName}" TextColor="{StaticResource TextPrimaryDark}" FontSize="20" FontAttributes="Bold"/>
                 </VerticalStackLayout>
-                <Border Grid.Column="1" Stroke="Transparent" HeightRequest="45" WidthRequest="45" StrokeShape="RoundRectangle 25">
-                    <Image Source="logo_controle.png" Aspect="AspectFit"/>
-                </Border>
+
+                <HorizontalStackLayout Grid.Column="1" Spacing="15">
+                    <Border StrokeThickness="0" BackgroundColor="#1E293B" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToSettingsCommand}"/>
+                        </Border.GestureRecognizers>
+                        <Path Data="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.49l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+                              Fill="#94A3B8" Aspect="Uniform" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                    <Border Stroke="Transparent" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20">
+                        <Image Source="logo_controle.png" Aspect="AspectFit"/>
+                    </Border>
+                </HorizontalStackLayout>
             </Grid>
 
-            <Border Grid.Row="1" Margin="0,15,0,0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="5">
-                <Grid ColumnDefinitions="40, *, 40">
-                    <ImageButton Grid.Column="0" Source="arrow_left.png" Command="{Binding PreviousMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
-                    <Label Grid.Column="1" Text="{Binding CurrentMonthDisplay}" 
-                           TextColor="{StaticResource TextPrimaryDark}" FontAttributes="Bold" 
-                           HorizontalOptions="Center" VerticalOptions="Center" TextTransform="Uppercase"/>
-
-                    <ImageButton Grid.Column="2" Source="arrow_right.png" Command="{Binding NextMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
-                </Grid>
-            </Border>
-        </Grid>
-
-        <ScrollView Grid.Row="1" Padding="0,0,0,80">
-            <VerticalStackLayout Spacing="20">
-
-                <Border Margin="25,5" StrokeThickness="0" StrokeShape="RoundRectangle 24" HeightRequest="130">
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Color="#00E676" Offset="0.0" />
-                            <GradientStop Color="#00A854" Offset="1.0" />
-                        </LinearGradientBrush>
-                    </Border.Background>
-                    <Border.Shadow>
-                        <Shadow Brush="#00E676" Offset="0,8" Radius="20" Opacity="0.3"/>
-                    </Border.Shadow>
-
-                    <VerticalStackLayout Padding="25" VerticalOptions="Center" Spacing="2">
-                        <Label Text="PatrimÃ´nio Total" TextColor="#003300" FontSize="14" Opacity="0.8"/>
-                        <Label Text="{Binding Balance}" TextColor="#002200" FontSize="36" FontAttributes="Bold"/>
-                    </VerticalStackLayout>
-                </Border>
-
-                <Grid ColumnDefinitions="*, *" ColumnSpacing="15" Padding="25,0">
-                    <Border Grid.Column="0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="15" HeightRequest="90">
-                        <VerticalStackLayout Spacing="5" VerticalOptions="Center">
-                            <Label Text="Entradas" TextColor="{StaticResource TextSecondaryDark}" FontSize="12"/>
-                            <Label Text="{Binding Income}" TextColor="{StaticResource Primary}" FontSize="16" FontAttributes="Bold"/>
-                        </VerticalStackLayout>
-                    </Border>
-                    <Border Grid.Column="1" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="15" HeightRequest="90">
-                        <VerticalStackLayout Spacing="5" VerticalOptions="Center">
-                            <Label Text="SaÃ­das" TextColor="{StaticResource TextSecondaryDark}" FontSize="12"/>
-                            <Label Text="{Binding Expense}" TextColor="#EF4444" FontSize="16" FontAttributes="Bold"/>
-                        </VerticalStackLayout>
-                    </Border>
-                </Grid>
-
-                <VerticalStackLayout Padding="25,0">
-                    <Label Text="AnÃ¡lise de Gastos" TextColor="{StaticResource TextPrimaryDark}" FontSize="18" FontAttributes="Bold" Margin="0,0,0,10"/>
-
-                    <Border BackgroundColor="#1E293B" StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="10" HeightRequest="250">
-                        <Grid>
-                            <micro:ChartView IsVisible="{Binding HasChartData}" Chart="{Binding ExpenseChart}" BackgroundColor="Transparent" />
-
-                            <VerticalStackLayout IsVisible="{Binding HasChartData, Converter={StaticResource InvertedBoolConverter}}" 
-                                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="15" Opacity="0.6">
-                                <Border HeightRequest="100" WidthRequest="100" StrokeShape="RoundRectangle 50" BackgroundColor="#2D3A4F" StrokeThickness="0">
-                                    <Label Text="!" FontSize="40" TextColor="#94A3B8" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                </Border>
-                                <Label Text="Sem despesas neste perÃ­odo" TextColor="#94A3B8"/>
-                            </VerticalStackLayout>
+            <ScrollView Grid.Row="1" Padding="0,0,0,120">
+                <VerticalStackLayout Spacing="20">
+                    <Border Margin="25,0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="5">
+                        <Grid ColumnDefinitions="40, *, 40">
+                            <ImageButton Grid.Column="0" Source="arrow_left.png" Command="{Binding PreviousMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
+                            <Label Grid.Column="1" Text="{Binding CurrentMonthDisplay}" TextColor="{StaticResource TextPrimaryDark}" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextTransform="Uppercase"/>
+                            <ImageButton Grid.Column="2" Source="arrow_right.png" Command="{Binding NextMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
                         </Grid>
                     </Border>
+
+                    <Border Margin="25,5" StrokeThickness="0" StrokeShape="RoundRectangle 24" HeightRequest="130">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#00E676" Offset="0.0" />
+                                <GradientStop Color="#00A854" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.Shadow>
+                            <Shadow Brush="#00E676" Offset="0,8" Radius="15" Opacity="0.3"/>
+                        </Border.Shadow>
+                        <VerticalStackLayout Padding="25" VerticalOptions="Center" Spacing="2">
+                            <Label Text="PatrimÃ´nio Total" TextColor="#003300" FontSize="14" Opacity="0.8"/>
+                            <Label Text="{Binding Balance}" TextColor="#002200" FontSize="36" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="15" Padding="25,0">
+                        <Border Grid.Column="0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="15" HeightRequest="90">
+                            <VerticalStackLayout Spacing="5" VerticalOptions="Center">
+                                <Label Text="Entradas" TextColor="{StaticResource TextSecondaryDark}" FontSize="12"/>
+                                <Label Text="{Binding Income}" TextColor="{StaticResource Primary}" FontSize="16" FontAttributes="Bold"/>
+                            </VerticalStackLayout>
+                        </Border>
+                        <Border Grid.Column="1" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="15" HeightRequest="90">
+                            <VerticalStackLayout Spacing="5" VerticalOptions="Center">
+                                <Label Text="SaÃ­das" TextColor="{StaticResource TextSecondaryDark}" FontSize="12"/>
+                                <Label Text="{Binding Expense}" TextColor="#EF4444" FontSize="16" FontAttributes="Bold"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+
+                    <VerticalStackLayout Padding="25,0">
+                        <Label Text="AnÃ¡lise de Gastos" TextColor="{StaticResource TextPrimaryDark}" FontSize="18" FontAttributes="Bold" Margin="0,0,0,10"/>
+                        <Border BackgroundColor="#1E293B" StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="10" HeightRequest="250">
+                            <Grid>
+                                <micro:ChartView IsVisible="{Binding HasChartData}" Chart="{Binding ExpenseChart}" BackgroundColor="Transparent" />
+                                <VerticalStackLayout IsVisible="{Binding HasChartData, Converter={StaticResource InvertedBoolConverter}}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="15" Opacity="0.6">
+                                    <Border HeightRequest="100" WidthRequest="100" StrokeShape="RoundRectangle 50" BackgroundColor="#2D3A4F" StrokeThickness="0">
+                                        <Label Text="!" FontSize="40" TextColor="#94A3B8" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                    </Border>
+                                    <Label Text="Sem despesas neste perÃ­odo" TextColor="#94A3B8"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
 
-            </VerticalStackLayout>
-        </ScrollView>
+        <Grid BackgroundColor="#CC000000" IsVisible="{Binding IsMenuOpen}" IgnoreSafeArea="True">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ToggleMenuCommand}"/>
+            </Grid.GestureRecognizers>
+        </Grid>
 
-        <Button Grid.Row="1"
-                Text="+" 
-                Command="{Binding ShowAddOptionsCommand}"
-                BackgroundColor="{StaticResource Primary}"
-                TextColor="#002200"
-                FontSize="30"
-                CornerRadius="35"
-                HeightRequest="70"
-                WidthRequest="70"
-                HorizontalOptions="End"
-                VerticalOptions="End"
-                Margin="25"
-                Shadow="{Shadow Radius=10, Offset='0,5', Brush='#00E676'}"/>
+        <Grid VerticalOptions="End" HeightRequest="80" IgnoreSafeArea="True">
 
-        <Grid Grid.RowSpan="2" BackgroundColor="#80000000" IsVisible="{Binding IsLoading}" ZIndex="99">
+            <Path Fill="#1E293B" StrokeThickness="0" Aspect="Fill" VerticalOptions="Fill" HorizontalOptions="Fill">
+                <Path.Data>
+                    <GeometryGroup>
+                        <PathGeometry Figures="M 0,20 L 0,80 L 400,80 L 400,20 L 260,20 C 260,20 250,20 240,30 C 230,45 220,55 200,55 C 180,55 170,45 160,30 C 150,20 140,20 140,20 Z"/>
+                    </GeometryGroup>
+                </Path.Data>
+                <Path.Shadow>
+                    <Shadow Brush="Black" Offset="0,-2" Radius="10" Opacity="0.2"/>
+                </Path.Shadow>
+            </Path>
+
+            <Grid ColumnDefinitions="*,*,80,*,*" Padding="0,20,0,0">
+                <Grid Grid.Column="0" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToHomeCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Path Data="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" Fill="{StaticResource Primary}" Aspect="Uniform" HeightRequest="24" WidthRequest="24"/>
+                    <Label Text="InÃ­cio" TextColor="{StaticResource Primary}" FontSize="10" FontAttributes="Bold" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                </Grid>
+
+                <Grid Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToTransactionsCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Path Data="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" Fill="#64748B" Aspect="Uniform" HeightRequest="24" WidthRequest="24"/>
+                    <Label Text="Extrato" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                </Grid>
+
+                <Grid Grid.Column="2" />
+
+                <Grid Grid.Column="3" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToCardsCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Path Data="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" Fill="#64748B" Aspect="Uniform" HeightRequest="24" WidthRequest="24"/>
+                    <Label Text="CartÃµes" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                </Grid>
+
+                <Grid Grid.Column="4" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToCarCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Path Data="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" Fill="#64748B" Aspect="Uniform" HeightRequest="24" WidthRequest="24"/>
+                    <Label Text="VeÃ­culos" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Grid VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,25"
+              InputTransparent="True" CascadeInputTransparent="False">
+
+            <Button x:Name="BtnIncome"
+                    Command="{Binding GoToNewIncomeCommand}"
+                    BackgroundColor="#00E676"
+                    HeightRequest="50" WidthRequest="50" CornerRadius="25"
+                    Opacity="0"
+                    InputTransparent="True">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="5" Opacity="0.3"/>
+                </Button.Shadow>
+            </Button>
+            <Path x:Name="IconIncome" Data="M12,4l-1.41,1.41L15.17,10H4v2h11.17l-4.58,4.59L12,18l8-8L12,4z"
+                  Fill="#003300" Aspect="Uniform" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center" Rotation="-90" Opacity="0"/>
+
+            <Button x:Name="BtnExpense"
+                    Command="{Binding GoToNewExpenseCommand}"
+                    BackgroundColor="#FF5252"
+                    HeightRequest="50" WidthRequest="50" CornerRadius="25"
+                    Opacity="0"
+                    InputTransparent="True">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="5" Opacity="0.3"/>
+                </Button.Shadow>
+            </Button>
+            <Path x:Name="IconExpense" Data="M12,4l-1.41,1.41L15.17,10H4v2h11.17l-4.58,4.59L12,18l8-8L12,4z"
+                  Fill="White" Aspect="Uniform" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center" Rotation="90" Opacity="0"/>
+
+            <Button x:Name="FabButton"
+                    Command="{Binding ToggleMenuCommand}"
+                    BackgroundColor="{StaticResource Primary}"
+                    CornerRadius="30"
+                    HeightRequest="60" WidthRequest="60"
+                    Margin="0,0,0,10">
+                <Button.Shadow>
+                    <Shadow Brush="#00E676" Offset="0,5" Radius="10" Opacity="0.5"/>
+                </Button.Shadow>
+            </Button>
+
+            <Path Data="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6V13z"
+                  Fill="#003300" Aspect="Uniform" HeightRequest="24" WidthRequest="24"
+                  HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True" Margin="0,0,0,10"/>
+        </Grid>
+
+        <Grid BackgroundColor="#CC000000" IsVisible="{Binding IsLoading}">
             <ActivityIndicator IsRunning="{Binding IsLoading}" Color="{StaticResource Primary}" HeightRequest="50" WidthRequest="50" VerticalOptions="Center" HorizontalOptions="Center"/>
         </Grid>
+
     </Grid>
 </ContentPage>
 
@@ -1920,11 +2628,68 @@ namespace controle_ja_mobile.Views.Privates;
 public partial class DashboardPage : ContentPage
 {
     private readonly DashboardViewModel _viewModel;
+
     public DashboardPage(DashboardViewModel vm)
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
         _viewModel = vm;
         BindingContext = _viewModel;
+
+        // Escuta mudanças na ViewModel para disparar animações
+        _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+    }
+
+    private async void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DashboardViewModel.IsMenuOpen))
+        {
+            if (_viewModel.IsMenuOpen)
+            {
+                // --- ABRIR MENU (Explosão) ---
+
+                // 1. Habilita visibilidade e clique
+                BtnIncome.Opacity = 1; IconIncome.Opacity = 1;
+                BtnExpense.Opacity = 1; IconExpense.Opacity = 1;
+                BtnIncome.InputTransparent = false;
+                BtnExpense.InputTransparent = false;
+
+                // 2. Animação em V (TranslateTo X, Y)
+                // Receita: Esquerda (-70) e Cima (-70)
+                var animIncome = BtnIncome.TranslateTo(-70, -70, 250, Easing.CubicOut);
+                var animIconIncome = IconIncome.TranslateTo(-70, -70, 250, Easing.CubicOut);
+
+                // Despesa: Direita (70) e Cima (-70)
+                var animExpense = BtnExpense.TranslateTo(70, -70, 250, Easing.CubicOut);
+                var animIconExpense = IconExpense.TranslateTo(70, -70, 250, Easing.CubicOut);
+
+                // Gira o botão +
+                var animFab = FabButton.RotateTo(45, 250, Easing.CubicOut);
+
+                // Aguarda todos terminarem
+                await Task.WhenAll(animIncome, animIconIncome, animExpense, animIconExpense, animFab);
+            }
+            else
+            {
+                // --- FECHAR MENU (Recolher) ---
+
+                // 1. Volta pro centro (0, 0)
+                var animIncome = BtnIncome.TranslateTo(0, 0, 250, Easing.CubicIn);
+                var animIconIncome = IconIncome.TranslateTo(0, 0, 250, Easing.CubicIn);
+
+                var animExpense = BtnExpense.TranslateTo(0, 0, 250, Easing.CubicIn);
+                var animIconExpense = IconExpense.TranslateTo(0, 0, 250, Easing.CubicIn);
+
+                var animFab = FabButton.RotateTo(0, 250, Easing.CubicIn);
+
+                await Task.WhenAll(animIncome, animIconIncome, animExpense, animIconExpense, animFab);
+
+                // 2. Esconde e desabilita clique
+                BtnIncome.Opacity = 0; IconIncome.Opacity = 0;
+                BtnExpense.Opacity = 0; IconExpense.Opacity = 0;
+                BtnIncome.InputTransparent = true;
+                BtnExpense.InputTransparent = true;
+            }
+        }
     }
 
     protected override async void OnAppearing()
@@ -1946,14 +2711,124 @@ CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Views\
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
              x:Class="controle_ja_mobile.Views.Privates.TransactionAddPage"
-             Title="TransactionAddPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:DataType="vm:TransactionAddViewModel"
+             Title="Novo LanÃ§amento"
+             BackgroundColor="{StaticResource PageBackgroundColorDark}">
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="25" Spacing="20">
+
+                <Label Text="{Binding PageTitle}" TextColor="{Binding ThemeColor}" 
+                       FontSize="20" FontAttributes="Bold" HorizontalOptions="Center"/>
+
+                <Border Stroke="{Binding ThemeColor}" StrokeThickness="2" 
+                        StrokeShape="RoundRectangle 15" BackgroundColor="#1E293B" 
+                        Padding="20,10" HeightRequest="80">
+                    <Grid ColumnDefinitions="Auto, *">
+                        <Label Grid.Column="0" Text="R$" 
+                               TextColor="{Binding ThemeColor}" 
+                               FontSize="24" FontAttributes="Bold" 
+                               VerticalOptions="Center" Margin="0,0,10,0"/>
+
+                        <Entry Grid.Column="1" 
+                               Text="{Binding Amount}" 
+                               Placeholder="0,00" 
+                               TextColor="White" 
+                               FontSize="32" 
+                               FontAttributes="Bold" 
+                               Keyboard="Numeric"
+                               BackgroundColor="Transparent"
+                               PlaceholderColor="#64748B"/>
+                    </Grid>
+                </Border>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="DescriÃ§Ã£o" TextColor="#94A3B8" FontSize="12"/>
+                    <Border BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="15,0" HeightRequest="50">
+                        <Entry Text="{Binding Description}" Placeholder="Ex: Mercado" TextColor="White" VerticalOptions="Center"/>
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Categoria" TextColor="#94A3B8" FontSize="12"/>
+                    <Grid ColumnDefinitions="*, 50" ColumnSpacing="10">
+                        <Border Grid.Column="0" BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="15,0" HeightRequest="50">
+                            <Picker Title="Selecione..." ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}"
+                                    ItemDisplayBinding="{Binding Name}" TextColor="White" TitleColor="#64748B" VerticalOptions="Center"/>
+                        </Border>
+                        <Button Grid.Column="1" Text="+" Command="{Binding AddNewCategoryCommand}" 
+                                BackgroundColor="#2D3A4F" TextColor="White" FontSize="20" Padding="0"/>
+                    </Grid>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Pagar com / Receber em" TextColor="#94A3B8" FontSize="12"/>
+                    <Border BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="15,0" HeightRequest="50">
+                        <Picker Title="Selecione a origem..." ItemsSource="{Binding PaymentSources}" SelectedItem="{Binding SelectedSource}"
+                                ItemDisplayBinding="{Binding Name}" TextColor="White" TitleColor="#64748B" VerticalOptions="Center"/>
+                    </Border>
+                </VerticalStackLayout>
+
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Data" TextColor="#94A3B8" FontSize="12"/>
+                        <Border BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="5,0" HeightRequest="50">
+                            <DatePicker Date="{Binding Date}" TextColor="White" Format="dd/MM/yyyy" VerticalOptions="Center" HorizontalOptions="Center"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Confirmado?" TextColor="#94A3B8" FontSize="12"/>
+                        <Border BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="10,0" HeightRequest="50">
+                            <Grid ColumnDefinitions="Auto, *">
+                                <Switch IsToggled="{Binding IsPaid}" OnColor="{Binding ThemeColor}" VerticalOptions="Center"/>
+                                <Label Grid.Column="1" Text="{Binding IsPaid, Converter={StaticResource InvertedBoolConverter}, ConverterParameter='Pendente'}" 
+                                       TextColor="White" VerticalOptions="Center" HorizontalOptions="Center" FontSize="12"/>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <Border IsVisible="{Binding ShowInstallmentOption}" 
+                        Stroke="{Binding ThemeColor}" StrokeThickness="1" StrokeShape="RoundRectangle 10" 
+                        BackgroundColor="Transparent" Padding="15" Margin="0,5">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Parcelar Compra?" TextColor="{Binding ThemeColor}" FontAttributes="Bold"/>
+                        <Grid ColumnDefinitions="Auto, *">
+                            <Switch IsToggled="{Binding IsInstallment}" OnColor="{Binding ThemeColor}"/>
+                            <Entry Grid.Column="1" IsVisible="{Binding IsInstallment}" Text="{Binding InstallmentCount}" 
+                                   Placeholder="NÂº Parcelas" Keyboard="Numeric" TextColor="White" HorizontalTextAlignment="End"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="Auto, *" Margin="0,5">
+                    <Label Text="Repetir todo mÃªs?" TextColor="White" VerticalOptions="Center"/>
+                    <Switch Grid.Column="1" IsToggled="{Binding IsRecurring}" OnColor="{Binding ThemeColor}" HorizontalOptions="End"/>
+                </Grid>
+
+                <VerticalStackLayout Spacing="15" Margin="0,20,0,50">
+                    <Button Text="SALVAR" Command="{Binding SaveAndCloseCommand}" 
+                            BackgroundColor="{Binding ThemeColor}" TextColor="#000000" FontAttributes="Bold" HeightRequest="50"/>
+
+                    <Button Text="SALVAR E CONTINUAR" Command="{Binding SaveAndContinueCommand}" 
+                            BackgroundColor="Transparent" BorderColor="{Binding ThemeColor}" BorderWidth="1" 
+                            TextColor="{Binding ThemeColor}" HeightRequest="50"/>
+
+                    <Button Text="Cancelar" Command="{Binding CancelCommand}" 
+                            BackgroundColor="Transparent" TextColor="#64748B" FontSize="14"/>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid BackgroundColor="#CC000000" IsVisible="{Binding IsLoading}" ZIndex="99">
+            <ActivityIndicator IsRunning="{Binding IsLoading}" Color="{Binding ThemeColor}" VerticalOptions="Center" HorizontalOptions="Center"/>
+        </Grid>
+    </Grid>
 </ContentPage>
 
 
@@ -1962,14 +2837,17 @@ ARQUIVO: TransactionAddPage.xaml.cs
 CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Views\Privates\TransactionAddPage.xaml.cs
 ==========================================
 
+using controle_ja_mobile.ViewModels;
+
 namespace controle_ja_mobile.Views.Privates;
 
 public partial class TransactionAddPage : ContentPage
 {
-	public TransactionAddPage()
-	{
-		InitializeComponent();
-	}
+    public TransactionAddPage(TransactionAddViewModel vm)
+    {
+        InitializeComponent();
+        BindingContext = vm;
+    }
 }
 
 
@@ -2241,6 +3119,19 @@ CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\Views\
                             BackgroundColor="Transparent"
                             TextColor="{StaticResource TextPrimaryDark}"
                             FontSize="14"/>
+
+                    <Button Text="ENTRAR COM GOOGLE"
+                        Command="{Binding GoogleLoginCommand}"
+                        BackgroundColor="White"
+                        TextColor="Black"
+                        FontAttributes="Bold"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        Margin="0,10,0,0">      
+                        <Button.Shadow>
+                            <Shadow Brush="Black" Offset="0,2" Radius="5" Opacity="0.2"/>
+                        </Button.Shadow>
+                    </Button>
                 </VerticalStackLayout>
 
             </VerticalStackLayout>
@@ -2640,9 +3531,113 @@ namespace controle_ja_mobile
             InitializeComponent();
             Routing.RegisterRoute(nameof(CreditCardAddPage), typeof(CreditCardAddPage));
             Routing.RegisterRoute(nameof(Views.Privates.VehicleAddPage), typeof(Views.Privates.VehicleAddPage));
+            Routing.RegisterRoute(nameof(TransactionAddPage), typeof(TransactionAddPage));
         }
     }
 }
+
+
+==========================================
+ARQUIVO: controle_ja_mobile.csproj
+CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\controle_ja_mobile.csproj
+==========================================
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
+		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
+
+		<!-- Note for MacCatalyst:
+		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
+		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
+		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
+		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
+		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
+
+		<OutputType>Exe</OutputType>
+		<RootNamespace>controle_ja_mobile</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- Display name -->
+		<ApplicationTitle>controle_ja_mobile</ApplicationTitle>
+
+		<!-- App Identifier -->
+		<ApplicationId>com.cainanbt.softwares.controle_ja_mobile</ApplicationId>
+
+		<!-- Versions -->
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+    <WindowsSdkPackageVersion>10.0.19041.38</WindowsSdkPackageVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
+	  <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- App Icon -->
+		<MauiIcon Include="Resources\AppIcon\app_icon.png" Color="#0F172A" />
+
+		<!-- Splash Screen -->
+		<MauiSplashScreen Include="Resources\Splash\app_splash.png" Color="#0F172A" BaseSize="180,180" />
+
+		<!-- Images -->
+		<MauiImage Include="Resources\Images\*" />
+		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
+
+		<!-- Custom Fonts -->
+		<MauiFont Include="Resources\Fonts\*" />
+
+		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\Images\logo_controle.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="Microcharts.Maui" Version="1.0.1" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\Privates\CreditCardAddPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Privates\CreditCardsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Privates\DashboardPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Privates\TransactionAddPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Privates\VehicleAddPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Privates\VehicleListPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
+</Project>
 
 
 ==========================================
@@ -2725,6 +3720,7 @@ ARQUIVO: MauiProgram.cs
 CAMINHO: E:\Desenvolvimento\Cainan\ControleJa\projects\controle_ja_mobile\MauiProgram.cs
 ==========================================
 
+using CommunityToolkit.Maui;
 using controle_ja_mobile.Services;
 using controle_ja_mobile.ViewModels;
 using controle_ja_mobile.Views.Privates;
@@ -2741,6 +3737,7 @@ namespace controle_ja_mobile
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .UseMicrocharts()
                 .ConfigureFonts(fonts =>
                 {
@@ -2752,21 +3749,24 @@ namespace controle_ja_mobile
             builder.Services.AddSingleton<AuthService>();
 
             //ViewModels
+            builder.Services.AddTransient<CreditCardsViewModel>();
+            builder.Services.AddTransient<DashboardViewModel>();
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<RegisterViewModel>();
-            builder.Services.AddTransient<DashboardViewModel>();
+            builder.Services.AddTransient<TransactionAddViewModel>();
             builder.Services.AddTransient<VehiclesViewModel>();
-            builder.Services.AddTransient<CreditCardsViewModel>();
 
             //Views
-            builder.Services.AddTransient<LoginPage>();
-            builder.Services.AddTransient<RegisterPage>(); 
-            builder.Services.AddTransient<DashboardPage>();
-            builder.Services.AddTransient<WelcomePage>();
-            builder.Services.AddTransient<VehicleListPage>();
-            builder.Services.AddTransient<VehicleAddPage>();
             builder.Services.AddTransient<CreditCardsPage>();
             builder.Services.AddTransient<CreditCardAddPage>();
+            builder.Services.AddTransient<DashboardPage>();
+            builder.Services.AddTransient<TransactionAddPage>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<RegisterPage>(); 
+            builder.Services.AddTransient<VehicleListPage>();
+            builder.Services.AddTransient<VehicleAddPage>();
+            builder.Services.AddTransient<WelcomePage>();
+
 
 
 #if DEBUG

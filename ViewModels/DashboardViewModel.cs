@@ -5,40 +5,95 @@ using controle_ja_mobile.Services;
 using controle_ja_mobile.Views.Privates;
 using Microcharts;
 using SkiaSharp;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace controle_ja_mobile.ViewModels
 {
     public partial class DashboardViewModel : ObservableObject
     {
         private readonly ApiService _apiService;
-        private readonly CultureInfo _culture = new CultureInfo("pt-BR"); // Força Brasil
-        
+        private readonly CultureInfo _culture = new CultureInfo("pt-BR");
+
+        // --- PROPRIEDADES ---
         [ObservableProperty] private DateTime currentDate;
         [ObservableProperty] private string currentMonthDisplay;
         [ObservableProperty] private string userName;
+
         [ObservableProperty] private string balance;
         [ObservableProperty] private string income;
         [ObservableProperty] private string expense;
-        [ObservableProperty] private Chart expenseChart;
-        [ObservableProperty] private bool isLoading;
-        [ObservableProperty] private bool hasChartData;
 
+        [ObservableProperty] private Chart expenseChart;
+        [ObservableProperty] private bool hasChartData;
+        [ObservableProperty] private bool isLoading;
+
+        // Controle do Menu
+        [ObservableProperty] private bool isMenuOpen;
 
         public DashboardViewModel(ApiService apiService)
         {
             _apiService = apiService;
-            UserName = Preferences.Get("UserName", "Usuário");
-
+            userName = Preferences.Get("UserName", "Usuário");
             currentDate = DateTime.Now;
             UpdateMonthDisplay();
         }
+
+        // --- COMANDOS DO MENU FLUTUANTE ---
+
+        [RelayCommand]
+        public void ToggleMenu()
+        {
+            IsMenuOpen = !IsMenuOpen;
+        }
+
+        [RelayCommand]
+        public async Task GoToNewIncome()
+        {
+            IsMenuOpen = false;
+            await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=RECEITA");
+        }
+
+        [RelayCommand]
+        public async Task GoToNewExpense()
+        {
+            IsMenuOpen = false;
+            await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=DESPESA");
+        }
+
+        // --- COMANDOS DA BARRA DE NAVEGAÇÃO (NOVO) ---
+
+        [RelayCommand]
+        public async Task GoToHome()
+        {
+            // Já estamos na Home, apenas recarrega
+            await LoadData();
+        }
+
+        [RelayCommand]
+        public async Task GoToTransactions()
+        {
+            await Shell.Current.DisplayAlert("Em Breve", "Extrato será implementado aqui!", "OK");
+        }
+
+        [RelayCommand]
+        public async Task GoToCards()
+        {
+            await Shell.Current.DisplayAlert("Em Breve", "Gestão de Cartões será aqui!", "OK");
+        }
+
+        [RelayCommand]
+        public async Task GoToCar()
+        {
+            await Shell.Current.DisplayAlert("Em Breve", "Gestão de Veículos será aqui!", "OK");
+        }
+
+        [RelayCommand]
+        public async Task GoToSettings()
+        {
+            await Shell.Current.DisplayAlert("Configurações", "Tela de perfil e conta.", "OK");
+        }
+
+        // --- COMANDOS DE DATA ---
 
         private void UpdateMonthDisplay()
         {
@@ -60,6 +115,8 @@ namespace controle_ja_mobile.ViewModels
             UpdateMonthDisplay();
         }
 
+        // --- CARREGAR DADOS ---
+
         [RelayCommand]
         public async Task LoadData()
         {
@@ -68,15 +125,13 @@ namespace controle_ja_mobile.ViewModels
 
             try
             {
-                // Datas (Início e Fim do Mês)
-                var now = DateTime.Now;
+                var now = CurrentDate;
                 var firstDay = new DateTime(now.Year, now.Month, 1);
                 var lastDay = firstDay.AddMonths(1).AddSeconds(-1);
 
                 long start = new DateTimeOffset(firstDay).ToUnixTimeMilliseconds();
                 long end = new DateTimeOffset(lastDay).ToUnixTimeMilliseconds();
 
-                // Chamadas API
                 var tSummary = _apiService.GetAsync<FinancialSummary>($"dashboard/summary?start={start}&end={end}");
                 var tChart = _apiService.GetAsync<List<ChartData>>($"dashboard/expenses-category?start={start}&end={end}");
 
@@ -85,7 +140,6 @@ namespace controle_ja_mobile.ViewModels
                 var summary = await tSummary;
                 var chartData = await tChart;
 
-                // 1. Atualiza Cards (Forçando R$)
                 if (summary != null)
                 {
                     Balance = summary.Balance.ToString("C", _culture);
@@ -99,11 +153,9 @@ namespace controle_ja_mobile.ViewModels
                     Expense = 0.ToString("C", _culture);
                 }
 
-                // 2. Lógica do Gráfico vs Estado Vazio
                 if (chartData != null && chartData.Any(x => x.Value > 0))
                 {
-                    hasChartData = true; // Mostra gráfico
-
+                    HasChartData = true;
                     var entries = new List<ChartEntry>();
                     var colors = new[] { "#00E676", "#2979FF", "#FFAB00", "#FF5252", "#E040FB" };
                     int i = 0;
@@ -131,33 +183,17 @@ namespace controle_ja_mobile.ViewModels
                 }
                 else
                 {
-                    HasChartData = false; // Mostra mensagem "Sem dados"
+                    HasChartData = false;
                     ExpenseChart = null;
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Erro: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Erro Dashboard: {ex.Message}");
             }
             finally
             {
                 IsLoading = false;
-            }
-        }
-
-        [RelayCommand]
-        public async Task ShowAddOptions()
-        {
-            string action = await App.Current.MainPage.DisplayActionSheet("Novo Lançamento", "Cancelar", null, "Nova Despesa", "Nova Receita");
-
-            if (action == "Nova Despesa")
-            {
-                // Navega passando o tipo via QueryParameter
-                await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=DESPESA");
-            }
-            else if (action == "Nova Receita")
-            {
-                await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=RECEITA");
             }
         }
     }

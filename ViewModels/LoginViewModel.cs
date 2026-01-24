@@ -15,14 +15,9 @@ namespace controle_ja_mobile.ViewModels
     {
         private readonly AuthService _authService;
 
-        [ObservableProperty]
-        private string email;
-
-        [ObservableProperty]
-        private string password;
-
-        [ObservableProperty]
-        private bool isLoading;
+        [ObservableProperty] private string email;
+        [ObservableProperty] private string password;
+        [ObservableProperty] private bool isLoading;
 
         public LoginViewModel(AuthService authService)
         {
@@ -32,7 +27,6 @@ namespace controle_ja_mobile.ViewModels
         [RelayCommand]
         public async Task Login()
         {
-            // 1. Validação
             if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
             {
                 await App.Current.MainPage.DisplayAlert("Ops", "Preencha e-mail e senha", "OK");
@@ -40,13 +34,9 @@ namespace controle_ja_mobile.ViewModels
             }
 
             IsLoading = true;
-
-            // 2. Chama API
             bool success = await _authService.loginAsync(Email, Password);
-
             IsLoading = false;
 
-            // 3. Navegação
             if (success)
             {
                 Application.Current.MainPage = new AppShell();
@@ -62,6 +52,12 @@ namespace controle_ja_mobile.ViewModels
         {
             var registerPage = IPlatformApplication.Current.Services.GetService<RegisterPage>();
             await Application.Current.MainPage.Navigation.PushAsync(registerPage);
+        }
+
+        [RelayCommand]
+        public async Task ForgotPassword()
+        {
+            await App.Current.MainPage.DisplayAlert("Recuperar Senha", "Funcionalidade de recuperação será enviada para seu e-mail.", "OK");
         }
     }
 }
