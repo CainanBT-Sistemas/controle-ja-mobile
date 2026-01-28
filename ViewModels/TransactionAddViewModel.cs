@@ -2,45 +2,30 @@
 using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
-using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace controle_ja_mobile.ViewModels
 {
-    public partial class TransactionAddViewModel : ObservableObject, IQueryAttributable
+    public partial class TransactionAddViewModel : BaseViewModel, IQueryAttributable
     {
         private readonly ApiService _apiService;
-
         public ObservableCollection<Category> Categories { get; } = new();
-
         public ObservableCollection<PaymentSource> PaymentSources { get; } = new();
 
         [ObservableProperty] private string pageTitle;
         [ObservableProperty] private string themeColor;
-
         [ObservableProperty] private string description;
         [ObservableProperty] private string amount;
         [ObservableProperty] private DateTime date = DateTime.Now;
-        [ObservableProperty] private bool isPaid = true; 
+        [ObservableProperty] private bool isPaid = true;
 
         [ObservableProperty] private Category selectedCategory;
+        [ObservableProperty] private PaymentSource selectedSource;
 
-        [ObservableProperty]
-        private PaymentSource selectedSource;
-
-        [ObservableProperty] private bool showInstallmentOption; // Controla visibilidade
+        [ObservableProperty] private bool showInstallmentOption;
         [ObservableProperty] private bool isInstallment;
         [ObservableProperty] private string installmentCount = "1";
-
         [ObservableProperty] private bool isRecurring;
-        [ObservableProperty] private bool isLoading;
 
         private TransactionType _currentType;
 
@@ -56,14 +41,24 @@ namespace controle_ja_mobile.ViewModels
             if (success)
             {
                 await App.Current.MainPage.DisplayAlert("Salvo!", "Lançamento registrado. Pode inserir o próximo.", "OK");
-
-                Amount = string.Empty;     
+                Amount = string.Empty;
                 Description = string.Empty;
+            }
+        }
+
+        [RelayCommand]
+        public async Task SaveAndClose()
+        {
+            bool success = await SaveInternal();
+            if (success)
+            {
+                await Shell.Current.GoToAsync("..");
             }
         }
 
         private async Task<bool> SaveInternal()
         {
+            // Validações continuam fora para feedback rápido
             if (string.IsNullOrWhiteSpace(Description) || string.IsNullOrWhiteSpace(Amount))
             {
                 await App.Current.MainPage.DisplayAlert("Atenção", "Preencha a Descrição e o Valor.", "OK");
@@ -75,15 +70,18 @@ namespace controle_ja_mobile.ViewModels
                 await App.Current.MainPage.DisplayAlert("Atenção", "Selecione a Categoria e a Conta/Cartão.", "OK");
                 return false;
             }
-            string cleanAmount = Amount.Replace("R$", "").Trim(); // Remove R$ se vier
+
+            string cleanAmount = Amount.Replace("R$", "").Trim();
             if (!decimal.TryParse(cleanAmount, out decimal decimalAmount))
             {
                 await App.Current.MainPage.DisplayAlert("Erro", "Valor inválido. Digite apenas números.", "OK");
                 return false;
             }
 
-            IsLoading = true;
-            try
+            bool savedSuccessfully = false;
+
+            // Envolve a chamada da API com nossa proteção de erros
+            await ExecuteAsync(async () =>
             {
                 var transaction = new
                 {
@@ -103,19 +101,18 @@ namespace controle_ja_mobile.ViewModels
 
                 if (result == null)
                 {
-                    await App.Current.MainPage.DisplayAlert("Erro", "O servidor recusou o salvamento.", "OK");
-                    return false;
+                    // Lançamos exceção para o ExecuteAsync pegar e mostrar a mensagem amigável de erro genérico
+                    throw new Exception("O servidor não retornou dados.");
                 }
 
-                return true;
-            }catch (Exception ex)
-            {
-                await App.Current.MainPage.DisplayAlert("Erro Crítico", ex.Message, "OK");
-                return false;
-            }
-            finally { IsLoading = false; }
+                savedSuccessfully = true;
+            });
+
+            return savedSuccessfully;
         }
 
+        [RelayCommand]
+        public async Task Cancel() => await Shell.Current.GoToAsync("..");
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
@@ -127,20 +124,6 @@ namespace controle_ja_mobile.ViewModels
                     _currentType = parsedType;
                     SetupScreen();
                 }
-            }
-        }
-
-        partial void OnSelectedSourceChanged(PaymentSource value)
-        {
-            if (value != null && value.Type == "CREDIT_CARD" && _currentType == TransactionType.DESPESA)
-            {
-                ShowInstallmentOption = true;
-                IsPaid = false;
-            }
-            else
-            {
-                ShowInstallmentOption = false;
-                IsInstallment = false;
             }
         }
 
@@ -161,12 +144,11 @@ namespace controle_ja_mobile.ViewModels
 
         private async Task LoadDependencies()
         {
-            IsLoading = true;
-            try
+            await ExecuteAsync(async () =>
             {
                 var tCats = _apiService.GetAsync<List<Category>>("categories");
                 var tAccs = _apiService.GetAsync<List<Account>>("accounts");
-                var tCards = _apiService.GetAsync<List<CreditCard>>("cards"); // Pega cartões também
+                var tCards = _apiService.GetAsync<List<CreditCard>>("cards");
 
                 await Task.WhenAll(tCats, tAccs, tCards);
 
@@ -174,31 +156,25 @@ namespace controle_ja_mobile.ViewModels
                 var accs = await tAccs;
                 var cards = await tCards;
 
-                // 1. Categorias
                 Categories.Clear();
                 if (cats != null)
                 {
                     foreach (var c in cats.Where(x => x.Type == _currentType)) Categories.Add(c);
                 }
 
-                // 2. Fontes de Pagamento (Junta Contas + Cartões)
                 PaymentSources.Clear();
                 if (accs != null)
                 {
                     foreach (var a in accs)
                         PaymentSources.Add(new PaymentSource { Id = a.Id, Name = a.Name, Type = "ACCOUNT" });
                 }
-                // Só mostra cartões se for DESPESA
+
                 if (cards != null && _currentType == TransactionType.DESPESA)
                 {
                     foreach (var c in cards)
                         PaymentSources.Add(new PaymentSource { Id = c.Id, Name = $"Cartão: {c.Name}", Type = "CREDIT_CARD" });
                 }
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            });
         }
 
         [RelayCommand]
@@ -207,45 +183,42 @@ namespace controle_ja_mobile.ViewModels
             string result = await App.Current.MainPage.DisplayPromptAsync("Nova Categoria", "Nome da categoria:");
             if (!string.IsNullOrWhiteSpace(result))
             {
-                IsLoading = true;
-                var newCat = new Category { Name = result, Type = _currentType };
-                var savedCat = await _apiService.PostAsync<Category>("categories", newCat);
-
-                if (savedCat != null)
+                await ExecuteAsync(async () =>
                 {
-                    Categories.Add(savedCat);
-                    SelectedCategory = savedCat; // Já seleciona a nova
-                }
-                IsLoading = false;
+                    var newCat = new Category { Name = result, Type = _currentType };
+                    var savedCat = await _apiService.PostAsync<Category>("categories", newCat);
+                    if (savedCat != null)
+                    {
+                        Categories.Add(savedCat);
+                        SelectedCategory = savedCat;
+                    }
+                });
             }
         }
-
-
-        // Botão "Salvar e Sair"
-        [RelayCommand]
-        public async Task SaveAndClose()
-        {
-            bool success = await SaveInternal();
-            if (success)
-            {
-                await Shell.Current.GoToAsync("..");
-            }
-        }
-
-        [RelayCommand]
-        public async Task Cancel() => await Shell.Current.GoToAsync("..");
 
         partial void OnSelectedCategoryChanged(Category value)
         {
             if (value != null && !string.IsNullOrEmpty(value.Color))
             {
-                // Muda a cor do tema da página para a cor da categoria (Feedback visual instantâneo)
                 ThemeColor = value.Color;
+            }
+        }
+
+        partial void OnSelectedSourceChanged(PaymentSource value)
+        {
+            if (value != null && value.Type == "CREDIT_CARD" && _currentType == TransactionType.DESPESA)
+            {
+                ShowInstallmentOption = true;
+                IsPaid = false;
+            }
+            else
+            {
+                ShowInstallmentOption = false;
+                IsInstallment = false;
             }
         }
     }
 
-    // Classe auxiliar para o Dropdown misto
     public class PaymentSource
     {
         public Guid Id { get; set; }

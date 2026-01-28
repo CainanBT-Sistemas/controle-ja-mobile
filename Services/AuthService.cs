@@ -1,9 +1,10 @@
 ﻿using controle_ja_mobile.Configs;
+using controle_ja_mobile.Helpers;
 using controle_ja_mobile.Models;
 using System.Net.Http.Headers;
-using System.Text.Json;
+using System.Security.Cryptography;
 using System.Text;
-using System.Security.Cryptography; // Necessário para a segurança do Google
+using System.Text.Json;
 
 namespace controle_ja_mobile.Services
 {
@@ -16,13 +17,48 @@ namespace controle_ja_mobile.Services
             _apiService = apiService;
         }
 
-        // --- LOGIN COM GOOGLE (FLUXO SEGURO PKCE) ---
+        // Login Normal (E-mail e Senha)
+        public async Task<bool> loginAsync(string email, string password)
+        {
+            try
+            {
+                var loginData = new { email, password };
+                var result = await _apiService.PostAsync<UserResponse>("auth/login", loginData);
+                if (result != null && !string.IsNullOrEmpty(result.Tokens?.AccessToken))
+                {
+                    Preferences.Set("AuthToken", result.Tokens.AccessToken);
+                    Preferences.Set("UserName", result.Username);
+                    return true;
+                }
+
+            }
+            catch (TaskCanceledException ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Erro", "Servidor indisponível. Tente novamente mais tarde.", "OK");
+               
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erro Google Auth: {ex.Message}");
+            }
+            return false;
+        }
+
+        // Registro
+        public async Task<bool> RegisterAsync(string name, string email, string password)
+        {
+            var registerData = new { name, email, password };
+            var result = await _apiService.PostAsync<UserResponse>("auth/register", registerData);
+            return result != null;
+        }
+
+        // LOGIN COM GOOGLE USANDO O FLUXO PKCE (SEGURO)
         public async Task<bool> LoginWithGoogleAsync()
         {
             try
             {
-                string clientId = "336338674705-v2hntbb10rnof4mrrkf8k03c2ot1opv9.apps.googleusercontent.com";
-                string redirectUri = "com.googleusercontent.apps.336338674705-v2hntbb10rnof4mrrkf8k03c2ot1opv9:/";
+                string clientId = AppSecrets.GoogleClientId;
+                string redirectUri = $"{AppSecrets.GoogleRedirectScheme}:/";
 
                 string codeVerifier = GenerateCodeVerifier();
                 string codeChallenge = GenerateCodeChallenge(codeVerifier);
@@ -33,7 +69,7 @@ namespace controle_ja_mobile.Services
                                  $"&redirect_uri={redirectUri}" +
                                  $"&code_challenge={codeChallenge}" +
                                  "&code_challenge_method=S256" +
-                                 "&scope=email%20profile%20openid";
+                                 "&scope=openid%20email%20profile";
 
                 var result = await WebAuthenticator.Default.AuthenticateAsync(
                     new Uri(authUrl),
@@ -46,40 +82,59 @@ namespace controle_ja_mobile.Services
 
                     if (!string.IsNullOrEmpty(accessToken))
                     {
-                        return await FinalizeGoogleLogin(accessToken);
+                        var client = new HttpClient();
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                        var userInfoResponse = await client.GetAsync("https://www.googleapis.com/oauth2/v3/userinfo");
+                        if (userInfoResponse.IsSuccessStatusCode)
+                        {
+                            var userInfoJson = await userInfoResponse.Content.ReadAsStringAsync();
+                            var userInfo = JsonSerializer.Deserialize<GoogleUserInfo>(userInfoJson);
+
+                            var googlePayload = new
+                            {
+                                email = userInfo.email,
+                                googleId = userInfo.sub,
+                                displayName = userInfo.name,
+                                photoUrl = userInfo.picture
+                            };
+
+                            var apiResult = await _apiService.PostAsync<UserResponse>("auth/google", googlePayload);
+
+                            if (apiResult != null && !string.IsNullOrEmpty(apiResult.Tokens?.AccessToken))
+                            {
+                                Preferences.Set("AuthToken", apiResult.Tokens.AccessToken);
+                                Preferences.Set("UserName", apiResult.Username);
+                                return true;
+                            }
+                        }
                     }
+                }
+            }
+            catch (TaskCanceledException ex)
+            {
+                if (ex.StackTrace?.Contains("WebAuthenticator") == true)
+                {
+                    await App.Current.MainPage.DisplayAlert("Cancelado", "Login cancelado pelo usuário.", "OK");
+                }
+                else
+                {
+                    await App.Current.MainPage.DisplayAlert("Erro", "Servidor indisponível. Tente novamente mais tarde.", "OK");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Erro Google Auth: {ex.Message}");
+                await App.Current.MainPage.DisplayAlert("Erro", "Servidor indisponível. " + ex.Message, "OK");
             }
+
             return false;
         }
 
-        private async Task<bool> FinalizeGoogleLogin(string accessToken)
+        private class GoogleUserInfo
         {
-            var userInfo = await GetGoogleUserInfo(accessToken);
-            if (userInfo != null)
-            {
-                var payload = new
-                {
-                    email = userInfo.email,
-                    googleId = userInfo.id,
-                    displayName = userInfo.name,
-                    photoUrl = userInfo.picture
-                };
-
-                var apiResult = await _apiService.PostAsync<UserResponse>("auth/google", payload);
-
-                if (apiResult?.Tokens?.AccessToken != null)
-                {
-                    Preferences.Set(AppConstants.AuthStorageKey, apiResult.Tokens.AccessToken);
-                    Preferences.Set("UserName", apiResult.Username);
-                    return true;
-                }
-            }
-            return false;
+            public string sub { get; set; } // Google ID
+            public string email { get; set; }
+            public string name { get; set; }
+            public string picture { get; set; }
         }
 
         // Troca o código pelo token (Obrigatório no fluxo PKCE)
@@ -109,41 +164,7 @@ namespace controle_ja_mobile.Services
             return null;
         }
 
-        // --- MÉTODOS DE SUPORTE (LOGIN NORMAL E REGISTRO) ---
-        public async Task<bool> loginAsync(string email, string password)
-        {
-            var loginData = new LoginRequest { email = email, password = password };
-            var result = await _apiService.PostAsync<UserResponse>("auth", loginData);
-            if (result?.Tokens?.AccessToken != null)
-            {
-                Preferences.Set(AppConstants.AuthStorageKey, result.Tokens.AccessToken);
-                string nameToSave = !string.IsNullOrEmpty(result.Username) ? result.Username : "Usuário";
-                Preferences.Set("UserName", nameToSave);
-                return true;
-            }
-            return false;
-        }
-
-        public async Task<bool> RegisterAsync(string name, string email, string password)
-        {
-            var registerData = new { username = name, email = email, password = password, role = UserRole.USER };
-            var result = await _apiService.PostAsync<UserResponse>("users/register", registerData);
-            return result != null;
-        }
-
-        private async Task<GoogleUser> GetGoogleUserInfo(string accessToken)
-        {
-            try
-            {
-                var client = new HttpClient();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                var json = await client.GetStringAsync("https://www.googleapis.com/oauth2/v2/userinfo");
-                return JsonSerializer.Deserialize<GoogleUser>(json);
-            }
-            catch { return null; }
-        }
-
-        // CRIPTOGRAFIA PARA O GOOGLE
+        // Métodos auxiliares PKCE
         private string GenerateCodeVerifier()
         {
             var bytes = new byte[32];
@@ -165,7 +186,10 @@ namespace controle_ja_mobile.Services
             return Convert.ToBase64String(bytes).Replace("+", "-").Replace("/", "_").TrimEnd('=');
         }
 
-        private class GoogleTokenResponse { public string access_token { get; set; } }
-        private class GoogleUser { public string id { get; set; } public string email { get; set; } public string name { get; set; } public string picture { get; set; } }
-    }
+        // Classe auxiliar para desserializar o token do Google
+        private class GoogleTokenResponse
+        {
+            public string access_token { get; set; }
+        }
+    }    
 }

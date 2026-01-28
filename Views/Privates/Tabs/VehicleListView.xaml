@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
              xmlns:models="clr-namespace:controle_ja_mobile.Models"
-             x:Class="controle_ja_mobile.Views.Privates.VehicleListPage"
-             x:DataType="vm:VehiclesViewModel"
-             Title="Minha Garagem"
-             BackgroundColor="{StaticResource PageBackgroundColorDark}">
+             x:Class="controle_ja_mobile.Views.Privates.Tabs.VehicleListView">
 
-    <Grid RowDefinitions="*, Auto">
+    <Grid RowDefinitions="*, Auto" BackgroundColor="{StaticResource PageBackgroundColorDark}">
 
         <RefreshView Grid.Row="0" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadVehiclesCommand}" RefreshColor="{StaticResource Primary}">
             <CollectionView ItemsSource="{Binding Vehicles}" Margin="20">
@@ -31,7 +27,6 @@
                                 <VerticalStackLayout Grid.Column="1" Padding="15,15,0,0" Spacing="2">
                                     <Label Text="{Binding Name}" TextColor="{StaticResource Primary}" FontAttributes="Bold" FontSize="18"/>
                                     <Label Text="{Binding FullDescription}" TextColor="{StaticResource TextSecondaryDark}" FontSize="14"/>
-
                                     <Border Margin="0,10,0,0" HorizontalOptions="Start" BackgroundColor="#2D3A4F" StrokeThickness="0" Padding="10,5" StrokeShape="RoundRectangle 8">
                                         <Label Text="{Binding ConsumptionInfo}" TextColor="#E2E8F0" FontSize="11"/>
                                     </Border>
@@ -48,21 +43,13 @@
             </CollectionView>
         </RefreshView>
 
-        <Button Grid.Row="0"
-                Text="+" 
-                Command="{Binding GoToAddPageCommand}"
-                BackgroundColor="{StaticResource Primary}"
-                TextColor="Black"
-                FontSize="24"
-                CornerRadius="30"
-                HeightRequest="60"
-                WidthRequest="60"
-                HorizontalOptions="End"
-                VerticalOptions="End"
-                Margin="25"
+        <Button Grid.Row="0" Text="+" Command="{Binding GoToAddPageCommand}"
+                BackgroundColor="{StaticResource Primary}" TextColor="Black" FontSize="24"
+                CornerRadius="30" HeightRequest="60" WidthRequest="60"
+                HorizontalOptions="End" VerticalOptions="End" Margin="25"
                 Shadow="{Shadow Radius=10, Offset='0,5', Brush='#00E676'}"/>
 
         <ActivityIndicator Grid.RowSpan="2" IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" 
                            Color="{StaticResource Primary}" VerticalOptions="Center" HorizontalOptions="Center"/>
     </Grid>
-</ContentPage>
+</ContentView>

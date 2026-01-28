@@ -7,34 +7,9 @@
     Title="Controle Já"
     Shell.FlyoutBehavior="Disabled"
     Shell.BackgroundColor="#0F172A"
-    Shell.ForegroundColor="White"
-    Shell.TitleColor="White"
-    Shell.NavBarIsVisible="False">
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False">
 
-    
-    <Shell.TabBarBackgroundColor>#1E293B</Shell.TabBarBackgroundColor>
-    <Shell.TabBarForegroundColor>#94A3B8</Shell.TabBarForegroundColor>
-    <Shell.TabBarTitleColor>#00E676</Shell.TabBarTitleColor>
-    <Shell.TabBarUnselectedColor>#94A3B8</Shell.TabBarUnselectedColor>
-
-    <TabBar>
-        <ShellContent
-        Title="Início"
-        Icon="home_icon.png" 
-        ContentTemplate="{DataTemplate local:DashboardPage}"
-        Route="DashboardPage" />
-
-        <ShellContent
-        Title="Cartões"
-        Icon="card_icon.png" 
-        ContentTemplate="{DataTemplate local:CreditCardsPage}"
-        Route="CreditCardsPage" />
-
-        <ShellContent
-        Title="Veículos"
-        Icon="car_icon.png" 
-        ContentTemplate="{DataTemplate local:VehicleListPage}"
-        Route="VehicleListPage" />
-    </TabBar>
+    <ShellContent Route="DashboardPage" ContentTemplate="{DataTemplate local:DashboardPage}" />
 
 </Shell>

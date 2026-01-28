@@ -1,115 +1,74 @@
 ﻿using controle_ja_mobile.Configs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
+using controle_ja_mobile.Helpers;
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace controle_ja_mobile.Services
 {
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly JsonSerializerOptions _serializerOptions;
+        private readonly string _baseUrl;
 
         public ApiService()
         {
-            _httpClient = new HttpClient()
+            _baseUrl = AppConstants.BaseUrl;
+
+            _httpClient = new HttpClient
             {
-                BaseAddress = new Uri(AppConstants.BaseUrl)
-            };
-            _serializerOptions = new JsonSerializerOptions()
-            {
-                PropertyNameCaseInsensitive = true
+                BaseAddress = new Uri(_baseUrl),
+                // CORREÇÃO: Define limite de 10 segundos. 
+                // Sem isso, o app fica rodando para sempre se o servidor cair.
+                Timeout = TimeSpan.FromSeconds(10)
             };
         }
 
-        private void AddAuthorizationHeader(string endpoint)
+        public async Task<T> PostAsync<T>(string endpoint, object data)
         {
-            if (endpoint.Contains("/auth") || endpoint.Contains("/register"))
+            // Não usamos try/catch aqui para deixar o erro subir para a ViewModel
+            var response = await _httpClient.PostAsJsonAsync(endpoint, data);
+
+            if (response.IsSuccessStatusCode)
             {
-                _httpClient.DefaultRequestHeaders.Authorization = null;
-                return;
+                if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                    return default;
+
+                return await response.Content.ReadFromJsonAsync<T>();
             }
-
-            var token = Preferences.Get(AppConstants.AuthStorageKey, string.Empty);
-            if (!string.IsNullOrEmpty(token))
+            else
             {
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-        }
-
-        public async Task<T?> GetAsync<T>(string endpoint)
-        {
-            try
-            {
-                AddAuthorizationHeader(endpoint);
-
-                var response = await _httpClient.GetAsync(endpoint);
-
-                if (response.IsSuccessStatusCode)
+                var errorJson = await response.Content.ReadAsStringAsync();
+                try
                 {
-                    return await response.Content.ReadFromJsonAsync<T>(_serializerOptions);
+                    var apiError = JsonSerializer.Deserialize<ApiErrorResponse>(errorJson);
+                    throw new Exception(apiError?.Message ?? "Erro desconhecido.");
+                }
+                catch
+                {
+                    throw new Exception("Erro desconhecido: " + errorJson);
                 }
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Erro GET {endpoint}: {ex.Message}");
-            }
-            return default;
         }
 
-        public async Task<T?> PostAsync<T>(string endpoint, object data)
+        public async Task<T> GetAsync<T>(string endpoint)
         {
-            try
+            var response = await _httpClient.GetAsync(endpoint);
+
+            if (response.IsSuccessStatusCode)
             {
-                AddAuthorizationHeader(endpoint);
-
-                var response = await _httpClient.PostAsJsonAsync(endpoint, data);
-
-                if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<T>();
+            }else
+            {
+                var errorJson = await response.Content.ReadAsStringAsync();
+                try
                 {
-                    return await response.Content.ReadFromJsonAsync<T>(_serializerOptions);
+                    var apiError = JsonSerializer.Deserialize<ApiErrorResponse>(errorJson);
+                    throw new Exception(apiError?.Message ?? "Erro desconhecido.");
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Erro POST {endpoint}: {ex.Message}");
-            }
-            return default;
-        }
-
-        public async Task<bool> PutAsync(string endpoint, object data)
-        {
-            try
-            {
-                AddAuthorizationHeader(endpoint);
-                var response = await _httpClient.PutAsJsonAsync(endpoint, data);
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Erro PUT {endpoint}: {ex.Message}");
-                return false;
-            }
-        }
-
-        public async Task<bool> DeleteAsync(string endpoint)
-        {
-            try
-            {
-                AddAuthorizationHeader(endpoint);
-                var response = await _httpClient.DeleteAsync(endpoint);
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Erro DELETE {endpoint}: {ex.Message}");
-                return false;
+                catch
+                {
+                    throw new Exception("Erro desconhecido: " + errorJson);
+                }
             }
         }
     }

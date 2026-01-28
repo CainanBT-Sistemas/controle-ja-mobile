@@ -3,30 +3,22 @@ using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
 using controle_ja_mobile.Views.Privates;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace controle_ja_mobile.ViewModels
 {
-    public partial class CreditCardsViewModel : ObservableObject
+    public partial class CreditCardsViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
-
-        // Lista para a tela principal
         public ObservableCollection<CreditCard> Cards { get; } = new();
 
-        [ObservableProperty] private bool isLoading;
         [ObservableProperty] private bool isRefreshing;
 
-        // --- PROPRIEDADES PARA O FORMULÁRIO DE CADASTRO ---
+        // Campos do Formulário
         [ObservableProperty] private string newCardName;
         [ObservableProperty] private string newCardLimit;
-        [ObservableProperty] private string newCardCloseDay; // Dia Fechamento
-        [ObservableProperty] private string newCardBestDay;  // Dia Vencimento
+        [ObservableProperty] private string newCardCloseDay;
+        [ObservableProperty] private string newCardBestDay;
 
         public CreditCardsViewModel(ApiService apiService)
         {
@@ -36,54 +28,42 @@ namespace controle_ja_mobile.ViewModels
         [RelayCommand]
         public async Task LoadCards()
         {
-            if (IsLoading) return;
-            IsLoading = true;
-
-            try
+            // Passamos 'false' no showLoading se estivermos usando o RefreshView, 
+            // senão o loading global aparece em cima do spinner nativo.
+            await ExecuteAsync(async () =>
             {
-                // GET /cards
-                var list = await _apiService.GetAsync<List<CreditCard>>("cards");
-
-                Cards.Clear();
-                if (list != null)
+                try
                 {
-                    foreach (var card in list) Cards.Add(card);
+                    var list = await _apiService.GetAsync<List<CreditCard>>("cards");
+                    Cards.Clear();
+                    if (list != null)
+                    {
+                        foreach (var card in list) Cards.Add(card);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Erro Cards: {ex.Message}");
-            }
-            finally
-            {
-                IsLoading = false;
-                IsRefreshing = false;
-            }
+                finally
+                {
+                    IsRefreshing = false; // Garante que o spinner para
+                }
+            }, showLoading: false);
         }
 
-        // Navega para a tela de adicionar (precisa criar a View CreditCardAddPage)
         [RelayCommand]
         public async Task GoToAddCard()
         {
-            // Registre essa rota no AppShell.xaml.cs depois!
             await Shell.Current.GoToAsync(nameof(CreditCardAddPage));
         }
 
-        // --- O COMMAND QUE VOCÊ PEDIU (SALVAR) ---
         [RelayCommand]
         public async Task SaveCard()
         {
-            // 1. Validações Básicas
-            if (string.IsNullOrWhiteSpace(NewCardName) ||
-                string.IsNullOrWhiteSpace(NewCardLimit) ||
-                string.IsNullOrWhiteSpace(NewCardCloseDay) ||
-                string.IsNullOrWhiteSpace(NewCardBestDay))
+            if (string.IsNullOrWhiteSpace(NewCardName) || string.IsNullOrWhiteSpace(NewCardLimit) ||
+                string.IsNullOrWhiteSpace(NewCardCloseDay) || string.IsNullOrWhiteSpace(NewCardBestDay))
             {
                 await App.Current.MainPage.DisplayAlert("Atenção", "Preencha todos os campos do cartão.", "OK");
                 return;
             }
 
-            // 2. Conversão de Tipos
             if (!decimal.TryParse(NewCardLimit, out decimal limit))
             {
                 await App.Current.MainPage.DisplayAlert("Erro", "Limite inválido. Digite apenas números.", "OK");
@@ -102,11 +82,8 @@ namespace controle_ja_mobile.ViewModels
                 return;
             }
 
-            IsLoading = true;
-
-            try
+            await ExecuteAsync(async () =>
             {
-                // 3. Monta o Objeto (Igual ao CreditCardDTO do Java)
                 var newCardDto = new
                 {
                     name = NewCardName,
@@ -115,42 +92,26 @@ namespace controle_ja_mobile.ViewModels
                     bestDay = bestDay
                 };
 
-                // 4. Envia para a API (POST /cards)
-                // Endpoint confirmado no arquivo CreditCardController.java
                 var result = await _apiService.PostAsync<CreditCard>("cards", newCardDto);
 
                 if (result != null)
                 {
                     await App.Current.MainPage.DisplayAlert("Sucesso", "Cartão adicionado!", "OK");
 
-                    // Limpa o formulário
+                    // Limpa campos
                     NewCardName = "";
                     NewCardLimit = "";
                     NewCardCloseDay = "";
                     NewCardBestDay = "";
 
-                    // Volta para a lista
                     await Shell.Current.GoToAsync("..");
-
-                    // Atualiza a lista
                     await LoadCards();
                 }
                 else
                 {
-                    // Se der erro (ex: limite de 2 cartões do plano Free), o Backend manda 400
-                    // O ApiService captura e loga, mas aqui mostramos um alerta genérico
-                    await App.Current.MainPage.DisplayAlert("Ops", "Não foi possível criar o cartão. Verifique se atingiu o limite ou se os dados estão corretos.", "OK");
+                    await App.Current.MainPage.DisplayAlert("Ops", "Não foi possível criar o cartão.", "OK");
                 }
-            }
-            catch (Exception ex)
-            {
-                await App.Current.MainPage.DisplayAlert("Erro", $"Falha de comunicação: {ex.Message}", "OK");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            });
         }
-
     }
 }

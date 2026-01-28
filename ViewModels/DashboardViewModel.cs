@@ -9,12 +9,11 @@ using System.Globalization;
 
 namespace controle_ja_mobile.ViewModels
 {
-    public partial class DashboardViewModel : ObservableObject
+    public partial class DashboardViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
         private readonly CultureInfo _culture = new CultureInfo("pt-BR");
 
-        // --- PROPRIEDADES ---
         [ObservableProperty] private DateTime currentDate;
         [ObservableProperty] private string currentMonthDisplay;
         [ObservableProperty] private string userName;
@@ -25,26 +24,19 @@ namespace controle_ja_mobile.ViewModels
 
         [ObservableProperty] private Chart expenseChart;
         [ObservableProperty] private bool hasChartData;
-        [ObservableProperty] private bool isLoading;
 
-        // Controle do Menu
         [ObservableProperty] private bool isMenuOpen;
 
         public DashboardViewModel(ApiService apiService)
         {
             _apiService = apiService;
-            userName = Preferences.Get("UserName", "Usuário");
-            currentDate = DateTime.Now;
+            UserName = Preferences.Get("UserName", "Usuário");
+            CurrentDate = DateTime.Now;
             UpdateMonthDisplay();
         }
 
-        // --- COMANDOS DO MENU FLUTUANTE ---
-
         [RelayCommand]
-        public void ToggleMenu()
-        {
-            IsMenuOpen = !IsMenuOpen;
-        }
+        public void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
 
         [RelayCommand]
         public async Task GoToNewIncome()
@@ -60,40 +52,20 @@ namespace controle_ja_mobile.ViewModels
             await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=DESPESA");
         }
 
-        // --- COMANDOS DA BARRA DE NAVEGAÇÃO (NOVO) ---
+        [RelayCommand]
+        public async Task GoToHome() => await LoadData();
 
         [RelayCommand]
-        public async Task GoToHome()
-        {
-            // Já estamos na Home, apenas recarrega
-            await LoadData();
-        }
+        public async Task GoToTransactions() => await Shell.Current.DisplayAlert("Em Breve", "Extrato será implementado aqui!", "OK");
 
         [RelayCommand]
-        public async Task GoToTransactions()
-        {
-            await Shell.Current.DisplayAlert("Em Breve", "Extrato será implementado aqui!", "OK");
-        }
+        public async Task GoToCards() => await Shell.Current.DisplayAlert("Em Breve", "Gestão de Cartões será aqui!", "OK");
 
         [RelayCommand]
-        public async Task GoToCards()
-        {
-            await Shell.Current.DisplayAlert("Em Breve", "Gestão de Cartões será aqui!", "OK");
-        }
+        public async Task GoToCar() => await Shell.Current.DisplayAlert("Em Breve", "Gestão de Veículos será aqui!", "OK");
 
         [RelayCommand]
-        public async Task GoToCar()
-        {
-            await Shell.Current.DisplayAlert("Em Breve", "Gestão de Veículos será aqui!", "OK");
-        }
-
-        [RelayCommand]
-        public async Task GoToSettings()
-        {
-            await Shell.Current.DisplayAlert("Configurações", "Tela de perfil e conta.", "OK");
-        }
-
-        // --- COMANDOS DE DATA ---
+        public async Task GoToSettings() => await Shell.Current.DisplayAlert("Configurações", "Tela de perfil e conta.", "OK");
 
         private void UpdateMonthDisplay()
         {
@@ -115,15 +87,10 @@ namespace controle_ja_mobile.ViewModels
             UpdateMonthDisplay();
         }
 
-        // --- CARREGAR DADOS ---
-
         [RelayCommand]
         public async Task LoadData()
         {
-            if (IsLoading) return;
-            IsLoading = true;
-
-            try
+            await ExecuteAsync(async () =>
             {
                 var now = CurrentDate;
                 var firstDay = new DateTime(now.Year, now.Month, 1);
@@ -132,6 +99,7 @@ namespace controle_ja_mobile.ViewModels
                 long start = new DateTimeOffset(firstDay).ToUnixTimeMilliseconds();
                 long end = new DateTimeOffset(lastDay).ToUnixTimeMilliseconds();
 
+                // Dispara as duas tarefas em paralelo
                 var tSummary = _apiService.GetAsync<FinancialSummary>($"dashboard/summary?start={start}&end={end}");
                 var tChart = _apiService.GetAsync<List<ChartData>>($"dashboard/expenses-category?start={start}&end={end}");
 
@@ -140,6 +108,7 @@ namespace controle_ja_mobile.ViewModels
                 var summary = await tSummary;
                 var chartData = await tChart;
 
+                // Atualiza tela com dados
                 if (summary != null)
                 {
                     Balance = summary.Balance.ToString("C", _culture);
@@ -159,7 +128,6 @@ namespace controle_ja_mobile.ViewModels
                     var entries = new List<ChartEntry>();
                     var colors = new[] { "#00E676", "#2979FF", "#FFAB00", "#FF5252", "#E040FB" };
                     int i = 0;
-
                     foreach (var item in chartData)
                     {
                         entries.Add(new ChartEntry((float)item.Value)
@@ -186,15 +154,7 @@ namespace controle_ja_mobile.ViewModels
                     HasChartData = false;
                     ExpenseChart = null;
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Erro Dashboard: {ex.Message}");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            });
         }
     }
 }

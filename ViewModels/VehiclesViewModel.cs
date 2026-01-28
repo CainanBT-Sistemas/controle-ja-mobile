@@ -7,20 +7,15 @@ using System.Collections.ObjectModel;
 
 namespace controle_ja_mobile.ViewModels
 {
-    public partial class VehiclesViewModel : ObservableObject
+    public partial class VehiclesViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
 
-        // --- Propriedades para a LISTAGEM ---
         public ObservableCollection<Vehicle> Vehicles { get; } = new();
 
-        [ObservableProperty]
-        private bool isLoading;
+        [ObservableProperty] private bool isRefreshing;
 
-        [ObservableProperty]
-        private bool isRefreshing; // Controla o "puxar para atualizar"
-
-        // --- Propriedades para o CADASTRO (Formulário) ---
+        // Campos do Formulário
         [ObservableProperty] private string newName;
         [ObservableProperty] private string newBrand;
         [ObservableProperty] private string newModel;
@@ -28,90 +23,66 @@ namespace controle_ja_mobile.ViewModels
         [ObservableProperty] private string newPlate;
         [ObservableProperty] private string newOdometer;
 
-        // Construtor com Injeção de Dependência
         public VehiclesViewModel(ApiService apiService)
         {
             _apiService = apiService;
         }
 
-        // COMANDO: Carregar Lista de Veículos
         [RelayCommand]
         public async Task LoadVehicles()
         {
-            if (IsLoading) return;
-            IsLoading = true;
-
-            try
+            await ExecuteAsync(async () =>
             {
-                // Chama a API: GET /vehicles
-                var list = await _apiService.GetAsync<List<Vehicle>>("vehicles");
-
-                Vehicles.Clear();
-                if (list != null)
+                try
                 {
-                    // Adiciona na lista observável para aparecer na tela
-                    foreach (var v in list)
+                    var list = await _apiService.GetAsync<List<Vehicle>>("vehicles");
+                    Vehicles.Clear();
+                    if (list != null)
                     {
-                        Vehicles.Add(v);
+                        foreach (var v in list) Vehicles.Add(v);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Erro ao carregar veículos: {ex.Message}");
-            }
-            finally
-            {
-                IsLoading = false;
-                IsRefreshing = false; // Para a animação do refresh
-            }
+                finally
+                {
+                    IsRefreshing = false;
+                }
+            }, showLoading: false);
         }
 
-        // COMANDO: Ir para tela de Adicionar
         [RelayCommand]
         public async Task GoToAddPage()
         {
-            // Navega para a página de cadastro
-            // O nome "VehicleAddPage" deve ter sido registrado no AppShell.xaml.cs (Routing.RegisterRoute)
             await Shell.Current.GoToAsync(nameof(VehicleAddPage));
         }
 
-        // COMANDO: Salvar Novo Veículo
         [RelayCommand]
         public async Task SaveVehicle()
         {
-            // 1. Validação Básica
-            if (string.IsNullOrWhiteSpace(NewName) ||
-                string.IsNullOrWhiteSpace(NewModel) ||
-                string.IsNullOrWhiteSpace(NewOdometer))
+            if (string.IsNullOrWhiteSpace(NewName) || string.IsNullOrWhiteSpace(NewModel) || string.IsNullOrWhiteSpace(NewOdometer))
             {
                 await App.Current.MainPage.DisplayAlert("Atenção", "Preencha pelo menos Nome, Modelo e KM Atual.", "OK");
                 return;
             }
 
-            IsLoading = true;
-
-            try
+            await ExecuteAsync(async () =>
             {
-                // 2. Monta o objeto anônimo igual ao DTO que o Java espera
                 var newVehicleData = new
                 {
                     name = NewName,
-                    brand = NewBrand ?? "", // Evita null
+                    brand = NewBrand ?? "",
                     model = NewModel,
-                    year = int.TryParse(NewYear, out int y) ? y : 2024, // Tenta converter ano, senão usa 2024
+                    year = int.TryParse(NewYear, out int y) ? y : 2024,
                     plate = NewPlate ?? "",
-                    currentOdometer = decimal.Parse(NewOdometer) // Converte string para decimal
+                    currentOdometer = decimal.Parse(NewOdometer)
                 };
 
-                // 3. Envia para a API: POST /vehicles
                 var result = await _apiService.PostAsync<Vehicle>("vehicles", newVehicleData);
 
                 if (result != null)
                 {
                     await App.Current.MainPage.DisplayAlert("Sucesso", "Veículo cadastrado!", "OK");
 
-                    // 4. Limpa os campos
+                    // Limpar
                     NewName = string.Empty;
                     NewBrand = string.Empty;
                     NewModel = string.Empty;
@@ -119,25 +90,14 @@ namespace controle_ja_mobile.ViewModels
                     NewPlate = string.Empty;
                     NewOdometer = string.Empty;
 
-                    // 5. Volta para a lista
                     await Shell.Current.GoToAsync("..");
-
-                    // 6. Atualiza a lista para mostrar o novo carro
                     await LoadVehicles();
                 }
                 else
                 {
                     await App.Current.MainPage.DisplayAlert("Erro", "Falha ao salvar veículo.", "OK");
                 }
-            }
-            catch (Exception ex)
-            {
-                await App.Current.MainPage.DisplayAlert("Erro", $"Ocorreu um erro: {ex.Message}", "OK");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            });
         }
     }
 }

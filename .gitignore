@@ -4,3 +4,4 @@ obj/
 *.user
 [Dd]ebug/
 [Rr]elease/
+/Configs/AppSecrets.cs
