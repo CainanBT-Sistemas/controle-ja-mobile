@@ -1,10 +1,13 @@
 ﻿using controle_ja_mobile.Configs;
-using controle_ja_mobile.Helpers;
 using controle_ja_mobile.Models;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Plugin.Fingerprint;
+using Plugin.Fingerprint.Abstractions;
+using controle_ja_mobile.Views.Privates;
+using Microsoft.Maui.Controls;
 
 namespace controle_ja_mobile.Services
 {
@@ -190,6 +193,24 @@ namespace controle_ja_mobile.Services
         private class GoogleTokenResponse
         {
             public string access_token { get; set; }
+        }
+
+        public async Task<bool> AuthenticateWithBiometricsAsync()
+        {
+            var result = await CrossFingerprint.Current.AuthenticateAsync(
+            new AuthenticationRequestConfiguration("Autenticação Biométrica", "Use FaceID ou impressão digital para continuar")
+        );
+
+            if (result.Authenticated)
+            {
+                await App.Current.MainPage.DisplayAlert("Sucesso", "Autenticação realizada com sucesso", "OK");
+                return true;
+            }
+            else
+            {
+                await App.Current.MainPage.DisplayAlert("Erro", "A autenticação biométrica falhou.", "OK");
+                return false;
+            }
         }
     }    
 }

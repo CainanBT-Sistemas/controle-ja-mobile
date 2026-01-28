@@ -5,6 +5,8 @@ using controle_ja_mobile.Views.Privates;
 using controle_ja_mobile.Views.Publics;
 using Microcharts.Maui;
 using Microsoft.Extensions.Logging;
+using Plugin.Fingerprint;
+using Plugin.Fingerprint.Abstractions;
 
 namespace controle_ja_mobile
 {
