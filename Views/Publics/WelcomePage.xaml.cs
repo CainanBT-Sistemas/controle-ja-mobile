@@ -2,9 +2,9 @@ namespace controle_ja_mobile.Views.Publics;
 
 using controle_ja_mobile.Services;
 using Microsoft.Maui.Controls;
-using Plugin.Fingerprint.Abstractions;
-using Plugin.Fingerprint;
 using controle_ja_mobile.Views.Privates;
+using controle_ja_mobile.ViewModels;
+using System.Net.Http.Headers;
 
 public partial class WelcomePage : ContentPage
 {
@@ -59,26 +59,22 @@ public partial class WelcomePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
-        // Chama a autenticação biométrica
-        await AuthenticateWithBiometricsAsync();
-    }
-
-    private async Task AuthenticateWithBiometricsAsync()
-    {
-        // Tenta autenticar com biometria
-        bool isAuthenticated = await _authService.AuthenticateWithBiometricsAsync();
-
-        if (isAuthenticated)
+        LoadingOverlay.IsVisible = true;
+        var token = await SecureStorage.GetAsync("auth_token");
+        if (!string.IsNullOrEmpty(token))
         {
-            // Redireciona para a Dashboard após autenticação biométrica bem-sucedida
-            var dashboardPage = IPlatformApplication.Current.Services.GetService<DashboardPage>();
-            await Navigation.PushAsync(dashboardPage);
+            bool success = await _authService.loginWithTokenAsync(token);
+            if (success)
+            {
+                Application.Current.MainPage = new AppShell();
+            }
+            else
+            {
+                var currentPage = App.Current.MainPage;
+                if (currentPage != null)
+                    await currentPage.DisplayAlert("Erro", "E-mail ou senha incorretos", "OK");
+            }
         }
-        else
-        {
-            // Exibe uma mensagem de erro ou mantém na WelcomePage
-            await DisplayAlert("Erro", "Não foi possível realizar a autenticação biométrica.", "OK");
-        }
+        LoadingOverlay.IsVisible = false;
     }
 }

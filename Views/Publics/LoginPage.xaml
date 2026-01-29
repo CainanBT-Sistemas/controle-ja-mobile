@@ -2,11 +2,13 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             xmlns:behaviors="clr-namespace:controle_ja_mobile.Behaviors"
              x:Class="controle_ja_mobile.Views.Publics.LoginPage"
              x:DataType="vm:LoginViewModel"
              NavigationPage.HasNavigationBar="False"
              Title="Login">
 
+    <!-- Configuração do gradiente no fundo -->
     <ContentPage.Background>
         <RadialGradientBrush Center="0.5, 0.2" Radius="0.8">
             <GradientStop Color="#1E293B" Offset="0.0" />
@@ -15,28 +17,68 @@
         </RadialGradientBrush>
     </ContentPage.Background>
 
+    <!-- Grid principal -->
     <Grid>
-        <Grid BackgroundColor="#CC000000" IsVisible="{Binding IsLoading}" ZIndex="99">
-            <ActivityIndicator IsRunning="{Binding IsLoading}" Color="{StaticResource Primary}" VerticalOptions="Center" HorizontalOptions="Center"/>
+        <!-- Loading Overlay -->
+        <Grid BackgroundColor="#CC000000" 
+              IsVisible="{Binding IsLoading}" 
+              ZIndex="99">
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                               Color="{StaticResource Primary}" 
+                               VerticalOptions="Center" 
+                               HorizontalOptions="Center"/>
         </Grid>
 
+        <!-- Conteúdo rolável -->
         <ScrollView>
-            <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
+            <ScrollView.Behaviors>
+                <!-- Ajusta o layout ao teclado -->
+                <behaviors:KeyboardAvoidanceBehavior />
+            </ScrollView.Behaviors>
 
+            <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center" HorizontalOptions="Center">
+
+                <!-- Logo e Títulos -->
                 <VerticalStackLayout Spacing="5" Margin="0,0,0,20">
                     <Image Source="logo_controle.png" HeightRequest="100" Aspect="AspectFit" Margin="0,0,0,15"/>
-                    <Label Text="Bem-vindo de volta!" TextColor="{StaticResource TextPrimaryDark}" FontSize="26" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
-                    <Label Text="Acesse com seu e-mail." TextColor="{StaticResource TextSecondaryDark}" FontSize="14" HorizontalTextAlignment="Center"/>
+                    <Label Text="Bem-vindo de volta!" 
+                           TextColor="{StaticResource TextPrimaryDark}" 
+                           FontSize="26" 
+                           FontAttributes="Bold" 
+                           HorizontalTextAlignment="Center"/>
+                    <Label Text="Acesse com seu e-mail." 
+                           TextColor="{StaticResource TextSecondaryDark}" 
+                           FontSize="14" 
+                           HorizontalTextAlignment="Center"/>
                 </VerticalStackLayout>
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}" Padding="15,2">
-                    <Entry Placeholder="E-mail" Text="{Binding Email}" Keyboard="Email" TextColor="{StaticResource TextPrimaryDark}" PlaceholderColor="{StaticResource TextSecondaryDark}"/>
+                <!-- Campo E-mail -->
+                <Border Stroke="{StaticResource TextSecondaryDark}" 
+                        StrokeThickness="1" 
+                        StrokeShape="RoundRectangle 10" 
+                        BackgroundColor="{StaticResource CardBackgroundDark}" 
+                        Padding="15,2">
+                    <Entry Placeholder="E-mail" 
+                           Text="{Binding Email}" 
+                           Keyboard="Email" 
+                           TextColor="{StaticResource TextPrimaryDark}" 
+                           PlaceholderColor="{StaticResource TextSecondaryDark}"/>
                 </Border>
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}" Padding="15,2">
-                    <Entry Placeholder="Senha" Text="{Binding Password}" IsPassword="True" TextColor="{StaticResource TextPrimaryDark}" PlaceholderColor="{StaticResource TextSecondaryDark}"/>
+                <!-- Campo Senha -->
+                <Border Stroke="{StaticResource TextSecondaryDark}" 
+                        StrokeThickness="1" 
+                        StrokeShape="RoundRectangle 10" 
+                        BackgroundColor="{StaticResource CardBackgroundDark}" 
+                        Padding="15,2">
+                    <Entry Placeholder="Senha" 
+                           Text="{Binding Password}" 
+                           IsPassword="True" 
+                           TextColor="{StaticResource TextPrimaryDark}" 
+                           PlaceholderColor="{StaticResource TextSecondaryDark}"/>
                 </Border>
 
+                <!-- Link de Esqueceu a Senha -->
                 <Label Text="Esqueceu sua senha?" 
                        TextColor="{StaticResource Primary}" 
                        FontSize="14" 
@@ -47,8 +89,15 @@
                     </Label.GestureRecognizers>
                 </Label>
 
+                <!-- Botão de Entrar e Link para Registrar -->
                 <VerticalStackLayout Spacing="15" Margin="0,10,0,0">
-                    <Button Text="ENTRAR" Command="{Binding LoginCommand}" BackgroundColor="{StaticResource Primary}" TextColor="#000000" FontAttributes="Bold" CornerRadius="10" HeightRequest="50"/>
+                    <Button Text="ENTRAR" 
+                            Command="{Binding LoginCommand}" 
+                            BackgroundColor="{StaticResource Primary}" 
+                            TextColor="#000000" 
+                            FontAttributes="Bold" 
+                            CornerRadius="10" 
+                            HeightRequest="50"/>
 
                     <Label Text="Ainda não tem conta? Crie agora" 
                            TextColor="{StaticResource TextSecondaryDark}" 
@@ -61,7 +110,6 @@
                         </Label.GestureRecognizers>
                     </Label>
                 </VerticalStackLayout>
-
             </VerticalStackLayout>
         </ScrollView>
     </Grid>

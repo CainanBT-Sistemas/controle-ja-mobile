@@ -10,7 +10,7 @@ namespace controle_ja_mobile
         {
             InitializeComponent();
 
-            MainPage = new NavigationPage(new WelcomePage(IPlatformApplication.Current.Services.GetService<AuthService>()));
+            MainPage = new NavigationPage(new WelcomePage(IPlatformApplication.Current?.Services.GetService<AuthService>()));
 
         }
 

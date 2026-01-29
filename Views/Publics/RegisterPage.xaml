@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="controle_ja_mobile.Views.Publics.LoginPage"
+             xmlns:behaviors="clr-namespace:controle_ja_mobile.Behaviors"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
-             x:Class="controle_ja_mobile.Views.Publics.RegisterPage"
-             x:DataType="vm:RegisterViewModel"
+             x:DataType="vm:LoginViewModel"
              NavigationPage.HasNavigationBar="False"
-             Title="Criar Conta">
+             Title="Login">
 
     <ContentPage.Background>
         <RadialGradientBrush Center="0.5, 0.2" Radius="0.8">
@@ -16,6 +17,7 @@
     </ContentPage.Background>
 
     <Grid>
+        <!-- Loading Overlay -->
         <Grid BackgroundColor="#CC000000" 
               IsVisible="{Binding IsLoading}" 
               ZIndex="99">
@@ -25,79 +27,61 @@
                                HorizontalOptions="Center"/>
         </Grid>
 
+        <!-- ScrollView para Movimentação -->
         <ScrollView>
-            <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+            <ScrollView.Behaviors>
+                <behaviors:KeyboardAvoidanceBehavior />
+                <!-- Ajusta automaticamente ao teclado -->
+            </ScrollView.Behaviors>
 
-                <Image Source="logo_controle.png" 
-                       HeightRequest="80" 
-                       Aspect="AspectFit" 
-                       Margin="0,0,0,10"/>
+            <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="CenterAndExpand" HorizontalOptions="Center">
 
-                <Label Text="Crie sua conta" 
-                       TextColor="{StaticResource TextPrimaryDark}" 
-                       FontSize="24" 
-                       FontAttributes="Bold" 
-                       HorizontalTextAlignment="Center"/>
+                <!-- Logo e Títulos -->
+                <VerticalStackLayout Spacing="5" Margin="0,0,0,20">
+                    <Image Source="logo_controle.png" HeightRequest="100" Aspect="AspectFit" Margin="0,0,0,15"/>
+                    <Label Text="Bem-vindo de volta!" TextColor="{StaticResource TextPrimaryDark}" FontSize="26" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                    <Label Text="Acesse com seu e-mail." TextColor="{StaticResource TextSecondaryDark}" FontSize="14" HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
 
-                <Label Text="Preencha os dados abaixo para começar."
-                       TextColor="{StaticResource TextSecondaryDark}"
-                       FontSize="14"
-                       HorizontalTextAlignment="Center"
-                       Margin="0,-10,0,10"/>
-
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" 
-                        StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}"
-                        Padding="15,2">
-                    <Entry Placeholder="Nome Completo" 
-                           Text="{Binding Name}"
-                           TextColor="{StaticResource TextPrimaryDark}"
-                           PlaceholderColor="{StaticResource TextSecondaryDark}"/>
+                <!-- Campo E-mail -->
+                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}" Padding="15,2">
+                    <Entry Placeholder="E-mail" Text="{Binding Email}" Keyboard="Email" TextColor="{StaticResource TextPrimaryDark}" PlaceholderColor="{StaticResource TextSecondaryDark}" />
                 </Border>
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" 
-                        StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}"
-                        Padding="15,2">
-                    <Entry Placeholder="Seu melhor e-mail" 
-                           Text="{Binding Email}"
-                           Keyboard="Email"
-                           TextColor="{StaticResource TextPrimaryDark}"
-                           PlaceholderColor="{StaticResource TextSecondaryDark}"/>
+                <!-- Campo Senha -->
+                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}" Padding="15,2">
+                    <Entry Placeholder="Senha" Text="{Binding Password}" IsPassword="True" TextColor="{StaticResource TextPrimaryDark}" PlaceholderColor="{StaticResource TextSecondaryDark}"/>
                 </Border>
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" 
-                        StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}"
-                        Padding="15,2">
-                    <Entry Placeholder="Crie uma senha" 
-                           Text="{Binding Password}"
-                           IsPassword="True"
-                           TextColor="{StaticResource TextPrimaryDark}"
-                           PlaceholderColor="{StaticResource TextSecondaryDark}"/>
-                </Border>
+                <!-- Link Esqueceu Senha -->
+                <Label Text="Esqueceu sua senha?" 
+                       TextColor="{StaticResource Primary}" 
+                       FontSize="14" 
+                       HorizontalOptions="End"
+                       Margin="0,-10,0,0">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" 
-                        StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}"
-                        Padding="15,2">
-                    <Entry Placeholder="Confirme a senha" 
-                           Text="{Binding ConfirmPassword}"
-                           IsPassword="True"
-                           TextColor="{StaticResource TextPrimaryDark}"
-                           PlaceholderColor="{StaticResource TextSecondaryDark}"/>
-                </Border>
+                <!-- Botão Entrar -->
+                <Button Text="ENTRAR" 
+                        Command="{Binding LoginCommand}" 
+                        BackgroundColor="{StaticResource Primary}" 
+                        TextColor="#000000" 
+                        FontAttributes="Bold" 
+                        CornerRadius="10" 
+                        HeightRequest="50" />
 
-                <Button Text="CADASTRAR"
-                        Command="{Binding RegisterCommand}"
-                        BackgroundColor="{StaticResource Primary}"
-                        TextColor="#000000"
-                        FontAttributes="Bold"
-                        CornerRadius="10"
-                        HeightRequest="50"
-                        Margin="0,10,0,0"/>
-
-                <Button Text="Voltar para Login"
-                        Command="{Binding GoBackCommand}"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource TextSecondaryDark}"
-                        FontSize="14"/>
+                <!-- Link para Registrar -->
+                <Label Text="Ainda não tem conta? Crie agora" 
+                       TextColor="{StaticResource TextSecondaryDark}" 
+                       HorizontalOptions="Center" 
+                       FontSize="14">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToRegisterCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
 
             </VerticalStackLayout>
         </ScrollView>

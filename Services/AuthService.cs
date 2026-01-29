@@ -4,10 +4,7 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Plugin.Fingerprint;
-using Plugin.Fingerprint.Abstractions;
-using controle_ja_mobile.Views.Privates;
-using Microsoft.Maui.Controls;
+
 
 namespace controle_ja_mobile.Services
 {
@@ -29,9 +26,7 @@ namespace controle_ja_mobile.Services
                 var result = await _apiService.PostAsync<UserResponse>("auth/login", loginData);
                 if (result != null && !string.IsNullOrEmpty(result.Tokens?.AccessToken))
                 {
-                    Preferences.Set("AuthToken", result.Tokens.AccessToken);
-                    Preferences.Set("UserName", result.Username);
-                    return true;
+                    SaveAuthTokenAsync(result.Tokens.RefreshToken,result.Username);
                 }
 
             }
@@ -42,6 +37,37 @@ namespace controle_ja_mobile.Services
             }
             catch (Exception ex)
             {
+
+                System.Diagnostics.Debug.WriteLine($"Erro Google Auth: {ex.Message}");
+            }
+            return false;
+        }
+
+        public async Task<bool> loginWithTokenAsync(string token)
+        {
+            try
+            {
+                var loginData = new { token };
+                var result = await _apiService.PostAsync<UserResponse>("auth/auto-login", loginData);
+                if (result != null && !string.IsNullOrEmpty(result.Tokens?.AccessToken))
+                {
+                    SaveAuthTokenAsync(result.Tokens.RefreshToken, result.Username);
+                }
+
+            }
+            catch (TaskCanceledException ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Erro", "Servidor indisponível. Tente novamente mais tarde.", "OK");
+
+            }
+            catch (Exception ex)
+            {
+                if(ex.Message.Contains("Token inválido"))
+                {
+                    SaveAuthTokenAsync(null, null);
+                    await App.Current.MainPage.DisplayAlert("Acesso Negado", "Token Inválido, acesse novamente.", "OK");
+                    return false;
+                }
                 System.Diagnostics.Debug.WriteLine($"Erro Google Auth: {ex.Message}");
             }
             return false;
@@ -51,7 +77,7 @@ namespace controle_ja_mobile.Services
         public async Task<bool> RegisterAsync(string name, string email, string password)
         {
             var registerData = new { name, email, password };
-            var result = await _apiService.PostAsync<UserResponse>("auth/register", registerData);
+            var result = await _apiService.PostAsync<UserResponse>("users/register", registerData);
             return result != null;
         }
 
@@ -105,8 +131,7 @@ namespace controle_ja_mobile.Services
 
                             if (apiResult != null && !string.IsNullOrEmpty(apiResult.Tokens?.AccessToken))
                             {
-                                Preferences.Set("AuthToken", apiResult.Tokens.AccessToken);
-                                Preferences.Set("UserName", apiResult.Username);
+                                SaveAuthTokenAsync(apiResult.Tokens.RefreshToken, apiResult.Username);
                                 return true;
                             }
                         }
@@ -126,6 +151,13 @@ namespace controle_ja_mobile.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("Token inválido"))
+                {
+                    SaveAuthTokenAsync(null, null);
+                    await App.Current.MainPage.DisplayAlert("Acesso Negado", "Token Inválido, acesse novamente.", "OK");
+                    return false;
+                }
+
                 await App.Current.MainPage.DisplayAlert("Erro", "Servidor indisponível. " + ex.Message, "OK");
             }
 
@@ -195,22 +227,17 @@ namespace controle_ja_mobile.Services
             public string access_token { get; set; }
         }
 
-        public async Task<bool> AuthenticateWithBiometricsAsync()
+        public async Task SaveAuthTokenAsync(string token, string username)
         {
-            var result = await CrossFingerprint.Current.AuthenticateAsync(
-            new AuthenticationRequestConfiguration("Autenticação Biométrica", "Use FaceID ou impressão digital para continuar")
-        );
-
-            if (result.Authenticated)
-            {
-                await App.Current.MainPage.DisplayAlert("Sucesso", "Autenticação realizada com sucesso", "OK");
-                return true;
-            }
+            if (token == null)
+                SecureStorage.Remove("auth_token");
             else
-            {
-                await App.Current.MainPage.DisplayAlert("Erro", "A autenticação biométrica falhou.", "OK");
-                return false;
-            }
+                await SecureStorage.SetAsync("auth_token", token);
+            if (username == null)
+                Preferences.Remove("UserName");
+            else
+                Preferences.Set("UserName", username);
+
         }
     }    
 }
