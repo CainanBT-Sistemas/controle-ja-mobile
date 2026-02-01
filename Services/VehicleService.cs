@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace controle_ja_mobile.Services
@@ -21,10 +22,14 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.GetAsync<HttpResponseMessage>("vehicles");
-                if (response.IsSuccessStatusCode)
+                var response = await _apiService.GetAsync<string>("vehicles");
+                if (!string.IsNullOrWhiteSpace(response))
                 {
-                    return await response.Content.ReadFromJsonAsync<List<Vehicle>>();
+                    var vehiclesResponse = JsonSerializer.Deserialize<List<Vehicle>>(response);
+                    if (vehiclesResponse != null)
+                    {
+                        return vehiclesResponse;
+                    }
                 }
                 return new List<Vehicle>();
             }
@@ -39,8 +44,15 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.PostAsync<HttpResponseMessage>("vehicles", vehicle);
-                //return response.IsSuccessStatusCode;
+                var response = await _apiService.PostAsync<string>("vehicles", vehicle);
+                if (!string.IsNullOrWhiteSpace(response))
+                {
+                    var vehicleResponse = JsonSerializer.Deserialize<Vehicle>(response);
+                    if (vehicleResponse != null)
+                    {
+                        return true;
+                    }
+                }
                 return false;
             }
             catch (Exception ex)

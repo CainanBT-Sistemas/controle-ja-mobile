@@ -24,6 +24,7 @@ namespace controle_ja_mobile.Services
 
         public async Task<string> PostAsync<T>(string endpoint, object data)
         {
+            AddAuthenticationHeaderAsync(endpoint);
             var response = await _httpClient.PostAsJsonAsync(endpoint, data);
             if (!response.IsSuccessStatusCode)
             {
@@ -32,14 +33,15 @@ namespace controle_ja_mobile.Services
             return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<T> GetAsync<T>(string endpoint)
+        public async Task<String> GetAsync<T>(string endpoint)
         {
+            AddAuthenticationHeaderAsync(endpoint);
             var response =  await _httpClient.GetAsync(endpoint);
             if (!response.IsSuccessStatusCode)
             {
                 HandlerErrors(response);
             }
-            return await response.Content.ReadFromJsonAsync<T>();
+            return await response.Content.ReadAsStringAsync();
         }
 
         private async void HandlerErrors(HttpResponseMessage response)
@@ -55,6 +57,21 @@ namespace controle_ja_mobile.Services
                     }
                 }
                 await App.Current.MainPage.DisplayAlert(errorResponse.Title, errors, "OK");
+            }
+        }
+
+        private async Task AddAuthenticationHeaderAsync(string endpoint)
+        {
+            if(endpoint.Contains("/auth") || endpoint.Contains("/users/register"))
+            {
+                return;
+            }
+
+            var token = await SecureStorage.GetAsync("auth_token");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             }
         }
 

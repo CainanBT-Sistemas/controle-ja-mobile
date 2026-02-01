@@ -60,7 +60,7 @@ public partial class WelcomePage : ContentPage
     {
         base.OnAppearing();
         LoadingOverlay.IsVisible = true;
-        var token = await SecureStorage.GetAsync("auth_token");
+        var token = await SecureStorage.GetAsync("refresh_token");
         if (!string.IsNullOrEmpty(token))
         {
             bool success = await _authService.loginWithTokenAsync(token);

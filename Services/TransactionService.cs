@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace controle_ja_mobile.Services
@@ -22,10 +23,14 @@ namespace controle_ja_mobile.Services
             try
             {
                 string endpoint = $"transactions?start={start}&end={end}";
-                var response = await _apiService.GetAsync<HttpResponseMessage>(endpoint);
-                if (response.IsSuccessStatusCode)
+                var response = await _apiService.GetAsync<string>(endpoint);
+                if (!string.IsNullOrWhiteSpace(response))
                 {
-                    return await response.Content.ReadFromJsonAsync<List<Transaction>>();
+                    var transactionsResponse = JsonSerializer.Deserialize<List<Transaction>>(response);
+                    if (transactionsResponse != null)
+                    {
+                        return transactionsResponse;
+                    }
                 }
                 return new List<Transaction>();
             }
@@ -40,8 +45,15 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.PostAsync<HttpResponseMessage>("transactions", transaction);
-                //return response.IsSuccessStatusCode;
+                var response = await _apiService.PostAsync<string>("transactions", transaction);
+                if (!string.IsNullOrWhiteSpace(response))
+                {
+                    var transactionResponse = JsonSerializer.Deserialize<Transaction>(response);
+                    if (transactionResponse != null)
+                    {
+                        return true;
+                    }
+                }
                 return false;
             }
             catch (Exception ex)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace controle_ja_mobile.Services
@@ -21,10 +22,14 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.GetAsync<HttpResponseMessage>("categories");
-                if (response.IsSuccessStatusCode)
+                var response = await _apiService.GetAsync<string>("categories");
+                if (!string.IsNullOrWhiteSpace(response))
                 {
-                    return await response.Content.ReadFromJsonAsync<List<Category>>() ?? new List<Category>();
+                    var categorysResponse = JsonSerializer.Deserialize<List<Category>>(response);
+                    if (categorysResponse != null)
+                    {
+                        return categorysResponse;
+                    }
                 }
                 return new List<Category>();
             }
@@ -39,11 +44,15 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.PostAsync<HttpResponseMessage>("categories", category);
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    return await response.Content.ReadFromJsonAsync<Category>() ?? new Category();
-                //}
+                var response = await _apiService.PostAsync<string>("categories", category);
+                if (!string.IsNullOrWhiteSpace(response))
+                {
+                    var categoryResponse = JsonSerializer.Deserialize<Category>(response);
+                    if (categoryResponse != null)
+                    {
+                        return categoryResponse;
+                    }
+                }
                 return new Category();
             }
             catch (Exception ex)

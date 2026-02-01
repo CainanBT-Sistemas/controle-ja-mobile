@@ -25,16 +25,16 @@ namespace controle_ja_mobile.Services
             try
             {
                 var loginData = new { email, password };
-                var result = await _apiService.PostAsync<HttpResponseMessage>("auth/login", loginData);
-                //if (result.IsSuccessStatusCode)
-                //{
-                //    var userResponse = await result.Content.ReadFromJsonAsync<UserResponse>();
-                //    if (userResponse != null && !string.IsNullOrEmpty(userResponse.Tokens?.AccessToken))
-                //    {
-                //        await SaveAuthTokenAsync(userResponse.Tokens.RefreshToken, userResponse.Username);
-                //        return true;
-                //    }
-                //}
+                var result = await _apiService.PostAsync<string>("auth/login", loginData);
+                if (!string.IsNullOrEmpty(result))
+                {
+                    var userResponse = JsonSerializer.Deserialize<UserResponse>(result);
+                    if (userResponse != null && userResponse?.Id != null)
+                    {
+                        await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username);
+                        return true;
+                    }
+                }
                 return false;
 
             }
@@ -56,13 +56,13 @@ namespace controle_ja_mobile.Services
             try
             {
                 var loginData = new { token };
-                var result = await _apiService.PostAsync<HttpResponseMessage>("auth/auto-login", loginData);
+                var result = await _apiService.PostAsync<string>("auth/auto-login", loginData);
                 if (!string.IsNullOrEmpty(result))
                 {
                     var userResponse = JsonSerializer.Deserialize<UserResponse>(result);
                     if (userResponse != null && !string.IsNullOrEmpty(userResponse.Tokens?.AccessToken))
                     {
-                        await SaveAuthTokenAsync(userResponse.Tokens.RefreshToken, userResponse.Username);
+                        await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username);
                         return true;
                     }
                 }
@@ -78,7 +78,7 @@ namespace controle_ja_mobile.Services
             {
                 if(ex.Message.Contains("Token inválido"))
                 {
-                    SaveAuthTokenAsync(null, null);
+                    SaveAuthTokenAsync(null,null, null);
                     await App.Current.MainPage.DisplayAlert("Acesso Negado", "Token Inválido, acesse novamente.", "OK");
                     return false;
                 }
@@ -162,13 +162,13 @@ namespace controle_ja_mobile.Services
                                 photoUrl = userInfo.picture
                             };
 
-                            var apiResult = await _apiService.PostAsync<HttpResponseMessage>("auth/google", googlePayload);
+                            var apiResult = await _apiService.PostAsync<string>("auth/google", googlePayload);
                             if (!string.IsNullOrWhiteSpace(apiResult))
                             {
                                 var userResponse = JsonSerializer.Deserialize<UserResponse>(apiResult);
                                 if (userResponse != null && !string.IsNullOrEmpty(userResponse.Tokens?.AccessToken))
                                 {
-                                    await SaveAuthTokenAsync(userResponse.Tokens.RefreshToken, userResponse.Username);
+                                    await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username);
                                     return true;
                                 }
                             }
@@ -192,7 +192,7 @@ namespace controle_ja_mobile.Services
             {
                 if (ex.Message.Contains("Token inválido"))
                 {
-                    SaveAuthTokenAsync(null, null);
+                    SaveAuthTokenAsync(null,null, null);
                     await App.Current.MainPage.DisplayAlert("Acesso Negado", "Token Inválido, acesse novamente.", "OK");
                     return false;
                 }
@@ -266,12 +266,16 @@ namespace controle_ja_mobile.Services
             public string access_token { get; set; }
         }
 
-        public async Task SaveAuthTokenAsync(string token, string username)
+        public async Task SaveAuthTokenAsync(string token, string refreshToken, string username)
         {
             if (token == null)
                 SecureStorage.Remove("auth_token");
             else
                 await SecureStorage.SetAsync("auth_token", token);
+            if (refreshToken == null)
+                SecureStorage.Remove("refresh_token");
+            else
+                await SecureStorage.SetAsync("refresh_token", refreshToken);
             if (username == null)
                 Preferences.Remove("UserName");
             else

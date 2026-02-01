@@ -27,9 +27,9 @@ namespace controle_ja_mobile.ViewModels
 
         [ObservableProperty] private bool isMenuOpen;
 
-        public DashboardViewModel(DashboardService _dashboardService)
+        public DashboardViewModel(DashboardService dashboardService)
         {
-            _dashboardService = _dashboardService;
+            _dashboardService = dashboardService;
             UserName = Preferences.Get("UserName", "Usuário");
             CurrentDate = DateTime.Now;
             UpdateMonthDisplay();

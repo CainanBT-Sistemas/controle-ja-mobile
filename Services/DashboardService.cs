@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace controle_ja_mobile.Services
@@ -21,10 +22,14 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.GetAsync<HttpResponseMessage>($"dashboard/expenses-category?start={start}&end={end}");
-                if (response.IsSuccessStatusCode)
+                var response = await _apiService.GetAsync<string>($"dashboard/expenses-category?start={start}&end={end}");
+                if (!string.IsNullOrWhiteSpace(response))
                 {
-                    return await response.Content.ReadFromJsonAsync<List<ChartData>>() ?? new List<ChartData>();
+                    var chartDataResponse = JsonSerializer.Deserialize<List<ChartData>>(response);
+                    if (chartDataResponse != null)
+                    {
+                        return chartDataResponse;
+                    }
                 }
                 return new List<ChartData>();
             }
@@ -39,10 +44,14 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.GetAsync<HttpResponseMessage>($"dashboard/incomes-category?start={start}&end={end}");
-                if (response.IsSuccessStatusCode)
+                var response = await _apiService.GetAsync<string>($"dashboard/incomes-category?start={start}&end={end}");
+                if (!string.IsNullOrWhiteSpace(response))
                 {
-                    return await response.Content.ReadFromJsonAsync<List<ChartData>>() ?? new List<ChartData>();
+                    var chartDataResponse = JsonSerializer.Deserialize<List<ChartData>>(response);
+                    if (chartDataResponse != null)
+                    {
+                        return chartDataResponse;
+                    }
                 }
                 return new List<ChartData>();
             }
@@ -57,10 +66,14 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.GetAsync<HttpResponseMessage>($"dashboard/fuel-comparison?start={start}&end={end}");
-                if (response.IsSuccessStatusCode)
+                var response = await _apiService.GetAsync<string>($"dashboard/fuel-comparison?start={start}&end={end}");
+                if (!string.IsNullOrWhiteSpace(response))
                 {
-                    return await response.Content.ReadFromJsonAsync<List<ChartData>>() ?? new List<ChartData>();
+                    var chartDataResponse = JsonSerializer.Deserialize<List<ChartData>>(response);
+                    if (chartDataResponse != null)
+                    {
+                        return chartDataResponse;
+                    }
                 }
                 return new List<ChartData>();
             }
@@ -75,17 +88,21 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.GetAsync<HttpResponseMessage>($"dashboard/summary?start={start}&end={end}");
-                if (response.IsSuccessStatusCode)
+                var response = await _apiService.GetAsync<string>($"dashboard/summary?start={start}&end={end}");
+                if (!string.IsNullOrWhiteSpace(response))
                 {
-                    return await response.Content.ReadFromJsonAsync<FinancialSummary>();
+                    var financialSummary = JsonSerializer.Deserialize<FinancialSummary>(response);
+                    if (financialSummary != null)
+                    {
+                        return financialSummary;
+                    }
                 }
-                return null;
+                return new FinancialSummary();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return null;
+                return new FinancialSummary();
             }
         }
 
@@ -98,10 +115,14 @@ namespace controle_ja_mobile.Services
                 {
                     endpoint += $"&uuid={uuid}";
                 }
-                var response = await _apiService.GetAsync<HttpResponseMessage>(endpoint);
-                if (response.IsSuccessStatusCode)
+                var response = await _apiService.GetAsync<string>(endpoint);
+                if (!string.IsNullOrWhiteSpace(response))
                 {
-                    return await response.Content.ReadFromJsonAsync<List<ChartData>>() ?? new List<ChartData>();
+                    var chartDataResponse = JsonSerializer.Deserialize<List<ChartData>>(response);
+                    if (chartDataResponse != null)
+                    {
+                        return chartDataResponse;
+                    }
                 }
                 return new List<ChartData>();
             }

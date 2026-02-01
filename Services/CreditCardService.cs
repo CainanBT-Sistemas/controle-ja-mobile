@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace controle_ja_mobile.Services
@@ -21,12 +22,15 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.GetAsync<HttpResponseMessage>("cards");
-                if (response.IsSuccessStatusCode)
+                var response = await _apiService.GetAsync<string>("cards");
+                if (!string.IsNullOrEmpty(response))
                 {
-                    return await response.Content.ReadFromJsonAsync<List<CreditCard>>() ?? new List<CreditCard>();
+                    var cardsResponse = JsonSerializer.Deserialize<List<CreditCard>>(response);
+                    if (cardsResponse != null)
+                    {
+                        return cardsResponse;
+                    }
                 }
-
                 return new List<CreditCard>();
             }
             catch (Exception ex)
@@ -40,8 +44,14 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                var response = await _apiService.PostAsync<HttpResponseMessage>("cards", card);
-                //return response.IsSuccessStatusCode;
+                var response = await _apiService.PostAsync<string>("cards", card);
+                if (!string.IsNullOrWhiteSpace(response))
+                {
+                    var cardResponse = JsonSerializer.Deserialize<CreditCard>(response);
+                    if(cardResponse != null) {
+                        return true;
+                    }
+                }
                 return false;
             }
             catch (Exception ex)
