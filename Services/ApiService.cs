@@ -18,72 +18,43 @@ namespace controle_ja_mobile.Services
             _httpClient = new HttpClient
             {
                 BaseAddress = new Uri(_baseUrl),
-                // CORREÇÃO: Define limite de 10 segundos. 
-                // Sem isso, o app fica rodando para sempre se o servidor cair.
                 Timeout = TimeSpan.FromSeconds(10)
             };
         }
 
-        public async Task<T> PostAsync<T>(string endpoint, object data)
+        public async Task<string> PostAsync<T>(string endpoint, object data)
         {
-            try
+            var response = await _httpClient.PostAsJsonAsync(endpoint, data);
+            if (!response.IsSuccessStatusCode)
             {
-                var response = await _httpClient.PostAsJsonAsync(endpoint, data);
-                bool success = await hasNoErrorAsync(response);
-                if (success)
-                {
-                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                        return default;
-
-                    return await response.Content.ReadFromJsonAsync<T>();
-                }
-                else
-                {
-                    throw new Exception("else ");
-                }
-            }catch(Exception ex)
-            {
-                Console.WriteLine("erro não mapeado: " + ex);
-                throw new Exception("Erro Desconhecido: " + ex.Message);
+                HandlerErrors(response);
             }
-            
-        }
-
-
-        private async Task<bool> hasNoErrorAsync(HttpResponseMessage response)
-        {
-            if (response.IsSuccessStatusCode)
-            {
-                return true;
-            }
-            if (response.IsSuccessStatusCode.Equals(HttpStatusCode.BadRequest))
-            {
-                
-            }
-            
-            await App.Current.MainPage.DisplayAlert("Acesso Negado", "Token Inválido, acesse novamente.", "OK");
-            return false;
+            return await response.Content.ReadAsStringAsync();
         }
 
         public async Task<T> GetAsync<T>(string endpoint)
         {
-            var response = await _httpClient.GetAsync(endpoint);
+            var response =  await _httpClient.GetAsync(endpoint);
+            if (!response.IsSuccessStatusCode)
+            {
+                HandlerErrors(response);
+            }
+            return await response.Content.ReadFromJsonAsync<T>();
+        }
 
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadFromJsonAsync<T>();
-            }else
-            {
-                var errorJson = await response.Content.ReadAsStringAsync();
-                try
+        private async void HandlerErrors(HttpResponseMessage response)
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<UserFriendlyError>();
+            if (errorResponse != null) {
+                string errors = "";
+                foreach (var e in errorResponse.Message.Split(", "))
                 {
-                    var apiError = JsonSerializer.Deserialize<ApiErrorResponse>(errorJson);
-                    throw new Exception(apiError?.Message ?? "Erro desconhecido.");
+                    if (!string.IsNullOrEmpty(e))
+                    {
+                        errors += string.IsNullOrEmpty(errors) ? e : "\n" + e;
+                    }
                 }
-                catch
-                {
-                    throw new Exception("Erro desconhecido: " + errorJson);
-                }
+                await App.Current.MainPage.DisplayAlert(errorResponse.Title, errors, "OK");
             }
         }
 

@@ -15,7 +15,7 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("name")]
         public string Name { get; set; } // Ex: Nubank
 
-        [JsonPropertyName("totalLimit")]
+        [JsonPropertyName("limit")]
         public decimal TotalLimit { get; set; }
 
         [JsonPropertyName("currentLimit")]

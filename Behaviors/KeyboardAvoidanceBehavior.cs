@@ -10,26 +10,29 @@ namespace controle_ja_mobile.Behaviors
     {
         private double _defaultHeight;
 
-        protected override void OnAttachedTo(ScrollView scrollView)
+        protected override void OnAttachedTo(ScrollView bindable)
         {
-            base.OnAttachedTo(scrollView);
+            base.OnAttachedTo(bindable);
 
-            // Salvar o tamanho inicial
-            scrollView.SizeChanged += (sender, args) =>
+            bindable.SizeChanged += (sender, args) =>
             {
-                if (_defaultHeight == 0)
-                    _defaultHeight = scrollView.Height;
-            };
-
-            scrollView.Focused += (sender, args) =>
-            {
-                var element = sender as ScrollView;
-                if (element != null)
+                var scrollView = bindable as ScrollView;
+                if (scrollView != null && scrollView.Height > 0)
                 {
-                    // Ajustar rolagem para trazer elementos ativos quando necessário
-                    element.ScrollToAsync(0, 100, true);
+                    if (_defaultHeight == 0)
+                        _defaultHeight = scrollView.Height;
+
+                    // Ajustar rolagem apenas quando altura for reduzida devido ao teclado
+                    if (_defaultHeight > scrollView.Height)
+                        scrollView.ScrollToAsync(0, _defaultHeight - scrollView.Height, true);
                 }
             };
+        }
+
+        protected override void OnDetachingFrom(ScrollView bindable)
+        {
+            base.OnDetachingFrom(bindable);
+            bindable.SizeChanged -= (sender, args) => { };
         }
     }
 }

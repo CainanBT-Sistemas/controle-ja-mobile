@@ -68,12 +68,6 @@ public partial class WelcomePage : ContentPage
             {
                 Application.Current.MainPage = new AppShell();
             }
-            else
-            {
-                var currentPage = App.Current.MainPage;
-                if (currentPage != null)
-                    await currentPage.DisplayAlert("Erro", "E-mail ou senha incorretos", "OK");
-            }
         }
         LoadingOverlay.IsVisible = false;
     }

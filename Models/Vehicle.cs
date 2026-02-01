@@ -21,6 +21,12 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("model")]
         public string Model { get; set; } = string.Empty;
 
+        [JsonPropertyName("year")]
+        public int Year { get; set; }
+
+        [JsonPropertyName("plate")]
+        public string Plate { get; set; } = string.Empty;
+
         [JsonPropertyName("currentOdometer")]
         public decimal CurrentOdometer { get; set; }
 

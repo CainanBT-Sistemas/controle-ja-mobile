@@ -1,6 +1,8 @@
 ﻿using controle_ja_mobile.Configs;
 using controle_ja_mobile.Models;
+using Microsoft.Maui.ApplicationModel.Communication;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -23,11 +25,17 @@ namespace controle_ja_mobile.Services
             try
             {
                 var loginData = new { email, password };
-                var result = await _apiService.PostAsync<UserResponse>("auth/login", loginData);
-                if (result != null && !string.IsNullOrEmpty(result.Tokens?.AccessToken))
-                {
-                    SaveAuthTokenAsync(result.Tokens.RefreshToken,result.Username);
-                }
+                var result = await _apiService.PostAsync<HttpResponseMessage>("auth/login", loginData);
+                //if (result.IsSuccessStatusCode)
+                //{
+                //    var userResponse = await result.Content.ReadFromJsonAsync<UserResponse>();
+                //    if (userResponse != null && !string.IsNullOrEmpty(userResponse.Tokens?.AccessToken))
+                //    {
+                //        await SaveAuthTokenAsync(userResponse.Tokens.RefreshToken, userResponse.Username);
+                //        return true;
+                //    }
+                //}
+                return false;
 
             }
             catch (TaskCanceledException ex)
@@ -48,11 +56,17 @@ namespace controle_ja_mobile.Services
             try
             {
                 var loginData = new { token };
-                var result = await _apiService.PostAsync<UserResponse>("auth/auto-login", loginData);
-                if (result != null && !string.IsNullOrEmpty(result.Tokens?.AccessToken))
+                var result = await _apiService.PostAsync<HttpResponseMessage>("auth/auto-login", loginData);
+                if (!string.IsNullOrEmpty(result))
                 {
-                    SaveAuthTokenAsync(result.Tokens.RefreshToken, result.Username);
+                    var userResponse = JsonSerializer.Deserialize<UserResponse>(result);
+                    if (userResponse != null && !string.IsNullOrEmpty(userResponse.Tokens?.AccessToken))
+                    {
+                        await SaveAuthTokenAsync(userResponse.Tokens.RefreshToken, userResponse.Username);
+                        return true;
+                    }
                 }
+                return false;
 
             }
             catch (TaskCanceledException ex)
@@ -74,11 +88,32 @@ namespace controle_ja_mobile.Services
         }
 
         // Registro
-        public async Task<bool> RegisterAsync(string name, string email, string password)
+        public async Task<bool> RegisterAsync(string username, string email, string password)
         {
-            var registerData = new { name, email, password };
-            var result = await _apiService.PostAsync<UserResponse>("users/register", registerData);
-            return result != null;
+            try
+            {
+                var registerData = new { username, email, password };
+                var result = await _apiService.PostAsync<HttpResponseMessage>("users/register", registerData);
+                if (!string.IsNullOrWhiteSpace(result)){
+                    var userResponse = JsonSerializer.Deserialize<UserResponse>(result);
+                    if(userResponse?.Id != null)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch(Exception ex)
+            {
+                if (ex.Message.Equals("Cannot access a closed Stream."))
+                {
+                    return false;
+                }
+
+                Console.WriteLine(ex);
+            }
+            return false;
+            
         }
 
         // LOGIN COM GOOGLE USANDO O FLUXO PKCE (SEGURO)
@@ -127,15 +162,19 @@ namespace controle_ja_mobile.Services
                                 photoUrl = userInfo.picture
                             };
 
-                            var apiResult = await _apiService.PostAsync<UserResponse>("auth/google", googlePayload);
-
-                            if (apiResult != null && !string.IsNullOrEmpty(apiResult.Tokens?.AccessToken))
+                            var apiResult = await _apiService.PostAsync<HttpResponseMessage>("auth/google", googlePayload);
+                            if (!string.IsNullOrWhiteSpace(apiResult))
                             {
-                                SaveAuthTokenAsync(apiResult.Tokens.RefreshToken, apiResult.Username);
-                                return true;
+                                var userResponse = JsonSerializer.Deserialize<UserResponse>(apiResult);
+                                if (userResponse != null && !string.IsNullOrEmpty(userResponse.Tokens?.AccessToken))
+                                {
+                                    await SaveAuthTokenAsync(userResponse.Tokens.RefreshToken, userResponse.Username);
+                                    return true;
+                                }
                             }
                         }
                     }
+                    return false;
                 }
             }
             catch (TaskCanceledException ex)
@@ -238,6 +277,37 @@ namespace controle_ja_mobile.Services
             else
                 Preferences.Set("UserName", username);
 
+        }
+
+        private async Task<bool> remover(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            var errorResponse = await response.Content.ReadAsStringAsync();
+
+            if (errorResponse.Contains("A senha deve ter no mínimo 6 caracteres"))
+            {
+                await App.Current.MainPage.DisplayAlert("Falha ao fazer login", "A senha deve ter no mínimo 6 caracteres", "ok");
+                return false;
+            }
+
+            if (errorResponse.Contains("O nome de usuário é obrigatório"))
+            {
+                await App.Current.MainPage.DisplayAlert("Falha ao fazer login", "O nome de usuário é obrigatório", "ok");
+                return false;
+
+            }
+            if (errorResponse.Contains("Formato de email inválido"))
+            {
+                await App.Current.MainPage.DisplayAlert("Falha ao fazer login", "Formato de email inválido", "ok");
+                return false;
+
+            }
+            
+
+            return false;
         }
     }    
 }

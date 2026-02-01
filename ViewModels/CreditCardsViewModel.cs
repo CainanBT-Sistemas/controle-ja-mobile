@@ -9,7 +9,7 @@ namespace controle_ja_mobile.ViewModels
 {
     public partial class CreditCardsViewModel : BaseViewModel
     {
-        private readonly ApiService _apiService;
+        private readonly CreditCardService _creditCardService;
         public ObservableCollection<CreditCard> Cards { get; } = new();
 
         [ObservableProperty] private bool isRefreshing;
@@ -20,31 +20,25 @@ namespace controle_ja_mobile.ViewModels
         [ObservableProperty] private string newCardCloseDay;
         [ObservableProperty] private string newCardBestDay;
 
-        public CreditCardsViewModel(ApiService apiService)
+        public CreditCardsViewModel(CreditCardService creditCardService)
         {
-            _apiService = apiService;
+            _creditCardService = creditCardService;
         }
 
         [RelayCommand]
-        public async Task LoadCards()
+        public async Task LoadCardsAsync()
         {
             // Passamos 'false' no showLoading se estivermos usando o RefreshView, 
             // senão o loading global aparece em cima do spinner nativo.
-            await ExecuteAsync(async () =>
+            await ExecuteWithErrorHandlingAsync(async () =>
             {
-                try
+                var cards = await _creditCardService.GetCreditCardsAsync();
+                Cards.Clear();
+                if (cards != null)
                 {
-                    var list = await _apiService.GetAsync<List<CreditCard>>("cards");
-                    Cards.Clear();
-                    if (list != null)
-                    {
-                        foreach (var card in list) Cards.Add(card);
-                    }
+                    foreach (var card in cards) Cards.Add(card);
                 }
-                finally
-                {
-                    IsRefreshing = false; // Garante que o spinner para
-                }
+                IsRefreshing = false;
             }, showLoading: false);
         }
 
@@ -55,7 +49,7 @@ namespace controle_ja_mobile.ViewModels
         }
 
         [RelayCommand]
-        public async Task SaveCard()
+        public async Task SaveCardAsync()
         {
             if (string.IsNullOrWhiteSpace(NewCardName) || string.IsNullOrWhiteSpace(NewCardLimit) ||
                 string.IsNullOrWhiteSpace(NewCardCloseDay) || string.IsNullOrWhiteSpace(NewCardBestDay))
@@ -82,19 +76,18 @@ namespace controle_ja_mobile.ViewModels
                 return;
             }
 
-            await ExecuteAsync(async () =>
+            var newCard = new CreditCard
             {
-                var newCardDto = new
-                {
-                    name = NewCardName,
-                    limit = limit,
-                    closeDay = closeDay,
-                    bestDay = bestDay
-                };
+                Name = NewCardName,
+                TotalLimit = limit,
+                CloseDay = closeDay,
+                BestDay = bestDay
+            };
 
-                var result = await _apiService.PostAsync<CreditCard>("cards", newCardDto);
-
-                if (result != null)
+            await ExecuteWithErrorHandlingAsync(async () =>
+            {
+                var success = await _creditCardService.SaveCreditCardAsync(newCard);
+                if (success)
                 {
                     await App.Current.MainPage.DisplayAlert("Sucesso", "Cartão adicionado!", "OK");
 
@@ -105,7 +98,7 @@ namespace controle_ja_mobile.ViewModels
                     NewCardBestDay = "";
 
                     await Shell.Current.GoToAsync("..");
-                    await LoadCards();
+                    await LoadCardsAsync();
                 }
                 else
                 {

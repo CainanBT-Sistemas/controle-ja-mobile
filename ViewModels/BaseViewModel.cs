@@ -14,7 +14,7 @@ namespace controle_ja_mobile.ViewModels
         private bool _isBusy;
 
         // Método centralizado para executar operações com tratamento de erro amigável
-        protected async Task ExecuteAsync(Func<Task> operation, bool showLoading = true)
+        protected async Task ExecuteWithErrorHandlingAsync(Func<Task> operation, bool showLoading = true)
         {
             if (IsBusy) return;
 

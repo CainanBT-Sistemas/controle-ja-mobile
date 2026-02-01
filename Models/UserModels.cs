@@ -28,8 +28,12 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("email")]
         public string Email { get; set; } = string.Empty;
 
+        [JsonPropertyName("createdAt")]
+        public long CreatedAt { get; set; }
+
         [JsonPropertyName("tokens")]
-        public AuthTokens? Tokens { get; set; }
+        public AuthTokens? Tokens { get; set; } = null;
+
     }
 
     public class InsertUpdateUserDTO

@@ -8,7 +8,10 @@ namespace controle_ja_mobile.ViewModels
 {
     public partial class TransactionAddViewModel : BaseViewModel, IQueryAttributable
     {
-        private readonly ApiService _apiService;
+        private readonly TransactionService _transactionService;
+        private readonly CategoryService _categoryService;
+        private readonly AccountService _accountService;
+        private readonly CreditCardService _creditCardService;
         public ObservableCollection<Category> Categories { get; } = new();
         public ObservableCollection<PaymentSource> PaymentSources { get; } = new();
 
@@ -29,10 +32,11 @@ namespace controle_ja_mobile.ViewModels
 
         private TransactionType _currentType;
 
-        public TransactionAddViewModel(ApiService apiService)
+        public TransactionAddViewModel(TransactionService transactionService)
         {
-            _apiService = apiService;
+            _transactionService = transactionService;
         }
+
 
         [RelayCommand]
         public async Task SaveAndContinue()
@@ -81,25 +85,23 @@ namespace controle_ja_mobile.ViewModels
             bool savedSuccessfully = false;
 
             // Envolve a chamada da API com nossa proteção de erros
-            await ExecuteAsync(async () =>
+            await ExecuteWithErrorHandlingAsync(async () =>
             {
-                var transaction = new
-                {
-                    name = Description,
-                    type = _currentType.ToString(),
-                    amount = decimalAmount,
-                    date = new DateTimeOffset(Date).ToUnixTimeMilliseconds(),
-                    paid = IsPaid,
-                    categoryId = SelectedCategory.Id,
-                    accountId = SelectedSource.Type == "ACCOUNT" ? SelectedSource.Id : (Guid?)null,
-                    creditCardId = SelectedSource.Type == "CREDIT_CARD" ? SelectedSource.Id : (Guid?)null,
-                    installments = IsInstallment && int.TryParse(InstallmentCount, out int i) ? i : 1,
-                    isRecurring = IsRecurring
-                };
+                Transaction transaction = new Transaction();
+                transaction.Name = description;
+                transaction.Type = _currentType;
+                transaction.Amount = decimalAmount;
+                transaction.Date = new DateTimeOffset(Date).ToUnixTimeMilliseconds();
+                transaction.Paid = IsPaid;
+                transaction.CategoryId = SelectedCategory.Id;
+                transaction.AccountId = SelectedSource.Type == "ACCOUNT" ? SelectedSource.Id : Guid.Empty;
+                transaction.CreditCardId = SelectedSource.Type == "CREDIT_CARD" ? SelectedSource.Id : (Guid?)null;
+                transaction.Installments = IsInstallment && int.TryParse(InstallmentCount, out int i) ? i : 1;
+                transaction.IsRecurring = IsRecurring;
 
-                var result = await _apiService.PostAsync<TransactionModel>("transactions", transaction);
+                bool success = await _transactionService.SaveTransactionAsync(transaction);
 
-                if (result == null)
+                if (success == null)
                 {
                     // Lançamos exceção para o ExecuteAsync pegar e mostrar a mensagem amigável de erro genérico
                     throw new Exception("O servidor não retornou dados.");
@@ -144,11 +146,11 @@ namespace controle_ja_mobile.ViewModels
 
         private async Task LoadDependencies()
         {
-            await ExecuteAsync(async () =>
+            await ExecuteWithErrorHandlingAsync(async () =>
             {
-                var tCats = _apiService.GetAsync<List<Category>>("categories");
-                var tAccs = _apiService.GetAsync<List<Account>>("accounts");
-                var tCards = _apiService.GetAsync<List<CreditCard>>("cards");
+                var tCats =  _categoryService.GetCategoriesAsync();
+                var tAccs =  _accountService.GetAccountsAsync();
+                var tCards = _creditCardService.GetCreditCardsAsync();
 
                 await Task.WhenAll(tCats, tAccs, tCards);
 
@@ -183,10 +185,10 @@ namespace controle_ja_mobile.ViewModels
             string result = await App.Current.MainPage.DisplayPromptAsync("Nova Categoria", "Nome da categoria:");
             if (!string.IsNullOrWhiteSpace(result))
             {
-                await ExecuteAsync(async () =>
+                await ExecuteWithErrorHandlingAsync(async () =>
                 {
                     var newCat = new Category { Name = result, Type = _currentType };
-                    var savedCat = await _apiService.PostAsync<Category>("categories", newCat);
+                    var savedCat = await _categoryService.SaveCategoryAsync(newCat);
                     if (savedCat != null)
                     {
                         Categories.Add(savedCat);

@@ -43,10 +43,6 @@ namespace controle_ja_mobile.ViewModels
                 var loginPage = IPlatformApplication.Current.Services.GetService<LoginPage>();
                 Application.Current.MainPage = loginPage;
             }
-            else
-            {
-                await App.Current.MainPage.DisplayAlert("Erro", "Falha ao criar conta. Verifique os dados ou tente outro e-mail.", "OK");
-            }
         }
 
         [RelayCommand]
