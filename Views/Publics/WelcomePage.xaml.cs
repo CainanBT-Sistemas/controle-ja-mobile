@@ -59,6 +59,19 @@ public partial class WelcomePage : ContentPage
         await Navigation.PushAsync(loginPage);
     }
 
+    private void NavigateToMainApp()
+    {
+        Dispatcher.Dispatch(() =>
+        {
+            Application.Current.MainPage = new AppShell();
+        });
+    }
+
+    private void ClearRefreshToken()
+    {
+        SecureStorage.Remove("refresh_token");
+    }
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();
@@ -89,16 +102,13 @@ public partial class WelcomePage : ContentPage
                         if (success)
                         {
                             // Navigate to main app
-                            Dispatcher.Dispatch(() =>
-                            {
-                                Application.Current.MainPage = new AppShell();
-                            });
+                            NavigateToMainApp();
                             return;
                         }
                         else
                         {
                             // Token is invalid, clear it
-                            SecureStorage.Remove("refresh_token");
+                            ClearRefreshToken();
                             await DisplayAlert("Sessão Expirada", "Sua sessão expirou. Por favor, faça login novamente.", "OK");
                         }
                     }
@@ -115,12 +125,12 @@ public partial class WelcomePage : ContentPage
                     
                     if (success)
                     {
-                        Application.Current.MainPage = new AppShell();
+                        NavigateToMainApp();
                     }
                     else
                     {
                         // Token is invalid, clear it
-                        SecureStorage.Remove("refresh_token");
+                        ClearRefreshToken();
                     }
                 }
             }
