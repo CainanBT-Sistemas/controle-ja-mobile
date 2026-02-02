@@ -277,9 +277,9 @@ namespace controle_ja_mobile.Services
             else
                 await SecureStorage.SetAsync("refresh_token", refreshToken);
             if (username == null)
-                Preferences.Remove("UserName");
+                Preferences.Remove(AppConstants.UserNameStorageKey);
             else
-                Preferences.Set("UserName", username);
+                Preferences.Set(AppConstants.UserNameStorageKey, username);
 
         }
 

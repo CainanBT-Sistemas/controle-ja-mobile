@@ -1,3 +1,4 @@
+using controle_ja_mobile.Configs;
 using controle_ja_mobile.ViewModels;
 using controle_ja_mobile.Views.Components;
 using controle_ja_mobile.Views.Privates.Tabs;
@@ -11,7 +12,7 @@ public partial class DashboardPage : ContentPage
         InitializeComponent();
 
         // Set user name on toolbar
-        MyToolbar.UserName = Preferences.Get("UserName", "Usuário");
+        MyToolbar.UserName = Preferences.Get(AppConstants.UserNameStorageKey, "Usuário");
 
         // 1. Instancia as Views e injeta os ViewModels
         var homeView = new HomeView { BindingContext = homeVm };

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using controle_ja_mobile.Configs;
 using controle_ja_mobile.Services;
 using controle_ja_mobile.Views.Publics;
 using controle_ja_mobile.Models;
@@ -30,7 +31,7 @@ namespace controle_ja_mobile.ViewModels
         {
             _apiService = apiService;
             _dashboardService = dashboardService;
-            UserName = Preferences.Get("UserName", "Usuário");
+            UserName = Preferences.Get(AppConstants.UserNameStorageKey, "Usuário");
             CurrentDate = DateTime.Now;
             UpdateMonthDisplay();
         }

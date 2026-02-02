@@ -1,3 +1,4 @@
+using controle_ja_mobile.Configs;
 using controle_ja_mobile.Views.Publics;
 
 namespace controle_ja_mobile.Views.Components;
@@ -61,11 +62,11 @@ public partial class DynamicToolbar : ContentView
         if (!confirm) return;
 
         // Clear session data
-        Preferences.Remove("AuthToken");
-        Preferences.Remove("UserName");
+        Preferences.Remove(AppConstants.AuthStorageKey);
+        Preferences.Remove(AppConstants.UserNameStorageKey);
 
         // Navigate to login page
-        var loginPage = IPlatformApplication.Current.Services.GetService<LoginPage>();
-        Application.Current.MainPage = new NavigationPage(loginPage);
+        var loginPageInstance = IPlatformApplication.Current.Services.GetService<LoginPage>();
+        Application.Current.MainPage = new NavigationPage(loginPageInstance);
     }
 }

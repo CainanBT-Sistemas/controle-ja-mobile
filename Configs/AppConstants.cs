@@ -13,5 +13,6 @@ namespace controle_ja_mobile.Configs
         : "http://localhost:8080/controle_ja_api/v1/";
 
         public const string AuthStorageKey = "AuthToken";
+        public const string UserNameStorageKey = "UserName";
     }
 }
