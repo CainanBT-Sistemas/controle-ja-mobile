@@ -11,7 +11,7 @@ public partial class BottomMenu : ContentView
     private readonly Color ActiveColor = Color.FromArgb("#00E676");
     private readonly Color InactiveColor = Color.FromArgb("#64748B");
 
-    // Propriedade Bindable (Recebe aviso da Dashboard quando o usuário desliza o dedo)
+    // Propriedade Bindable (Recebe aviso da Dashboard quando o usuï¿½rio desliza o dedo)
     public static readonly BindableProperty ActivePageProperty =
         BindableProperty.Create(nameof(ActivePage), typeof(string), typeof(BottomMenu), "Home", propertyChanged: OnActivePageChanged);
 
@@ -32,16 +32,16 @@ public partial class BottomMenu : ContentView
         if (bindable is BottomMenu menu) menu.UpdateVisualState();
     }
 
-    // Pinta os ícones baseados na página atual
+    // Pinta os ï¿½cones baseados na pï¿½gina atual
     private void UpdateVisualState()
     {
-        if (PathHome == null) return; // Proteção
+        if (PathHome == null) return; // Proteï¿½ï¿½o
 
         // 1. Reseta tudo
         PathHome.Fill = InactiveColor; LblHome.TextColor = InactiveColor;
-        PathExtrato.Fill = InactiveColor; LblExtrato.TextColor = InactiveColor;
         PathCards.Fill = InactiveColor; LblCards.TextColor = InactiveColor;
         PathVehicles.Fill = InactiveColor; LblVehicles.TextColor = InactiveColor;
+        PathSettings.Fill = InactiveColor; LblSettings.TextColor = InactiveColor;
 
         // 2. Pinta o ativo
         switch (ActivePage)
@@ -52,12 +52,12 @@ public partial class BottomMenu : ContentView
                 PathCards.Fill = ActiveColor; LblCards.TextColor = ActiveColor; break;
             case "Vehicles":
                 PathVehicles.Fill = ActiveColor; LblVehicles.TextColor = ActiveColor; break;
-            case "Extrato":
-                PathExtrato.Fill = ActiveColor; LblExtrato.TextColor = ActiveColor; break;
+            case "Settings":
+                PathSettings.Fill = ActiveColor; LblSettings.TextColor = ActiveColor; break;
         }
     }
 
-    // --- MUDANÇA PRINCIPAL AQUI ---
+    // --- MUDANï¿½A PRINCIPAL AQUI ---
     // Em vez de navegar, mandamos uma mensagem para a DashboardPage rodar o carrossel
 
     private void OnHomeClicked(object sender, EventArgs e)
@@ -76,12 +76,12 @@ public partial class BottomMenu : ContentView
         MessagingCenter.Send(this, "NavigateTo", "Vehicles");
     }
 
-    private async void OnExtratoClicked(object sender, EventArgs e)
+    private void OnSettingsClicked(object sender, EventArgs e)
     {
-        await App.Current.MainPage.DisplayAlert("Em Breve", "Extrato", "OK");
+        MessagingCenter.Send(this, "NavigateTo", "Settings");
     }
 
-    // --- LÓGICA DO FAB (Botão +) ---
+    // --- Lï¿½GICA DO FAB (Botï¿½o +) ---
     // Essa parte continua navegando de verdade, pois abre uma tela de cadastro
 
     private async void OnFabClicked(object sender, EventArgs e)
@@ -93,18 +93,18 @@ public partial class BottomMenu : ContentView
     private async void OnNewIncomeClicked(object sender, EventArgs e)
     {
         _isMenuOpen = false; await ToggleMenuAnimations();
-        // Navegação real para página de cadastro
+        // Navegaï¿½ï¿½o real para pï¿½gina de cadastro
         await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=RECEITA");
     }
 
     private async void OnNewExpenseClicked(object sender, EventArgs e)
     {
         _isMenuOpen = false; await ToggleMenuAnimations();
-        // Navegação real para página de cadastro
+        // Navegaï¿½ï¿½o real para pï¿½gina de cadastro
         await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=DESPESA");
     }
 
-    // Animações do FAB
+    // Animaï¿½ï¿½es do FAB
     private async Task ToggleMenuAnimations()
     {
         if (_isMenuOpen)

@@ -6,7 +6,7 @@ namespace controle_ja_mobile.Views.Privates;
 
 public partial class DashboardPage : ContentPage
 {
-    public DashboardPage(DashboardViewModel homeVm, CreditCardsViewModel cardsVm, VehiclesViewModel vehiclesVm)
+    public DashboardPage(DashboardViewModel homeVm, CreditCardsViewModel cardsVm, VehiclesViewModel vehiclesVm, SettingsViewModel settingsVm)
     {
         InitializeComponent();
 
@@ -14,13 +14,15 @@ public partial class DashboardPage : ContentPage
         var homeView = new HomeView { BindingContext = homeVm };
         var cardsView = new CreditCardsView { BindingContext = cardsVm };
         var vehiclesView = new VehicleListView { BindingContext = vehiclesVm };
+        var settingsView = new SettingsView { BindingContext = settingsVm };
 
         // 2. Adiciona ao Carrossel (Agora ele acha o MainCarousel por causa do x:Name)
         MainCarousel.ItemsSource = new List<ContentView>
         {
             homeView,
             cardsView,
-            vehiclesView
+            vehiclesView,
+            settingsView
         };
 
         // 3. Inscreve no MessagingCenter
@@ -31,6 +33,7 @@ public partial class DashboardPage : ContentPage
                 case "Home": MainCarousel.Position = 0; break;
                 case "Cards": MainCarousel.Position = 1; break;
                 case "Vehicles": MainCarousel.Position = 2; break;
+                case "Settings": MainCarousel.Position = 3; break;
             }
         });
     }
@@ -45,6 +48,7 @@ public partial class DashboardPage : ContentPage
                 case 0: MyBottomMenu.ActivePage = "Home"; break;
                 case 1: MyBottomMenu.ActivePage = "Cards"; break;
                 case 2: MyBottomMenu.ActivePage = "Vehicles"; break;
+                case 3: MyBottomMenu.ActivePage = "Settings"; break;
             }
         }
     }
