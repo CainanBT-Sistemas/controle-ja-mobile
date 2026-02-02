@@ -31,7 +31,7 @@ namespace controle_ja_mobile.Services
                     var userResponse = JsonSerializer.Deserialize<UserResponse>(result);
                     if (userResponse != null && userResponse?.Id != null)
                     {
-                        await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username);
+                        await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username, userResponse.Email);
                         return true;
                     }
                 }
@@ -62,7 +62,7 @@ namespace controle_ja_mobile.Services
                     var userResponse = JsonSerializer.Deserialize<UserResponse>(result);
                     if (userResponse != null && !string.IsNullOrEmpty(userResponse.Tokens?.AccessToken))
                     {
-                        await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username);
+                        await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username, userResponse.Email);
                         return true;
                     }
                 }
@@ -168,7 +168,7 @@ namespace controle_ja_mobile.Services
                                 var userResponse = JsonSerializer.Deserialize<UserResponse>(apiResult);
                                 if (userResponse != null && !string.IsNullOrEmpty(userResponse.Tokens?.AccessToken))
                                 {
-                                    await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username);
+                                    await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username, userResponse.Email);
                                     return true;
                                 }
                             }
@@ -266,7 +266,7 @@ namespace controle_ja_mobile.Services
             public string access_token { get; set; }
         }
 
-        public async Task SaveAuthTokenAsync(string token, string refreshToken, string username)
+        public async Task SaveAuthTokenAsync(string token, string refreshToken, string username, string email = null)
         {
             if (token == null)
                 SecureStorage.Remove("auth_token");
@@ -280,6 +280,10 @@ namespace controle_ja_mobile.Services
                 Preferences.Remove("UserName");
             else
                 Preferences.Set("UserName", username);
+            if (email == null)
+                Preferences.Remove("UserEmail");
+            else
+                Preferences.Set("UserEmail", email);
 
         }
 

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="controle_ja_mobile.Views.Privates.Tabs.TransactionsListView">
+
+    <Grid>
+        <Grid BackgroundColor="#0F172A" RowDefinitions="Auto, *">
+
+            <Grid Grid.Row="0" Padding="25,15,25,10">
+                <VerticalStackLayout>
+                    <Label Text="Transações" TextColor="White" FontSize="24" FontAttributes="Bold"/>
+                    <Label Text="Histórico de entradas e saídas" TextColor="#94A3B8" FontSize="14"/>
+                </VerticalStackLayout>
+            </Grid>
+
+            <ScrollView Grid.Row="1" Padding="0,0,0,100">
+                <VerticalStackLayout Spacing="20" Padding="25,10">
+
+                    <!-- Placeholder para transações -->
+                    <Border BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="20">
+                        <VerticalStackLayout Spacing="15" VerticalOptions="Center" HorizontalOptions="Center">
+                            <Border HeightRequest="80" WidthRequest="80" StrokeShape="RoundRectangle 40" BackgroundColor="#2D3A4F" StrokeThickness="0">
+                                <Path Data="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" 
+                                      Fill="#94A3B8" 
+                                      Aspect="Uniform" 
+                                      HeightRequest="32" 
+                                      WidthRequest="32" 
+                                      HorizontalOptions="Center" 
+                                      VerticalOptions="Center"/>
+                            </Border>
+                            <Label Text="Lista de transações" TextColor="White" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+                            <Label Text="Funcionalidade em desenvolvimento" TextColor="#94A3B8" FontSize="14" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+    </Grid>
+</ContentView>
