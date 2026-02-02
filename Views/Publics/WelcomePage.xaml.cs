@@ -144,5 +144,7 @@ public partial class WelcomePage : ContentPage
     private void ClearRefreshToken()
     {
         SecureStorage.Remove("refresh_token");
+        SecureStorage.Remove("auth_token");
+        Preferences.Remove("UserName");
     }
 }
