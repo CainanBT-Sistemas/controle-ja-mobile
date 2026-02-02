@@ -46,15 +46,13 @@ namespace controle_ja_mobile.ViewModels
             IsSettingsMenuVisible = !IsSettingsMenuVisible;
         }
 
-        // 2. FECHAR AO CLICAR FORA (Com Feedback)
+        // 2. FECHAR AO CLICAR FORA
         [RelayCommand]
         public async Task CloseSettingsMenu()
         {
             if (IsSettingsMenuVisible)
             {
                 IsSettingsMenuVisible = false;
-                // Feedback visual que você pediu
-                await Shell.Current.DisplayAlert("Feedback", "Você clicou fora! O menu foi fechado.", "OK");
             }
         }
 

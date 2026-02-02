@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
 using controle_ja_mobile.Views.Privates;
+using controle_ja_mobile.Views.Publics;
 using System.Collections.ObjectModel;
 
 namespace controle_ja_mobile.ViewModels
@@ -15,6 +16,10 @@ namespace controle_ja_mobile.ViewModels
         public ObservableCollection<Vehicle> Vehicles { get; } = new();
 
         [ObservableProperty] private bool isRefreshing;
+        
+        // Menu superior (configurações)
+        [ObservableProperty] private bool isSettingsMenuVisible;
+        [ObservableProperty] private string userName;
 
         // Campos do Formulário
         [ObservableProperty] private string newName;
@@ -27,6 +32,45 @@ namespace controle_ja_mobile.ViewModels
         public VehiclesViewModel(VehicleService vehicleService)
         {
             _vehicleService = vehicleService;
+            UserName = Preferences.Get("UserName", "Usuário");
+        }
+
+        // COMANDOS DO MENU SUPERIOR
+        [RelayCommand]
+        public void ToggleSettingsMenu()
+        {
+            IsSettingsMenuVisible = !IsSettingsMenuVisible;
+        }
+
+        [RelayCommand]
+        public async Task CloseSettingsMenu()
+        {
+            if (IsSettingsMenuVisible)
+            {
+                IsSettingsMenuVisible = false;
+            }
+        }
+
+        [RelayCommand]
+        public async Task PerformLogout()
+        {
+            IsSettingsMenuVisible = false;
+            
+            bool confirm = await Shell.Current.DisplayAlert("Sair", "Tem certeza que deseja desconectar da sua conta?", "Sim", "Não");
+            if (!confirm) return;
+
+            Preferences.Remove("AuthToken");
+            Preferences.Remove("UserName");
+
+            var loginPage = IPlatformApplication.Current.Services.GetService<LoginPage>();
+            Application.Current.MainPage = new NavigationPage(loginPage);
+        }
+
+        [RelayCommand]
+        public async Task GoToProfile()
+        {
+            IsSettingsMenuVisible = false;
+            await Shell.Current.DisplayAlert("Meu Perfil", "A edição de perfil estará disponível em breve.", "OK");
         }
 
         [RelayCommand]

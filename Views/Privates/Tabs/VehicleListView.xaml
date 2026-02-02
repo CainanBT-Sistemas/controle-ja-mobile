@@ -2,11 +2,52 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:controle_ja_mobile.Models"
-             x:Class="controle_ja_mobile.Views.Privates.Tabs.VehicleListView">
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             x:Class="controle_ja_mobile.Views.Privates.Tabs.VehicleListView"
+             x:DataType="vm:VehiclesViewModel">
 
-    <Grid RowDefinitions="*, Auto" BackgroundColor="{StaticResource PageBackgroundColorDark}">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource PageBackgroundColorDark}">
 
-        <RefreshView Grid.Row="0" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadVehiclesCommand}" RefreshColor="{StaticResource Primary}">
+        <!-- Header com nome do usuário e menu de configurações -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Padding="25,15,25,10" BackgroundColor="{StaticResource PageBackgroundColorDark}">
+            <VerticalStackLayout>
+                <Label Text="Bem-vindo," TextColor="#94A3B8" FontSize="14"/>
+                <Label Text="{Binding UserName}" TextColor="White" FontSize="20" FontAttributes="Bold"/>
+            </VerticalStackLayout>
+
+            <HorizontalStackLayout Grid.Column="1" Spacing="15">
+                <Border StrokeThickness="0" BackgroundColor="#1E293B" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20">
+                    <Grid>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleSettingsMenuCommand}"/>
+                        </Grid.GestureRecognizers>
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal">
+                                    <VisualState.Setters>
+                                        <Setter Property="Opacity" Value="1" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Property="Opacity" Value="0.5" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <Path Data="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.49l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z" Fill="#94A3B8" Aspect="Uniform" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+                    </Grid>
+                </Border>
+
+                <Border Stroke="Transparent" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20">
+                    <Image Source="logo_controle.png" Aspect="AspectFit"/>
+                </Border>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadVehiclesCommand}" RefreshColor="{StaticResource Primary}">
             <CollectionView ItemsSource="{Binding Vehicles}" Margin="20">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical" ItemSpacing="15"/>
@@ -43,7 +84,7 @@
             </CollectionView>
         </RefreshView>
 
-        <Button Grid.Row="0" Text="+" Command="{Binding GoToAddPageCommand}"
+        <Button Grid.Row="1" Text="+" Command="{Binding GoToAddPageCommand}"
                 BackgroundColor="{StaticResource Primary}" TextColor="Black" FontSize="24"
                 CornerRadius="30" HeightRequest="60" WidthRequest="60"
                 HorizontalOptions="End" VerticalOptions="End" Margin="25"
@@ -51,5 +92,71 @@
 
         <ActivityIndicator Grid.RowSpan="2" IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" 
                            Color="{StaticResource Primary}" VerticalOptions="Center" HorizontalOptions="Center"/>
+
+        <!-- Menu de configurações flutuante -->
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsSettingsMenuVisible}">
+
+            <BoxView Color="Black" Opacity="0.5" HorizontalOptions="Fill" VerticalOptions="Fill">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CloseSettingsMenuCommand}" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <Border BackgroundColor="#334155" 
+                    StrokeThickness="0" 
+                    StrokeShape="RoundRectangle 10" 
+                    HorizontalOptions="End" 
+                    VerticalOptions="Start"
+                    Margin="0, 60, 80, 0" 
+                    WidthRequest="180"
+                    Padding="0">
+
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.5"/>
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="0">
+
+                    <Grid Padding="15,12" BackgroundColor="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="#475569" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToProfileCommand}"/>
+                        </Grid.GestureRecognizers>
+                        <Label Text="Meu Perfil" TextColor="White" FontSize="14" InputTransparent="True"/>
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="#475569" />
+
+                    <Grid Padding="15,12" BackgroundColor="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="#475569" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding PerformLogoutCommand}"/>
+                        </Grid.GestureRecognizers>
+                        <Label Text="Sair da Conta" TextColor="#EF4444" FontSize="14" FontAttributes="Bold" InputTransparent="True"/>
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </Grid>
 </ContentView>
