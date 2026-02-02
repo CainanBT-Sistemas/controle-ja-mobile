@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:controle_ja_mobile.Behaviors"
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             x:Class="controle_ja_mobile.Views.Publics.RegisterPage"
+             x:DataType="vm:RegisterViewModel"
+             NavigationPage.HasNavigationBar="False"
+             Title="Registrar">
+
+    <ContentPage.Background>
+        <RadialGradientBrush Center="0.5, 0.2" Radius="0.8">
+            <GradientStop Color="#1E293B" Offset="0.0" />
+            <GradientStop Color="#0F172A" Offset="0.4" />
+            <GradientStop Color="#002118" Offset="1.0" />
+        </RadialGradientBrush>
+    </ContentPage.Background>
+
+    <!-- ScrollView funcional -->
+    <ScrollView VerticalOptions="FillAndExpand">
+        <ScrollView.Behaviors>
+            <behaviors:KeyboardAvoidanceBehavior />
+        </ScrollView.Behaviors>
+
+        <!-- Layout interno -->
+        <VerticalStackLayout Padding="30" Spacing="25" HorizontalOptions="FillAndExpand">
+
+            <!-- Logo -->
+            <Image Source="logo_controle.png" 
+                   HeightRequest="100" 
+                   Aspect="AspectFit" />
+
+            <!-- Título -->
+            <Label Text="Crie sua conta" 
+                   TextColor="#FFFFFF" 
+                   FontSize="26" 
+                   FontAttributes="Bold" />
+
+            <!-- Campos de Entrada -->
+            <Entry Placeholder="Nome Completo" 
+                   Text="{Binding Name}" 
+                   Keyboard="Default" 
+                   TextColor="#FFFFFF" 
+                   PlaceholderColor="#AAAAAA"/>
+
+            <Entry Placeholder="E-mail" 
+                   Text="{Binding Email}" 
+                   Keyboard="Email" 
+                   TextColor="#FFFFFF" 
+                   PlaceholderColor="#AAAAAA"/>
+
+            <Entry Placeholder="Senha" 
+                   Text="{Binding Password}" 
+                   IsPassword="True" 
+                   TextColor="#FFFFFF" 
+                   PlaceholderColor="#AAAAAA"/>
+
+            <Entry Placeholder="Confirme sua senha" 
+                   Text="{Binding ConfirmPassword}" 
+                   IsPassword="True" 
+                   TextColor="#FFFFFF" 
+                   PlaceholderColor="#AAAAAA"/>
+
+            <!-- Botões -->
+            <Button Text="REGISTRAR" 
+                    Command="{Binding RegisterCommand}" 
+                    BackgroundColor="#00FF00" 
+                    TextColor="#000000" 
+                    CornerRadius="10"
+                    HeightRequest="50"/>
+
+            <Button Text="Voltar para Login" 
+                    Command="{Binding GoBackCommand}" 
+                    BackgroundColor="Transparent" 
+                    TextColor="#FFFFFF"
+                    BorderColor="#FFFFFF"
+                    BorderWidth="1"
+                    CornerRadius="10" 
+                    HeightRequest="40"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
