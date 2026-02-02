@@ -26,10 +26,6 @@ namespace controle_ja_mobile.ViewModels
         [ObservableProperty] private string currentMonthDisplay;
         [ObservableProperty] private bool isMenuOpen; // Menu inferior
 
-        // === CONTROLE DO MENU SUPERIOR (POPUP) ===
-        [ObservableProperty]
-        private bool isSettingsMenuVisible;
-
         public DashboardViewModel(ApiService apiService, DashboardService dashboardService)
         {
             _apiService = apiService;
@@ -37,54 +33,6 @@ namespace controle_ja_mobile.ViewModels
             UserName = Preferences.Get("UserName", "Usuário");
             CurrentDate = DateTime.Now;
             UpdateMonthDisplay();
-        }
-
-        // 1. ABRIR/FECHAR PELO BOTÃO DA ENGRENAGEM
-        [RelayCommand]
-        public void ToggleSettingsMenu()
-        {
-            IsSettingsMenuVisible = !IsSettingsMenuVisible;
-        }
-
-        // 2. FECHAR AO CLICAR FORA (Com Feedback)
-        [RelayCommand]
-        public async Task CloseSettingsMenu()
-        {
-            if (IsSettingsMenuVisible)
-            {
-                IsSettingsMenuVisible = false;
-                // Feedback visual que você pediu
-                await Shell.Current.DisplayAlert("Feedback", "Você clicou fora! O menu foi fechado.", "OK");
-            }
-        }
-
-        // 3. AÇÃO: LOGOUT (Com Confirmação)
-        [RelayCommand]
-        public async Task PerformLogout()
-        {
-            // Fecha o menu
-            IsSettingsMenuVisible = false;
-
-            // Pergunta de confirmação antes de sair
-            bool confirm = await Shell.Current.DisplayAlert("Sair", "Tem certeza que deseja desconectar da sua conta?", "Sim", "Não");
-            if (!confirm) return;
-
-            // Limpa os dados de sessão
-            Preferences.Remove("AuthToken");
-            Preferences.Remove("UserName");
-
-            // Redireciona para a tela de Login
-            var loginPage = IPlatformApplication.Current.Services.GetService<LoginPage>();
-            Application.Current.MainPage = new NavigationPage(loginPage);
-        }
-
-        // 4. AÇÃO: PERFIL (Com Feedback)
-        [RelayCommand]
-        public async Task GoToProfile()
-        {
-            IsSettingsMenuVisible = false;
-            // Feedback do clique e ação
-            await Shell.Current.DisplayAlert("Meu Perfil", "A edição de perfil estará disponível em breve.", "OK");
         }
 
         // --- OUTROS COMANDOS DO SISTEMA ---

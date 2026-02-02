@@ -7,8 +7,11 @@
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#0F172A">
 
-    <Grid>
+    <Grid RowDefinitions="Auto, *">
+        <components:DynamicToolbar x:Name="MyToolbar" Grid.Row="0" />
+
         <CarouselView x:Name="MainCarousel"
+                      Grid.Row="1"
                       Loop="False"
                       IsSwipeEnabled="True"
                       IndicatorView="Indicator"
@@ -24,7 +27,7 @@
 
         </CarouselView>
 
-        <Grid VerticalOptions="End">
+        <Grid Grid.Row="1" VerticalOptions="End">
             <components:BottomMenu x:Name="MyBottomMenu" />
         </Grid>
 

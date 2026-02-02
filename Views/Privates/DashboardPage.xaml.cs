@@ -10,6 +10,9 @@ public partial class DashboardPage : ContentPage
     {
         InitializeComponent();
 
+        // Set user name on toolbar
+        MyToolbar.UserName = Preferences.Get("UserName", "Usuário");
+
         // 1. Instancia as Views e injeta os ViewModels
         var homeView = new HomeView { BindingContext = homeVm };
         var cardsView = new CreditCardsView { BindingContext = cardsVm };
@@ -33,6 +36,9 @@ public partial class DashboardPage : ContentPage
                 case "Vehicles": MainCarousel.Position = 2; break;
             }
         });
+
+        // Set initial title
+        UpdateToolbarTitle(0);
     }
 
     private void OnPositionChanged(object sender, PositionChangedEventArgs e)
@@ -46,6 +52,23 @@ public partial class DashboardPage : ContentPage
                 case 1: MyBottomMenu.ActivePage = "Cards"; break;
                 case 2: MyBottomMenu.ActivePage = "Vehicles"; break;
             }
+        }
+
+        // Update toolbar title based on current position
+        UpdateToolbarTitle(e.CurrentPosition);
+    }
+
+    private void UpdateToolbarTitle(int position)
+    {
+        if (MyToolbar != null)
+        {
+            MyToolbar.PageTitle = position switch
+            {
+                0 => "Dashboard",
+                1 => "Meus Cartões",
+                2 => "Meus Veículos",
+                _ => "Dashboard"
+            };
         }
     }
 }
