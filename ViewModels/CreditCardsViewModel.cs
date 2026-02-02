@@ -39,7 +39,7 @@ namespace controle_ja_mobile.ViewModels
         }
 
         [RelayCommand]
-        public async Task CloseSettingsMenu()
+        public void CloseSettingsMenu()
         {
             if (IsSettingsMenuVisible)
             {
