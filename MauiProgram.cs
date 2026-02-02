@@ -39,6 +39,7 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<RegisterViewModel>();
             builder.Services.AddTransient<TransactionAddViewModel>();
             builder.Services.AddTransient<VehiclesViewModel>();
+            builder.Services.AddTransient<SettingsViewModel>();
 
             //Views
             builder.Services.AddTransient<CreditCardAddPage>();
