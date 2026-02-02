@@ -26,6 +26,7 @@ namespace controle_ja_mobile
             builder.Services.AddSingleton<AccountService>();
             builder.Services.AddSingleton<ApiService>();
             builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddSingleton<BiometricAuthService>();
             builder.Services.AddSingleton<CategoryService>();
             builder.Services.AddSingleton<CreditCardService>();
             builder.Services.AddSingleton<DashboardService>();
