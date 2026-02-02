@@ -1,72 +1,103 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
-using controle_ja_mobile.Views.Privates;
+using controle_ja_mobile.Views.Publics;
+using controle_ja_mobile.Models;
 using Microcharts;
 using SkiaSharp;
 using System.Globalization;
+using controle_ja_mobile.Views.Privates;
 
 namespace controle_ja_mobile.ViewModels
 {
     public partial class DashboardViewModel : BaseViewModel
     {
+        private readonly ApiService _apiService;
         private readonly DashboardService _dashboardService;
         private readonly CultureInfo _culture = new CultureInfo("pt-BR");
-
-        [ObservableProperty] private DateTime currentDate;
-        [ObservableProperty] private string currentMonthDisplay;
-        [ObservableProperty] private string userName;
 
         [ObservableProperty] private string balance;
         [ObservableProperty] private string income;
         [ObservableProperty] private string expense;
-
         [ObservableProperty] private Chart expenseChart;
         [ObservableProperty] private bool hasChartData;
+        [ObservableProperty] private string userName;
+        [ObservableProperty] private DateTime currentDate;
+        [ObservableProperty] private string currentMonthDisplay;
+        [ObservableProperty] private bool isMenuOpen; // Menu inferior
 
-        [ObservableProperty] private bool isMenuOpen;
+        // === CONTROLE DO MENU SUPERIOR (POPUP) ===
+        [ObservableProperty]
+        private bool isSettingsMenuVisible;
 
-        public DashboardViewModel(DashboardService dashboardService)
+        public DashboardViewModel(ApiService apiService, DashboardService dashboardService)
         {
+            _apiService = apiService;
             _dashboardService = dashboardService;
             UserName = Preferences.Get("UserName", "Usuário");
             CurrentDate = DateTime.Now;
             UpdateMonthDisplay();
         }
 
+        // 1. ABRIR/FECHAR PELO BOTÃO DA ENGRENAGEM
         [RelayCommand]
-        public void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
-
-        [RelayCommand]
-        public async Task GoToNewIncome()
+        public void ToggleSettingsMenu()
         {
-            IsMenuOpen = false;
-            await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=RECEITA");
+            IsSettingsMenuVisible = !IsSettingsMenuVisible;
         }
 
+        // 2. FECHAR AO CLICAR FORA (Com Feedback)
         [RelayCommand]
-        public async Task GoToNewExpense()
+        public async Task CloseSettingsMenu()
         {
-            IsMenuOpen = false;
-            await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=DESPESA");
+            if (IsSettingsMenuVisible)
+            {
+                IsSettingsMenuVisible = false;
+                // Feedback visual que você pediu
+                await Shell.Current.DisplayAlert("Feedback", "Você clicou fora! O menu foi fechado.", "OK");
+            }
         }
 
+        // 3. AÇÃO: LOGOUT (Com Confirmação)
         [RelayCommand]
-        public async Task GoToHome() => await LoadData();
+        public async Task PerformLogout()
+        {
+            // Fecha o menu
+            IsSettingsMenuVisible = false;
 
+            // Pergunta de confirmação antes de sair
+            bool confirm = await Shell.Current.DisplayAlert("Sair", "Tem certeza que deseja desconectar da sua conta?", "Sim", "Não");
+            if (!confirm) return;
+
+            // Limpa os dados de sessão
+            Preferences.Remove("AuthToken");
+            Preferences.Remove("UserName");
+
+            // Redireciona para a tela de Login
+            var loginPage = IPlatformApplication.Current.Services.GetService<LoginPage>();
+            Application.Current.MainPage = new NavigationPage(loginPage);
+        }
+
+        // 4. AÇÃO: PERFIL (Com Feedback)
         [RelayCommand]
-        public async Task GoToTransactions() => await Shell.Current.DisplayAlert("Em Breve", "Extrato será implementado aqui!", "OK");
+        public async Task GoToProfile()
+        {
+            IsSettingsMenuVisible = false;
+            // Feedback do clique e ação
+            await Shell.Current.DisplayAlert("Meu Perfil", "A edição de perfil estará disponível em breve.", "OK");
+        }
 
-        [RelayCommand]
-        public async Task GoToCards() => await Shell.Current.DisplayAlert("Em Breve", "Gestão de Cartões será aqui!", "OK");
+        // --- OUTROS COMANDOS DO SISTEMA ---
+        [RelayCommand] public void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
+        [RelayCommand] public async Task GoToNewIncome() { IsMenuOpen = false; await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=RECEITA"); }
+        [RelayCommand] public async Task GoToNewExpense() { IsMenuOpen = false; await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=DESPESA"); }
+        [RelayCommand] public async Task GoToHome() => await LoadData();
+        [RelayCommand] public async Task GoToTransactions() => await Shell.Current.DisplayAlert("Em Breve", "Extrato será implementado aqui!", "OK");
+        [RelayCommand] public async Task GoToCards() => await Shell.Current.DisplayAlert("Em Breve", "Gestão de Cartões será aqui!", "OK");
+        [RelayCommand] public async Task GoToCar() => await Shell.Current.DisplayAlert("Em Breve", "Gestão de Veículos será aqui!", "OK");
 
-        [RelayCommand]
-        public async Task GoToCar() => await Shell.Current.DisplayAlert("Em Breve", "Gestão de Veículos será aqui!", "OK");
 
-        [RelayCommand]
-        public async Task GoToSettings() => await Shell.Current.DisplayAlert("Configurações", "Tela de perfil e conta.", "OK");
-
+        // --- DATA E LOAD DATA ---
         private void UpdateMonthDisplay()
         {
             CurrentMonthDisplay = CurrentDate.ToString("MMMM 'de' yyyy", _culture);
@@ -99,7 +130,6 @@ namespace controle_ja_mobile.ViewModels
                 long start = new DateTimeOffset(firstDay).ToUnixTimeMilliseconds();
                 long end = new DateTimeOffset(lastDay).ToUnixTimeMilliseconds();
 
-                // Dispara as duas tarefas em paralelo
                 var tSummary = _dashboardService.getDashboardSummary(start, end);
                 var tChart = _dashboardService.getExpensesByCategory(start, end);
 
@@ -108,7 +138,6 @@ namespace controle_ja_mobile.ViewModels
                 var summary = await tSummary;
                 var chartData = await tChart;
 
-                // Atualiza tela com dados
                 if (summary != null)
                 {
                     Balance = summary.Balance.ToString("C", _culture);
