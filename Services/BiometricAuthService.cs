@@ -65,13 +65,5 @@ namespace controle_ja_mobile.Services
                 return false;
             }
         }
-
-        /// <summary>
-        /// Gets the type of biometric authentication available
-        /// </summary>
-        public async Task<FingerprintAuthenticationType> GetAuthenticationTypeAsync()
-        {
-            return await _fingerprint.GetAuthenticationTypeAsync();
-        }
     }
 }
