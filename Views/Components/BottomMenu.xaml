@@ -59,7 +59,7 @@
         </Grid>
 
         <!-- FAB moved to right side above tab bar -->
-        <Grid VerticalOptions="End" HorizontalOptions="End" Margin="0,0,20,50" InputTransparent="True" CascadeInputTransparent="False">
+        <Grid VerticalOptions="End" HorizontalOptions="End" Margin="0,0,20,90" InputTransparent="True" CascadeInputTransparent="False">
 
             <Button x:Name="BtnIncome" Clicked="OnNewIncomeClicked" BackgroundColor="#00E676" HeightRequest="50" WidthRequest="50" CornerRadius="25" Opacity="0" InputTransparent="True"/>
             <Grid x:Name="GridIncome" HorizontalOptions="Center" VerticalOptions="Center" Opacity="0" InputTransparent="True">
