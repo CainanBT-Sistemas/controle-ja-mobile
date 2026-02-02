@@ -40,14 +40,14 @@ namespace controle_ja_mobile.ViewModels
         }
 
         [RelayCommand]
-        public async Task GoToCreditCards()
+        public void GoToCreditCards()
         {
             // Navigate to credit cards list (already exists in carousel)
             MessagingCenter.Send(this, "NavigateTo", "Cards");
         }
 
         [RelayCommand]
-        public async Task GoToVehicles()
+        public void GoToVehicles()
         {
             // Navigate to vehicles list (already exists in carousel)
             MessagingCenter.Send(this, "NavigateTo", "Vehicles");
