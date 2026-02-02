@@ -32,7 +32,7 @@
                                             StrokeThickness="0" 
                                             BackgroundColor="{StaticResource Primary}"
                                             StrokeShape="RoundRectangle 25">
-                                        <Label Text="{Binding UserName, StringFormat='{0:0}'}" 
+                                        <Label Text="{Binding UserName, Converter={StaticResource FirstLetterConverter}}" 
                                                TextColor="#003300" 
                                                FontSize="20" 
                                                FontAttributes="Bold"
