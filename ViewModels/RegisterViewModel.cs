@@ -35,22 +35,14 @@ namespace controle_ja_mobile.ViewModels
                 return;
             }
 
-            // Chamada segura
-            await ExecuteAsync(async () =>
-            {
-                bool sucesso = await _authService.RegisterAsync(Name, Email, Password);
+            bool sucesso = await _authService.RegisterAsync(Name, Email, Password);
 
-                if (sucesso)
-                {
-                    await App.Current.MainPage.DisplayAlert("Sucesso", "Conta criada com sucesso! Faça login.", "OK");
-                    var loginPage = IPlatformApplication.Current.Services.GetService<LoginPage>();
-                    Application.Current.MainPage = loginPage;
-                }
-                else
-                {
-                    await App.Current.MainPage.DisplayAlert("Erro", "Falha ao criar conta. Verifique os dados ou tente outro e-mail.", "OK");
-                }
-            });
+            if (sucesso)
+            {
+                await App.Current.MainPage.DisplayAlert("Sucesso", "Conta criada com sucesso! Faça login.", "OK");
+                var loginPage = IPlatformApplication.Current.Services.GetService<LoginPage>();
+                Application.Current.MainPage = loginPage;
+            }
         }
 
         [RelayCommand]

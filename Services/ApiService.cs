@@ -1,5 +1,6 @@
 ﻿using controle_ja_mobile.Configs;
 using controle_ja_mobile.Helpers;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -17,59 +18,62 @@ namespace controle_ja_mobile.Services
             _httpClient = new HttpClient
             {
                 BaseAddress = new Uri(_baseUrl),
-                // CORREÇÃO: Define limite de 10 segundos. 
-                // Sem isso, o app fica rodando para sempre se o servidor cair.
                 Timeout = TimeSpan.FromSeconds(10)
             };
         }
 
-        public async Task<T> PostAsync<T>(string endpoint, object data)
+        public async Task<string> PostAsync<T>(string endpoint, object data)
         {
-            // Não usamos try/catch aqui para deixar o erro subir para a ViewModel
+            AddAuthenticationHeaderAsync(endpoint);
             var response = await _httpClient.PostAsJsonAsync(endpoint, data);
-
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                    return default;
-
-                return await response.Content.ReadFromJsonAsync<T>();
+                HandlerErrors(response);
             }
-            else
-            {
-                var errorJson = await response.Content.ReadAsStringAsync();
-                try
-                {
-                    var apiError = JsonSerializer.Deserialize<ApiErrorResponse>(errorJson);
-                    throw new Exception(apiError?.Message ?? "Erro desconhecido.");
-                }
-                catch
-                {
-                    throw new Exception("Erro desconhecido: " + errorJson);
-                }
-            }
+            return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<T> GetAsync<T>(string endpoint)
+        public async Task<String> GetAsync<T>(string endpoint)
         {
-            var response = await _httpClient.GetAsync(endpoint);
+            AddAuthenticationHeaderAsync(endpoint);
+            var response =  await _httpClient.GetAsync(endpoint);
+            if (!response.IsSuccessStatusCode)
+            {
+                HandlerErrors(response);
+            }
+            return await response.Content.ReadAsStringAsync();
+        }
 
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadFromJsonAsync<T>();
-            }else
-            {
-                var errorJson = await response.Content.ReadAsStringAsync();
-                try
+        private async void HandlerErrors(HttpResponseMessage response)
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<UserFriendlyError>();
+            if (errorResponse != null) {
+                string errors = "";
+                foreach (var e in errorResponse.Message.Split(", "))
                 {
-                    var apiError = JsonSerializer.Deserialize<ApiErrorResponse>(errorJson);
-                    throw new Exception(apiError?.Message ?? "Erro desconhecido.");
+                    if (!string.IsNullOrEmpty(e))
+                    {
+                        errors += string.IsNullOrEmpty(errors) ? e : "\n" + e;
+                    }
                 }
-                catch
-                {
-                    throw new Exception("Erro desconhecido: " + errorJson);
-                }
+                await App.Current.MainPage.DisplayAlert(errorResponse.Title, errors, "OK");
             }
         }
+
+        private async Task AddAuthenticationHeaderAsync(string endpoint)
+        {
+            if(endpoint.Contains("/auth") || endpoint.Contains("/users/register"))
+            {
+                return;
+            }
+
+            var token = await SecureStorage.GetAsync("auth_token");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
+        }
+
     }
 }

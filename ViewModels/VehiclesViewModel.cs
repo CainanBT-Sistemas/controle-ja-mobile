@@ -9,7 +9,8 @@ namespace controle_ja_mobile.ViewModels
 {
     public partial class VehiclesViewModel : BaseViewModel
     {
-        private readonly ApiService _apiService;
+       
+        private readonly VehicleService _vehicleService;
 
         public ObservableCollection<Vehicle> Vehicles { get; } = new();
 
@@ -23,19 +24,19 @@ namespace controle_ja_mobile.ViewModels
         [ObservableProperty] private string newPlate;
         [ObservableProperty] private string newOdometer;
 
-        public VehiclesViewModel(ApiService apiService)
+        public VehiclesViewModel(VehicleService vehicleService)
         {
-            _apiService = apiService;
+            _vehicleService = vehicleService;
         }
 
         [RelayCommand]
         public async Task LoadVehicles()
         {
-            await ExecuteAsync(async () =>
+            await ExecuteWithErrorHandlingAsync(async () =>
             {
                 try
                 {
-                    var list = await _apiService.GetAsync<List<Vehicle>>("vehicles");
+                    var list = await _vehicleService.GetVehiclesAsync();
                     Vehicles.Clear();
                     if (list != null)
                     {
@@ -64,19 +65,17 @@ namespace controle_ja_mobile.ViewModels
                 return;
             }
 
-            await ExecuteAsync(async () =>
+            await ExecuteWithErrorHandlingAsync(async () =>
             {
-                var newVehicleData = new
-                {
-                    name = NewName,
-                    brand = NewBrand ?? "",
-                    model = NewModel,
-                    year = int.TryParse(NewYear, out int y) ? y : 2024,
-                    plate = NewPlate ?? "",
-                    currentOdometer = decimal.Parse(NewOdometer)
-                };
+                Vehicle newVehicleData = new Vehicle();
+                newVehicleData.Name = NewName;
+                newVehicleData.Model = NewModel;
+                newVehicleData.Brand = NewBrand;
+                newVehicleData.Year = int.TryParse(NewYear, out int y) ? y : 2024;
+                newVehicleData.Plate = NewPlate;
+                newVehicleData.CurrentOdometer = decimal.Parse(NewOdometer);
 
-                var result = await _apiService.PostAsync<Vehicle>("vehicles", newVehicleData);
+                var result = await _vehicleService.SaveVehicleAsync(newVehicleData);
 
                 if (result != null)
                 {

@@ -23,8 +23,14 @@ namespace controle_ja_mobile
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+            builder.Services.AddSingleton<AccountService>();
             builder.Services.AddSingleton<ApiService>();
             builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddSingleton<CategoryService>();
+            builder.Services.AddSingleton<CreditCardService>();
+            builder.Services.AddSingleton<DashboardService>();
+            builder.Services.AddSingleton<TransactionService>();
+            builder.Services.AddSingleton<VehicleService>();
 
             //ViewModels
             builder.Services.AddTransient<CreditCardsViewModel>();

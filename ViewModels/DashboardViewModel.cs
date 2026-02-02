@@ -11,7 +11,7 @@ namespace controle_ja_mobile.ViewModels
 {
     public partial class DashboardViewModel : BaseViewModel
     {
-        private readonly ApiService _apiService;
+        private readonly DashboardService _dashboardService;
         private readonly CultureInfo _culture = new CultureInfo("pt-BR");
 
         [ObservableProperty] private DateTime currentDate;
@@ -27,9 +27,9 @@ namespace controle_ja_mobile.ViewModels
 
         [ObservableProperty] private bool isMenuOpen;
 
-        public DashboardViewModel(ApiService apiService)
+        public DashboardViewModel(DashboardService dashboardService)
         {
-            _apiService = apiService;
+            _dashboardService = dashboardService;
             UserName = Preferences.Get("UserName", "Usuário");
             CurrentDate = DateTime.Now;
             UpdateMonthDisplay();
@@ -90,7 +90,7 @@ namespace controle_ja_mobile.ViewModels
         [RelayCommand]
         public async Task LoadData()
         {
-            await ExecuteAsync(async () =>
+            await ExecuteWithErrorHandlingAsync(async () =>
             {
                 var now = CurrentDate;
                 var firstDay = new DateTime(now.Year, now.Month, 1);
@@ -100,8 +100,8 @@ namespace controle_ja_mobile.ViewModels
                 long end = new DateTimeOffset(lastDay).ToUnixTimeMilliseconds();
 
                 // Dispara as duas tarefas em paralelo
-                var tSummary = _apiService.GetAsync<FinancialSummary>($"dashboard/summary?start={start}&end={end}");
-                var tChart = _apiService.GetAsync<List<ChartData>>($"dashboard/expenses-category?start={start}&end={end}");
+                var tSummary = _dashboardService.getDashboardSummary(start, end);
+                var tChart = _dashboardService.getExpensesByCategory(start, end);
 
                 await Task.WhenAll(tSummary, tChart);
 

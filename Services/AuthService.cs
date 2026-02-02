@@ -1,10 +1,12 @@
 ﻿using controle_ja_mobile.Configs;
-using controle_ja_mobile.Helpers;
 using controle_ja_mobile.Models;
+using Microsoft.Maui.ApplicationModel.Communication;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+
 
 namespace controle_ja_mobile.Services
 {
@@ -23,13 +25,17 @@ namespace controle_ja_mobile.Services
             try
             {
                 var loginData = new { email, password };
-                var result = await _apiService.PostAsync<UserResponse>("auth/login", loginData);
-                if (result != null && !string.IsNullOrEmpty(result.Tokens?.AccessToken))
+                var result = await _apiService.PostAsync<string>("auth/login", loginData);
+                if (!string.IsNullOrEmpty(result))
                 {
-                    Preferences.Set("AuthToken", result.Tokens.AccessToken);
-                    Preferences.Set("UserName", result.Username);
-                    return true;
+                    var userResponse = JsonSerializer.Deserialize<UserResponse>(result);
+                    if (userResponse != null && userResponse?.Id != null)
+                    {
+                        await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username);
+                        return true;
+                    }
                 }
+                return false;
 
             }
             catch (TaskCanceledException ex)
@@ -39,17 +45,75 @@ namespace controle_ja_mobile.Services
             }
             catch (Exception ex)
             {
+
+                System.Diagnostics.Debug.WriteLine($"Erro Google Auth: {ex.Message}");
+            }
+            return false;
+        }
+
+        public async Task<bool> loginWithTokenAsync(string token)
+        {
+            try
+            {
+                var loginData = new { token };
+                var result = await _apiService.PostAsync<string>("auth/auto-login", loginData);
+                if (!string.IsNullOrEmpty(result))
+                {
+                    var userResponse = JsonSerializer.Deserialize<UserResponse>(result);
+                    if (userResponse != null && !string.IsNullOrEmpty(userResponse.Tokens?.AccessToken))
+                    {
+                        await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username);
+                        return true;
+                    }
+                }
+                return false;
+
+            }
+            catch (TaskCanceledException ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Erro", "Servidor indisponível. Tente novamente mais tarde.", "OK");
+
+            }
+            catch (Exception ex)
+            {
+                if(ex.Message.Contains("Token inválido"))
+                {
+                    SaveAuthTokenAsync(null,null, null);
+                    await App.Current.MainPage.DisplayAlert("Acesso Negado", "Token Inválido, acesse novamente.", "OK");
+                    return false;
+                }
                 System.Diagnostics.Debug.WriteLine($"Erro Google Auth: {ex.Message}");
             }
             return false;
         }
 
         // Registro
-        public async Task<bool> RegisterAsync(string name, string email, string password)
+        public async Task<bool> RegisterAsync(string username, string email, string password)
         {
-            var registerData = new { name, email, password };
-            var result = await _apiService.PostAsync<UserResponse>("auth/register", registerData);
-            return result != null;
+            try
+            {
+                var registerData = new { username, email, password };
+                var result = await _apiService.PostAsync<HttpResponseMessage>("users/register", registerData);
+                if (!string.IsNullOrWhiteSpace(result)){
+                    var userResponse = JsonSerializer.Deserialize<UserResponse>(result);
+                    if(userResponse?.Id != null)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch(Exception ex)
+            {
+                if (ex.Message.Equals("Cannot access a closed Stream."))
+                {
+                    return false;
+                }
+
+                Console.WriteLine(ex);
+            }
+            return false;
+            
         }
 
         // LOGIN COM GOOGLE USANDO O FLUXO PKCE (SEGURO)
@@ -98,16 +162,19 @@ namespace controle_ja_mobile.Services
                                 photoUrl = userInfo.picture
                             };
 
-                            var apiResult = await _apiService.PostAsync<UserResponse>("auth/google", googlePayload);
-
-                            if (apiResult != null && !string.IsNullOrEmpty(apiResult.Tokens?.AccessToken))
+                            var apiResult = await _apiService.PostAsync<string>("auth/google", googlePayload);
+                            if (!string.IsNullOrWhiteSpace(apiResult))
                             {
-                                Preferences.Set("AuthToken", apiResult.Tokens.AccessToken);
-                                Preferences.Set("UserName", apiResult.Username);
-                                return true;
+                                var userResponse = JsonSerializer.Deserialize<UserResponse>(apiResult);
+                                if (userResponse != null && !string.IsNullOrEmpty(userResponse.Tokens?.AccessToken))
+                                {
+                                    await SaveAuthTokenAsync(userResponse.Tokens.AccessToken, userResponse.Tokens.RefreshToken, userResponse.Username);
+                                    return true;
+                                }
                             }
                         }
                     }
+                    return false;
                 }
             }
             catch (TaskCanceledException ex)
@@ -123,6 +190,13 @@ namespace controle_ja_mobile.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message.Contains("Token inválido"))
+                {
+                    SaveAuthTokenAsync(null,null, null);
+                    await App.Current.MainPage.DisplayAlert("Acesso Negado", "Token Inválido, acesse novamente.", "OK");
+                    return false;
+                }
+
                 await App.Current.MainPage.DisplayAlert("Erro", "Servidor indisponível. " + ex.Message, "OK");
             }
 
@@ -190,6 +264,54 @@ namespace controle_ja_mobile.Services
         private class GoogleTokenResponse
         {
             public string access_token { get; set; }
+        }
+
+        public async Task SaveAuthTokenAsync(string token, string refreshToken, string username)
+        {
+            if (token == null)
+                SecureStorage.Remove("auth_token");
+            else
+                await SecureStorage.SetAsync("auth_token", token);
+            if (refreshToken == null)
+                SecureStorage.Remove("refresh_token");
+            else
+                await SecureStorage.SetAsync("refresh_token", refreshToken);
+            if (username == null)
+                Preferences.Remove("UserName");
+            else
+                Preferences.Set("UserName", username);
+
+        }
+
+        private async Task<bool> remover(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            var errorResponse = await response.Content.ReadAsStringAsync();
+
+            if (errorResponse.Contains("A senha deve ter no mínimo 6 caracteres"))
+            {
+                await App.Current.MainPage.DisplayAlert("Falha ao fazer login", "A senha deve ter no mínimo 6 caracteres", "ok");
+                return false;
+            }
+
+            if (errorResponse.Contains("O nome de usuário é obrigatório"))
+            {
+                await App.Current.MainPage.DisplayAlert("Falha ao fazer login", "O nome de usuário é obrigatório", "ok");
+                return false;
+
+            }
+            if (errorResponse.Contains("Formato de email inválido"))
+            {
+                await App.Current.MainPage.DisplayAlert("Falha ao fazer login", "Formato de email inválido", "ok");
+                return false;
+
+            }
+            
+
+            return false;
         }
     }    
 }

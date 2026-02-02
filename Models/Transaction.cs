@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace controle_ja_mobile.Models
 {
-    public class TransactionModel
+    public class Transaction
     {
         [JsonPropertyName("id")]
         public Guid? Id { get; set; }
@@ -41,6 +41,15 @@ namespace controle_ja_mobile.Models
 
         [JsonPropertyName("accountName")]
         public string? AccountName { get; set; }
+
+        [JsonPropertyName("isRecurring")]
+        public bool IsRecurring { get; set; }
+
+        [JsonPropertyName("installments")]
+        public int Installments { get; set; }
+
+        [JsonPropertyName("creditCardId")]
+        public Guid? CreditCardId { get; set; }
 
         [JsonPropertyName("vehicleId")]
         public Guid? VehicleId { get; set; }

@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             xmlns:behaviors="clr-namespace:controle_ja_mobile.Behaviors"
              x:Class="controle_ja_mobile.Views.Publics.LoginPage"
              x:DataType="vm:LoginViewModel"
              NavigationPage.HasNavigationBar="False"
@@ -15,54 +16,66 @@
         </RadialGradientBrush>
     </ContentPage.Background>
 
-    <Grid>
-        <Grid BackgroundColor="#CC000000" IsVisible="{Binding IsLoading}" ZIndex="99">
-            <ActivityIndicator IsRunning="{Binding IsLoading}" Color="{StaticResource Primary}" VerticalOptions="Center" HorizontalOptions="Center"/>
-        </Grid>
+    <ScrollView VerticalOptions="FillAndExpand">
+        <ScrollView.Behaviors>
+            <behaviors:KeyboardAvoidanceBehavior/>
+        </ScrollView.Behaviors>
 
-        <ScrollView>
-            <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
+        <VerticalStackLayout>
 
-                <VerticalStackLayout Spacing="5" Margin="0,0,0,20">
-                    <Image Source="logo_controle.png" HeightRequest="100" Aspect="AspectFit" Margin="0,0,0,15"/>
-                    <Label Text="Bem-vindo de volta!" TextColor="{StaticResource TextPrimaryDark}" FontSize="26" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
-                    <Label Text="Acesse com seu e-mail." TextColor="{StaticResource TextSecondaryDark}" FontSize="14" HorizontalTextAlignment="Center"/>
-                </VerticalStackLayout>
+            <Image Source="logo_controle.png" HeightRequest="100" Aspect="AspectFit" Margin="0,0,0,15"/>
+            <Label Text="Bem-vindo de volta!" 
+        TextColor="White" 
+        FontSize="26" 
+        FontAttributes="Bold" 
+        HorizontalTextAlignment="Center"/>
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}" Padding="15,2">
-                    <Entry Placeholder="E-mail" Text="{Binding Email}" Keyboard="Email" TextColor="{StaticResource TextPrimaryDark}" PlaceholderColor="{StaticResource TextSecondaryDark}"/>
-                </Border>
+            <!-- Campo E-mail -->
+            <Entry Placeholder="E-mail" 
+        Text="{Binding Email}" 
+        Keyboard="Email" 
+        TextColor="White" 
+        PlaceholderColor="Gray" />
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}" Padding="15,2">
-                    <Entry Placeholder="Senha" Text="{Binding Password}" IsPassword="True" TextColor="{StaticResource TextPrimaryDark}" PlaceholderColor="{StaticResource TextSecondaryDark}"/>
-                </Border>
+            <!-- Campo Senha -->
+            <Entry Placeholder="Senha" 
+        Text="{Binding Password}" 
+        IsPassword="True" 
+        TextColor="White" 
+        PlaceholderColor="Gray" />
 
-                <Label Text="Esqueceu sua senha?" 
-                       TextColor="{StaticResource Primary}" 
-                       FontSize="14" 
-                       HorizontalOptions="End"
-                       Margin="0,-10,0,0">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}"/>
-                    </Label.GestureRecognizers>
-                </Label>
+            <!-- Esqueceu senha -->
+            <Label Text="Esqueceu sua senha?" 
+        TextColor="Green" 
+        FontSize="14" 
+        HorizontalOptions="End">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
 
-                <VerticalStackLayout Spacing="15" Margin="0,10,0,0">
-                    <Button Text="ENTRAR" Command="{Binding LoginCommand}" BackgroundColor="{StaticResource Primary}" TextColor="#000000" FontAttributes="Bold" CornerRadius="10" HeightRequest="50"/>
+            <!-- Botão Entrar -->
+            <Button Text="ENTRAR" 
+        Command="{Binding LoginCommand}" 
+        BackgroundColor="Green" 
+        TextColor="Black" 
+        FontAttributes="Bold" 
+        CornerRadius="10"
+        HeightRequest="50"
+        Margin="0,10" />
 
-                    <Label Text="Ainda não tem conta? Crie agora" 
-                           TextColor="{StaticResource TextSecondaryDark}" 
-                           HorizontalOptions="Center" 
-                           TextDecorations="Underline"
-                           FontSize="14"
-                           Padding="10">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToRegisterCommand}"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                </VerticalStackLayout>
+            <!-- Botão Registrar -->
+            <Label Text="Ainda não tem conta? Crie agora"
+        TextColor="White"
+        HorizontalTextAlignment="Center"
+        FontSize="14"
+        TextDecorations="Underline">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToRegisterCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
 
-            </VerticalStackLayout>
-        </ScrollView>
-    </Grid>
+        </VerticalStackLayout>
+
+    </ScrollView>
 </ContentPage>

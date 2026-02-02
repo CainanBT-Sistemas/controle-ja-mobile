@@ -29,7 +29,7 @@ namespace controle_ja_mobile.ViewModels
                 return;
             }
 
-            await ExecuteAsync(async () =>
+            await ExecuteWithErrorHandlingAsync(async () =>
             {
                 bool success = await _authService.loginAsync(Email, Password);
 

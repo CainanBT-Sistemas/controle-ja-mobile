@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:controle_ja_mobile.Behaviors"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
              x:Class="controle_ja_mobile.Views.Publics.RegisterPage"
              x:DataType="vm:RegisterViewModel"
              NavigationPage.HasNavigationBar="False"
-             Title="Criar Conta">
+             Title="Registrar">
 
     <ContentPage.Background>
         <RadialGradientBrush Center="0.5, 0.2" Radius="0.8">
@@ -15,91 +16,67 @@
         </RadialGradientBrush>
     </ContentPage.Background>
 
-    <Grid>
-        <Grid BackgroundColor="#CC000000" 
-              IsVisible="{Binding IsLoading}" 
-              ZIndex="99">
-            <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                               Color="{StaticResource Primary}" 
-                               VerticalOptions="Center" 
-                               HorizontalOptions="Center"/>
-        </Grid>
+    <!-- ScrollView funcional -->
+    <ScrollView VerticalOptions="FillAndExpand">
+        <ScrollView.Behaviors>
+            <behaviors:KeyboardAvoidanceBehavior />
+        </ScrollView.Behaviors>
 
-        <ScrollView>
-            <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+        <!-- Layout interno -->
+        <VerticalStackLayout Padding="30" Spacing="25" HorizontalOptions="FillAndExpand">
 
-                <Image Source="logo_controle.png" 
-                       HeightRequest="80" 
-                       Aspect="AspectFit" 
-                       Margin="0,0,0,10"/>
+            <!-- Logo -->
+            <Image Source="logo_controle.png" 
+                   HeightRequest="100" 
+                   Aspect="AspectFit" />
 
-                <Label Text="Crie sua conta" 
-                       TextColor="{StaticResource TextPrimaryDark}" 
-                       FontSize="24" 
-                       FontAttributes="Bold" 
-                       HorizontalTextAlignment="Center"/>
+            <!-- Título -->
+            <Label Text="Crie sua conta" 
+                   TextColor="#FFFFFF" 
+                   FontSize="26" 
+                   FontAttributes="Bold" />
 
-                <Label Text="Preencha os dados abaixo para começar."
-                       TextColor="{StaticResource TextSecondaryDark}"
-                       FontSize="14"
-                       HorizontalTextAlignment="Center"
-                       Margin="0,-10,0,10"/>
+            <!-- Campos de Entrada -->
+            <Entry Placeholder="Nome Completo" 
+                   Text="{Binding Name}" 
+                   Keyboard="Default" 
+                   TextColor="#FFFFFF" 
+                   PlaceholderColor="#AAAAAA"/>
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" 
-                        StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}"
-                        Padding="15,2">
-                    <Entry Placeholder="Nome Completo" 
-                           Text="{Binding Name}"
-                           TextColor="{StaticResource TextPrimaryDark}"
-                           PlaceholderColor="{StaticResource TextSecondaryDark}"/>
-                </Border>
+            <Entry Placeholder="E-mail" 
+                   Text="{Binding Email}" 
+                   Keyboard="Email" 
+                   TextColor="#FFFFFF" 
+                   PlaceholderColor="#AAAAAA"/>
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" 
-                        StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}"
-                        Padding="15,2">
-                    <Entry Placeholder="Seu melhor e-mail" 
-                           Text="{Binding Email}"
-                           Keyboard="Email"
-                           TextColor="{StaticResource TextPrimaryDark}"
-                           PlaceholderColor="{StaticResource TextSecondaryDark}"/>
-                </Border>
+            <Entry Placeholder="Senha" 
+                   Text="{Binding Password}" 
+                   IsPassword="True" 
+                   TextColor="#FFFFFF" 
+                   PlaceholderColor="#AAAAAA"/>
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" 
-                        StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}"
-                        Padding="15,2">
-                    <Entry Placeholder="Crie uma senha" 
-                           Text="{Binding Password}"
-                           IsPassword="True"
-                           TextColor="{StaticResource TextPrimaryDark}"
-                           PlaceholderColor="{StaticResource TextSecondaryDark}"/>
-                </Border>
+            <Entry Placeholder="Confirme sua senha" 
+                   Text="{Binding ConfirmPassword}" 
+                   IsPassword="True" 
+                   TextColor="#FFFFFF" 
+                   PlaceholderColor="#AAAAAA"/>
 
-                <Border Stroke="{StaticResource TextSecondaryDark}" StrokeThickness="1" 
-                        StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource CardBackgroundDark}"
-                        Padding="15,2">
-                    <Entry Placeholder="Confirme a senha" 
-                           Text="{Binding ConfirmPassword}"
-                           IsPassword="True"
-                           TextColor="{StaticResource TextPrimaryDark}"
-                           PlaceholderColor="{StaticResource TextSecondaryDark}"/>
-                </Border>
+            <!-- Botões -->
+            <Button Text="REGISTRAR" 
+                    Command="{Binding RegisterCommand}" 
+                    BackgroundColor="#00FF00" 
+                    TextColor="#000000" 
+                    CornerRadius="10"
+                    HeightRequest="50"/>
 
-                <Button Text="CADASTRAR"
-                        Command="{Binding RegisterCommand}"
-                        BackgroundColor="{StaticResource Primary}"
-                        TextColor="#000000"
-                        FontAttributes="Bold"
-                        CornerRadius="10"
-                        HeightRequest="50"
-                        Margin="0,10,0,0"/>
-
-                <Button Text="Voltar para Login"
-                        Command="{Binding GoBackCommand}"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource TextSecondaryDark}"
-                        FontSize="14"/>
-
-            </VerticalStackLayout>
-        </ScrollView>
-    </Grid>
+            <Button Text="Voltar para Login" 
+                    Command="{Binding GoBackCommand}" 
+                    BackgroundColor="Transparent" 
+                    TextColor="#FFFFFF"
+                    BorderColor="#FFFFFF"
+                    BorderWidth="1"
+                    CornerRadius="10" 
+                    HeightRequest="40"/>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
