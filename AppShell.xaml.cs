@@ -28,6 +28,7 @@ namespace controle_ja_mobile
             Routing.RegisterRoute(nameof(CreditCardAddPage), typeof(CreditCardAddPage));
             Routing.RegisterRoute(nameof(VehicleAddPage), typeof(VehicleAddPage));
             Routing.RegisterRoute(nameof(TransactionAddPage), typeof(TransactionAddPage));
+            Routing.RegisterRoute(nameof(SettingsPage), typeof(SettingsPage));
         }
 
         // Esse método é chamado toda vez que você troca de tela
@@ -43,8 +44,8 @@ namespace controle_ja_mobile
 
             if (currentRoute != null)
             {
-                // Se a rota contiver "AddPage", definimos visibilidade como FALSE
-                if (currentRoute.Contains("AddPage"))
+                // Se a rota contiver "AddPage" ou "SettingsPage", definimos visibilidade como FALSE
+                if (currentRoute.Contains("AddPage") || currentRoute.Contains("SettingsPage"))
                 {
                     IsTabBarVisible = false;
                 }
