@@ -1,10 +1,10 @@
-namespace controle_ja_mobile.Views.Publics;
-
 using controle_ja_mobile.Services;
 using Microsoft.Maui.Controls;
 using controle_ja_mobile.Views.Privates;
 using controle_ja_mobile.ViewModels;
 using System.Net.Http.Headers;
+
+namespace controle_ja_mobile.Views.Publics;
 
 public partial class WelcomePage : ContentPage
 {
