@@ -11,7 +11,7 @@ public partial class BottomMenu : ContentView
     private readonly Color ActiveColor = Color.FromArgb("#00E676");
     private readonly Color InactiveColor = Color.FromArgb("#64748B");
 
-    // Propriedade Bindable (Recebe aviso da Dashboard quando o usu�rio desliza o dedo)
+    // Propriedade Bindable (Recebe aviso da Dashboard quando o usuário desliza o dedo)
     public static readonly BindableProperty ActivePageProperty =
         BindableProperty.Create(nameof(ActivePage), typeof(string), typeof(BottomMenu), "Home", propertyChanged: OnActivePageChanged);
 
@@ -32,13 +32,14 @@ public partial class BottomMenu : ContentView
         if (bindable is BottomMenu menu) menu.UpdateVisualState();
     }
 
-    // Pinta os �cones baseados na p�gina atual
+    // Pinta os ícones baseados na página atual
     private void UpdateVisualState()
     {
-        if (PathHome == null) return; // Prote��o
+        if (PathHome == null) return; // Proteção
 
         // 1. Reseta tudo
         PathHome.Fill = InactiveColor; LblHome.TextColor = InactiveColor;
+        PathTransactions.Fill = InactiveColor; LblTransactions.TextColor = InactiveColor;
         PathCards.Fill = InactiveColor; LblCards.TextColor = InactiveColor;
         PathVehicles.Fill = InactiveColor; LblVehicles.TextColor = InactiveColor;
         PathSettings.Fill = InactiveColor; LblSettings.TextColor = InactiveColor;
@@ -48,6 +49,8 @@ public partial class BottomMenu : ContentView
         {
             case "Home":
                 PathHome.Fill = ActiveColor; LblHome.TextColor = ActiveColor; break;
+            case "Transactions":
+                PathTransactions.Fill = ActiveColor; LblTransactions.TextColor = ActiveColor; break;
             case "Cards":
                 PathCards.Fill = ActiveColor; LblCards.TextColor = ActiveColor; break;
             case "Vehicles":
@@ -57,13 +60,15 @@ public partial class BottomMenu : ContentView
         }
     }
 
-    // --- MUDAN�A PRINCIPAL AQUI ---
-    // Em vez de navegar, mandamos uma mensagem para a DashboardPage rodar o carrossel
-
+    // --- NAVEGAÇÃO DAS TABS ---
     private void OnHomeClicked(object sender, EventArgs e)
     {
-        // Envia mensagem: "Ei Dashboard, muda pro slide Home"
         MessagingCenter.Send(this, "NavigateTo", "Home");
+    }
+
+    private void OnTransactionsClicked(object sender, EventArgs e)
+    {
+        MessagingCenter.Send(this, "NavigateTo", "Transactions");
     }
 
     private void OnCardsClicked(object sender, EventArgs e)
@@ -81,9 +86,7 @@ public partial class BottomMenu : ContentView
         MessagingCenter.Send(this, "NavigateTo", "Settings");
     }
 
-    // --- L�GICA DO FAB (Bot�o +) ---
-    // Essa parte continua navegando de verdade, pois abre uma tela de cadastro
-
+    // --- LÓGICA DO FAB (Botão +) ---
     private async void OnFabClicked(object sender, EventArgs e)
     {
         _isMenuOpen = !_isMenuOpen;
@@ -93,31 +96,29 @@ public partial class BottomMenu : ContentView
     private async void OnNewIncomeClicked(object sender, EventArgs e)
     {
         _isMenuOpen = false; await ToggleMenuAnimations();
-        // Navega��o real para p�gina de cadastro
         await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=RECEITA");
     }
 
     private async void OnNewExpenseClicked(object sender, EventArgs e)
     {
         _isMenuOpen = false; await ToggleMenuAnimations();
-        // Navega��o real para p�gina de cadastro
         await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=DESPESA");
     }
 
-    // Anima��es do FAB
+    // Animações do FAB - Agora mostra verticalmente acima
     private async Task ToggleMenuAnimations()
     {
         if (_isMenuOpen)
         {
             BtnIncome.InputTransparent = false; BtnExpense.InputTransparent = false;
-            BtnIncome.Opacity = 1; IconIncome.Opacity = 1;
-            BtnExpense.Opacity = 1; IconExpense.Opacity = 1;
+            BtnIncome.Opacity = 1; GridIncome.Opacity = 1;
+            BtnExpense.Opacity = 1; GridExpense.Opacity = 1;
 
             await Task.WhenAll(
-                BtnIncome.TranslateTo(-70, -70, 250, Easing.CubicOut),
-                IconIncome.TranslateTo(-70, -70, 250, Easing.CubicOut),
-                BtnExpense.TranslateTo(70, -70, 250, Easing.CubicOut),
-                IconExpense.TranslateTo(70, -70, 250, Easing.CubicOut),
+                BtnIncome.TranslateTo(0, -70, 250, Easing.CubicOut),
+                GridIncome.TranslateTo(0, -70, 250, Easing.CubicOut),
+                BtnExpense.TranslateTo(0, -140, 250, Easing.CubicOut),
+                GridExpense.TranslateTo(0, -140, 250, Easing.CubicOut),
                 FabButton.RotateTo(45, 250, Easing.CubicOut)
             );
         }
@@ -125,13 +126,13 @@ public partial class BottomMenu : ContentView
         {
             await Task.WhenAll(
                 BtnIncome.TranslateTo(0, 0, 250, Easing.CubicIn),
-                IconIncome.TranslateTo(0, 0, 250, Easing.CubicIn),
+                GridIncome.TranslateTo(0, 0, 250, Easing.CubicIn),
                 BtnExpense.TranslateTo(0, 0, 250, Easing.CubicIn),
-                IconExpense.TranslateTo(0, 0, 250, Easing.CubicIn),
+                GridExpense.TranslateTo(0, 0, 250, Easing.CubicIn),
                 FabButton.RotateTo(0, 250, Easing.CubicIn)
             );
-            BtnIncome.Opacity = 0; IconIncome.Opacity = 0;
-            BtnExpense.Opacity = 0; IconExpense.Opacity = 0;
+            BtnIncome.Opacity = 0; GridIncome.Opacity = 0;
+            BtnExpense.Opacity = 0; GridExpense.Opacity = 0;
             BtnIncome.InputTransparent = true; BtnExpense.InputTransparent = true;
         }
     }

@@ -17,7 +17,7 @@ namespace controle_ja_mobile.ViewModels
         {
             _apiService = apiService;
             UserName = Preferences.Get("UserName", "Usuário");
-            UserEmail = Preferences.Get("UserEmail", "email@exemplo.com");
+            UserEmail = Preferences.Get("UserEmail", "usuario@email.com");
             AppVersion = AppInfo.VersionString;
         }
 
@@ -25,6 +25,32 @@ namespace controle_ja_mobile.ViewModels
         public async Task GoToProfile()
         {
             await Shell.Current.DisplayAlert("Meu Perfil", "A edição de perfil estará disponível em breve.", "OK");
+        }
+
+        [RelayCommand]
+        public async Task GoToAccounts()
+        {
+            await Shell.Current.DisplayAlert("Contas", "Lista de contas em breve.", "OK");
+        }
+
+        [RelayCommand]
+        public async Task GoToCategories()
+        {
+            await Shell.Current.DisplayAlert("Categorias", "Lista de categorias em breve.", "OK");
+        }
+
+        [RelayCommand]
+        public async Task GoToCreditCards()
+        {
+            // Navigate to credit cards list (already exists in carousel)
+            MessagingCenter.Send(this, "NavigateTo", "Cards");
+        }
+
+        [RelayCommand]
+        public async Task GoToVehicles()
+        {
+            // Navigate to vehicles list (already exists in carousel)
+            MessagingCenter.Send(this, "NavigateTo", "Vehicles");
         }
 
         [RelayCommand]

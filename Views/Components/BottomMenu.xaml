@@ -8,7 +8,7 @@
         <Path Fill="#1E293B" StrokeThickness="0" Aspect="Fill" VerticalOptions="End" HeightRequest="80" HorizontalOptions="Fill">
             <Path.Data>
                 <GeometryGroup>
-                    <PathGeometry Figures="M 0,20 L 0,80 L 400,80 L 400,20 L 260,20 C 260,20 250,20 240,30 C 230,45 220,55 200,55 C 180,55 170,45 160,30 C 150,20 140,20 140,20 Z"/>
+                    <PathGeometry Figures="M 0,0 L 0,80 L 400,80 L 400,0 Z"/>
                 </GeometryGroup>
             </Path.Data>
             <Path.Shadow>
@@ -16,7 +16,7 @@
             </Path.Shadow>
         </Path>
 
-        <Grid ColumnDefinitions="*,*,80,*,*" Padding="0,20,0,0" VerticalOptions="End" HeightRequest="80">
+        <Grid ColumnDefinitions="*,*,*,*,*" Padding="0,20,0,0" VerticalOptions="End" HeightRequest="80">
             <Grid Grid.Column="0" HorizontalOptions="Center" VerticalOptions="Center">
                 <Grid.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnHomeClicked"/>
@@ -27,13 +27,19 @@
 
             <Grid Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center">
                 <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnTransactionsClicked"/>
+                </Grid.GestureRecognizers>
+                <Path x:Name="PathTransactions" Data="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" Fill="#64748B" Aspect="Uniform" HeightRequest="24" WidthRequest="24"/>
+                <Label x:Name="LblTransactions" Text="Extrato" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
+            </Grid>
+
+            <Grid Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center">
+                <Grid.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnCardsClicked"/>
                 </Grid.GestureRecognizers>
                 <Path x:Name="PathCards" Data="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" Fill="#64748B" Aspect="Uniform" HeightRequest="24" WidthRequest="24"/>
                 <Label x:Name="LblCards" Text="Cartões" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
             </Grid>
-
-            <Grid Grid.Column="2" />
 
             <Grid Grid.Column="3" HorizontalOptions="Center" VerticalOptions="Center">
                 <Grid.GestureRecognizers>
@@ -52,13 +58,18 @@
             </Grid>
         </Grid>
 
-        <Grid VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,35" InputTransparent="True" CascadeInputTransparent="False">
+        <!-- FAB moved to right side above tab bar -->
+        <Grid VerticalOptions="End" HorizontalOptions="End" Margin="0,0,15,35" InputTransparent="True" CascadeInputTransparent="False">
 
             <Button x:Name="BtnIncome" Clicked="OnNewIncomeClicked" BackgroundColor="#00E676" HeightRequest="50" WidthRequest="50" CornerRadius="25" Opacity="0" InputTransparent="True"/>
-            <Path x:Name="IconIncome" Data="M12,4l-1.41,1.41L15.17,10H4v2h11.17l-4.58,4.59L12,18l8-8L12,4z" Fill="#003300" Aspect="Uniform" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center" Rotation="-90" Opacity="0" InputTransparent="True"/>
+            <Grid x:Name="GridIncome" HorizontalOptions="Center" VerticalOptions="Center" Opacity="0" InputTransparent="True">
+                <Path Data="M12,4l-1.41,1.41L15.17,10H4v2h11.17l-4.58,4.59L12,18l8-8L12,4z" Fill="#003300" Aspect="Uniform" HeightRequest="20" WidthRequest="20" Rotation="-90"/>
+            </Grid>
 
             <Button x:Name="BtnExpense" Clicked="OnNewExpenseClicked" BackgroundColor="#FF5252" HeightRequest="50" WidthRequest="50" CornerRadius="25" Opacity="0" InputTransparent="True"/>
-            <Path x:Name="IconExpense" Data="M12,4l-1.41,1.41L15.17,10H4v2h11.17l-4.58,4.59L12,18l8-8L12,4z" Fill="White" Aspect="Uniform" HeightRequest="20" WidthRequest="20" HorizontalOptions="Center" VerticalOptions="Center" Rotation="90" Opacity="0" InputTransparent="True"/>
+            <Grid x:Name="GridExpense" HorizontalOptions="Center" VerticalOptions="Center" Opacity="0" InputTransparent="True">
+                <Path Data="M12,4l-1.41,1.41L15.17,10H4v2h11.17l-4.58,4.59L12,18l8-8L12,4z" Fill="White" Aspect="Uniform" HeightRequest="20" WidthRequest="20" Rotation="90"/>
+            </Grid>
 
             <Button x:Name="FabButton" Clicked="OnFabClicked" BackgroundColor="{StaticResource Primary}" CornerRadius="30" HeightRequest="60" WidthRequest="60" Margin="0,0,0,10"/>
             <Path Data="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6V13z" Fill="#003300" Aspect="Uniform" HeightRequest="24" WidthRequest="24" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True" Margin="0,0,0,10"/>

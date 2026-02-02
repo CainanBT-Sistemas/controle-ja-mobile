@@ -12,6 +12,7 @@ public partial class DashboardPage : ContentPage
 
         // 1. Instancia as Views e injeta os ViewModels
         var homeView = new HomeView { BindingContext = homeVm };
+        var transactionsView = new TransactionsListView();
         var cardsView = new CreditCardsView { BindingContext = cardsVm };
         var vehiclesView = new VehicleListView { BindingContext = vehiclesVm };
         var settingsView = new SettingsView { BindingContext = settingsVm };
@@ -20,6 +21,7 @@ public partial class DashboardPage : ContentPage
         MainCarousel.ItemsSource = new List<ContentView>
         {
             homeView,
+            transactionsView,
             cardsView,
             vehiclesView,
             settingsView
@@ -31,9 +33,20 @@ public partial class DashboardPage : ContentPage
             switch (target)
             {
                 case "Home": MainCarousel.Position = 0; break;
-                case "Cards": MainCarousel.Position = 1; break;
-                case "Vehicles": MainCarousel.Position = 2; break;
-                case "Settings": MainCarousel.Position = 3; break;
+                case "Transactions": MainCarousel.Position = 1; break;
+                case "Cards": MainCarousel.Position = 2; break;
+                case "Vehicles": MainCarousel.Position = 3; break;
+                case "Settings": MainCarousel.Position = 4; break;
+            }
+        });
+
+        // Also subscribe to messages from SettingsViewModel
+        MessagingCenter.Subscribe<SettingsViewModel, string>(this, "NavigateTo", (sender, target) =>
+        {
+            switch (target)
+            {
+                case "Cards": MainCarousel.Position = 2; break;
+                case "Vehicles": MainCarousel.Position = 3; break;
             }
         });
     }
@@ -46,9 +59,10 @@ public partial class DashboardPage : ContentPage
             switch (e.CurrentPosition)
             {
                 case 0: MyBottomMenu.ActivePage = "Home"; break;
-                case 1: MyBottomMenu.ActivePage = "Cards"; break;
-                case 2: MyBottomMenu.ActivePage = "Vehicles"; break;
-                case 3: MyBottomMenu.ActivePage = "Settings"; break;
+                case 1: MyBottomMenu.ActivePage = "Transactions"; break;
+                case 2: MyBottomMenu.ActivePage = "Cards"; break;
+                case 3: MyBottomMenu.ActivePage = "Vehicles"; break;
+                case 4: MyBottomMenu.ActivePage = "Settings"; break;
             }
         }
     }
