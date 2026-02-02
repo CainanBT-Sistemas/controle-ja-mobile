@@ -22,7 +22,7 @@ namespace controle_ja_mobile
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
-
+            builder.Services.AddSingleton<BiometricAuthService>();
             builder.Services.AddSingleton<AccountService>();
             builder.Services.AddSingleton<ApiService>();
             builder.Services.AddSingleton<AuthService>();
