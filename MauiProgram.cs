@@ -2,6 +2,7 @@
 using controle_ja_mobile.Services;
 using controle_ja_mobile.ViewModels;
 using controle_ja_mobile.Views.Privates;
+using controle_ja_mobile.Views.Privates.Management;
 using controle_ja_mobile.Views.Publics;
 using Microcharts.Maui;
 using Microsoft.Extensions.Logging;
@@ -40,6 +41,9 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<TransactionAddViewModel>();
             builder.Services.AddTransient<VehiclesViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
+            builder.Services.AddTransient<AccountsViewModel>();
+            builder.Services.AddTransient<CategoriesViewModel>();
+
 
             //Views
             builder.Services.AddTransient<CreditCardAddPage>();
@@ -49,6 +53,10 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<RegisterPage>(); 
             builder.Services.AddTransient<VehicleAddPage>();
             builder.Services.AddTransient<WelcomePage>();
+            builder.Services.AddTransient<ManageCreditCardsPage>();
+            builder.Services.AddTransient<ManageVehiclesPage>();
+            builder.Services.AddTransient<ManageAccountsPage>();
+            builder.Services.AddTransient<ManageCategoriesPage>();
 
 
 

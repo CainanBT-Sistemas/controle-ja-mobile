@@ -66,6 +66,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\account.svg" />
+	  <None Remove="Resources\Images\arrow_back_36dp.svg" />
+	  <None Remove="Resources\Images\car_36dp.svg" />
+	  <None Remove="Resources\Images\category_36dp.svg" />
+	  <None Remove="Resources\Images\credit_card_36dp.svg" />
+	  <None Remove="Resources\Images\delete_36dp.svg" />
+	  <None Remove="Resources\Images\edit_36dp.svg" />
 	  <None Remove="Resources\Images\logo_controle.png" />
 	</ItemGroup>
 
@@ -75,6 +82,21 @@
 		<PackageReference Include="Microcharts.Maui" Version="1.0.1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Plugin.Fingerprint" Version="3.0.0-beta.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\Privates\Management\ManageAccountsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Privates\Management\ManageCategoriesPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Privates\Management\ManageCreditCardsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Privates\Management\ManageVehiclesPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>

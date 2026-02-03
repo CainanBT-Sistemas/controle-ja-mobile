@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             xmlns:models="clr-namespace:controle_ja_mobile.Models"
+             x:Class="controle_ja_mobile.Views.Privates.Management.ManageAccountsPage"
+             Title="Minhas Contas"
+             BackgroundColor="{StaticResource PageBackgroundColorDark}"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto, *">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="15,20,15,15" BackgroundColor="#0F172A">
+            <Border StrokeThickness="0" BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}"/>
+                </Border.GestureRecognizers>
+                <Path Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" Fill="White" Aspect="Uniform" HeightRequest="24" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Border>
+            <Label Grid.Column="1" Text="Contas" TextColor="White" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center"/>
+            <Border Grid.Column="2" StrokeThickness="0" BackgroundColor="{StaticResource Primary}" HeightRequest="35" WidthRequest="35" StrokeShape="RoundRectangle 17.5">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToAddAccountCommand}"/>
+                </Border.GestureRecognizers>
+                <Label Text="+" TextColor="Black" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,-2,0,0"/>
+            </Border>
+        </Grid>
+
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadAccountsCommand}" RefreshColor="{StaticResource Primary}">
+            <CollectionView ItemsSource="{Binding Accounts}" Margin="20">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="15"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20">
+                        <Border BackgroundColor="#1E293B" StrokeThickness="0" HeightRequest="100" WidthRequest="100" StrokeShape="RoundRectangle 50">
+                            <Path Data="M2,20H20V22H2V20M4,12H6V19H4V12M9,12H11V19H9V12M13,12H15V19H13V12M19,4H5V9H19V4M4,4H20V2H4V4Z" Fill="#64748B" Aspect="Uniform" Margin="25" Opacity="0.5"/>
+                        </Border>
+                        <Label Text="Nenhuma conta encontrada" TextColor="#94A3B8" FontSize="16" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Account">
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AccountsViewModel}}, Path=DeleteAccountCommand}" CommandParameter="{Binding .}">
+
+                                        <Border BackgroundColor="#EF4444" WidthRequest="70" StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="0,15,15,0"/>
+                                            </Border.StrokeShape>
+                                            <Path Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" Fill="White" HeightRequest="24" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+
+                                    </SwipeItemView>
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+
+                            <Border StrokeShape="RoundRectangle 15" StrokeThickness="0" BackgroundColor="#1E293B" Padding="15">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AccountsViewModel}}, Path=EditAccountCommand}" CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Name}" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                                        <Label Text="Saldo Atual" TextColor="#94A3B8" FontSize="12"/>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" Text="{Binding Balance, StringFormat='{0:C}'}" TextColor="{StaticResource Primary}" FontAttributes="Bold" FontSize="16" VerticalOptions="Center"/>
+                                </Grid>
+                            </Border>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

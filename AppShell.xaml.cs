@@ -1,4 +1,5 @@
 ﻿using controle_ja_mobile.Views.Privates;
+using controle_ja_mobile.Views.Privates.Management;
 using System.Windows.Input;
 
 namespace controle_ja_mobile
@@ -27,7 +28,11 @@ namespace controle_ja_mobile
             // Registra as páginas que não estão nas abas principais (páginas de navegação interna)
             Routing.RegisterRoute(nameof(CreditCardAddPage), typeof(CreditCardAddPage));
             Routing.RegisterRoute(nameof(VehicleAddPage), typeof(VehicleAddPage));
-            Routing.RegisterRoute(nameof(TransactionAddPage), typeof(TransactionAddPage));
+            Routing.RegisterRoute(nameof(TransactionAddPage), typeof(TransactionAddPage));            
+            Routing.RegisterRoute(nameof(ManageCreditCardsPage), typeof(ManageCreditCardsPage));
+            Routing.RegisterRoute(nameof(ManageVehiclesPage), typeof(ManageVehiclesPage));
+            Routing.RegisterRoute(nameof(ManageAccountsPage), typeof(ManageAccountsPage));
+            Routing.RegisterRoute(nameof(ManageCategoriesPage), typeof(ManageCategoriesPage));
         }
 
         // Esse método é chamado toda vez que você troca de tela

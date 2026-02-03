@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             xmlns:models="clr-namespace:controle_ja_mobile.Models"
+             xmlns:converters="clr-namespace:controle_ja_mobile.Converters"
+             x:Class="controle_ja_mobile.Views.Privates.Management.ManageCategoriesPage"
+             Title="Categorias"
+             BackgroundColor="{StaticResource PageBackgroundColorDark}"
+             NavigationPage.HasNavigationBar="False">
+
+    <ContentPage.Resources>
+        <converters:BoolToArrowConverter x:Key="BoolToArrowConverter" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, *">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="15,20,15,15" BackgroundColor="#0F172A">
+            <Border StrokeThickness="0" BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}"/>
+                </Border.GestureRecognizers>
+                <Image Source="arrow_back_36dp.png" Aspect="AspectFit" HeightRequest="24" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Border>
+
+            <Label Grid.Column="1" Text="Categorias" TextColor="White" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center"/>
+
+            <Border Grid.Column="2" StrokeThickness="0" BackgroundColor="{StaticResource Primary}" HeightRequest="35" WidthRequest="35" StrokeShape="RoundRectangle 17.5">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToAddCategoryCommand}"/>
+                </Border.GestureRecognizers>
+                <Label Text="+" TextColor="Black" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,-2,0,0"/>
+            </Border>
+        </Grid>
+
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCategoriesCommand}" RefreshColor="{StaticResource Primary}">
+            <CollectionView ItemsSource="{Binding CategoryGroups}" Margin="15">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="15"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20" Opacity="1">
+                        <Image Source="category_36dp.png" HeightRequest="80" WidthRequest="80" Opacity="0.5" Aspect="AspectFit"/>
+                        <Label Text="Nenhuma categoria encontrada" TextColor="#94A3B8" FontSize="16"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:CategoryGroup">
+                        <Border BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="0">
+                            <VerticalStackLayout>
+
+                                <Grid ColumnDefinitions="*, Auto" Padding="15" BackgroundColor="#2D3A4F">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CategoriesViewModel}}, Path=ToggleGroupCommand}" CommandParameter="{Binding .}"/>
+                                    </Grid.GestureRecognizers>
+
+                                    <VerticalStackLayout Spacing="0">
+                                        <Label Text="{Binding Name}" TextColor="{StaticResource Primary}" FontAttributes="Bold" FontSize="16"/>
+                                        <Label Text="{Binding TypeDescription}" TextColor="#94A3B8" FontSize="10"/>
+                                    </VerticalStackLayout>
+
+                                    <Label Grid.Column="1" Text="{Binding IsExpanded, Converter={StaticResource BoolToArrowConverter}}" TextColor="#94A3B8" FontSize="14" VerticalOptions="Center"/>
+                                </Grid>
+
+                                <StackLayout BindableLayout.ItemsSource="{Binding VisibleItems}" Spacing="0">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="models:Category">
+                                            <Grid ColumnDefinitions="Auto, *, Auto, Auto" Padding="15,12" BackgroundColor="Transparent">
+
+                                                <BoxView WidthRequest="2" Color="#334155" HeightRequest="20" VerticalOptions="Center" Margin="5,0,15,0"/>
+
+                                                <Label Grid.Column="1" Text="{Binding Name}" TextColor="White" FontSize="14" VerticalOptions="Center"/>
+
+                                                <Grid Grid.Column="2" Margin="0,0,15,0" HeightRequest="30" WidthRequest="30">
+                                                    <Grid.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CategoriesViewModel}}, Path=EditCategoryCommand}" CommandParameter="{Binding .}"/>
+                                                    </Grid.GestureRecognizers>
+                                                    <Path Data="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" 
+                                                          Fill="#94A3B8" Aspect="Uniform" HeightRequest="18" WidthRequest="18" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                </Grid>
+
+                                                <ImageButton Grid.Column="3" 
+                                                             Source="delete_36dp.png" 
+                                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CategoriesViewModel}}, Path=DeleteCategoryCommand}" 
+                                                             CommandParameter="{Binding .}"
+                                                             HeightRequest="24" WidthRequest="24" Aspect="AspectFit" VerticalOptions="Center">
+                                                </ImageButton>
+
+                                            </Grid>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </StackLayout>
+
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

@@ -75,5 +75,15 @@ namespace controle_ja_mobile.Services
             }
         }
 
+        internal async Task<string> DeleteAsync(string endpoint)
+        {
+            AddAuthenticationHeaderAsync(endpoint);
+            var response = await _httpClient.DeleteAsync(endpoint);
+            if (!response.IsSuccessStatusCode)
+            {
+                HandlerErrors(response);
+            }
+            return await response.Content.ReadAsStringAsync();
+        }
     }
 }

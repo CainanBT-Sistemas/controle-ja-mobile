@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Services;
+using controle_ja_mobile.Views.Privates.Management; // Namespace sugerido
 using controle_ja_mobile.Views.Publics;
 
 namespace controle_ja_mobile.ViewModels
@@ -24,33 +25,34 @@ namespace controle_ja_mobile.ViewModels
         [RelayCommand]
         public async Task GoToProfile()
         {
+            // Em breve página de edição de perfil
             await Shell.Current.DisplayAlert("Meu Perfil", "A edição de perfil estará disponível em breve.", "OK");
         }
 
         [RelayCommand]
         public async Task GoToAccounts()
         {
-            await Shell.Current.DisplayAlert("Contas", "Lista de contas em breve.", "OK");
+            await Shell.Current.GoToAsync(nameof(ManageAccountsPage));
         }
 
         [RelayCommand]
         public async Task GoToCategories()
         {
-            await Shell.Current.DisplayAlert("Categorias", "Lista de categorias em breve.", "OK");
+            await Shell.Current.GoToAsync(nameof(ManageCategoriesPage));
         }
 
         [RelayCommand]
-        public void GoToCreditCards()
+        public async Task GoToCreditCards()
         {
-            // Navigate to credit cards list (already exists in carousel)
-            MessagingCenter.Send(this, "NavigateTo", "Cards");
+            // Navega para a página de gerenciamento dedicada
+            await Shell.Current.GoToAsync(nameof(ManageCreditCardsPage));
         }
 
         [RelayCommand]
-        public void GoToVehicles()
+        public async Task GoToVehicles()
         {
-            // Navigate to vehicles list (already exists in carousel)
-            MessagingCenter.Send(this, "NavigateTo", "Vehicles");
+            // Navega para a página de gerenciamento dedicada
+            await Shell.Current.GoToAsync(nameof(ManageVehiclesPage));
         }
 
         [RelayCommand]

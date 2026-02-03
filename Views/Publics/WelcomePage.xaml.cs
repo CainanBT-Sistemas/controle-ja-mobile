@@ -91,12 +91,6 @@ public partial class WelcomePage : ContentPage
                             NavigateToMainApp();
                             return;
                         }
-                        else
-                        {
-                            // Token is invalid, clear it
-                            ClearRefreshToken();
-                            await DisplayAlert("Sessão Expirada", "Sua sessão expirou. Por favor, faça login novamente.", "OK");
-                        }
                     }
                     else
                     {

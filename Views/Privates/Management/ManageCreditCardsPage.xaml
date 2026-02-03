@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="controle_ja_mobile.Views.Privates.Management.ManageCreditCardsPage"
+             xmlns:views="clr-namespace:controle_ja_mobile.Views.Privates.Tabs"
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             Title="Meus Cartões"
+             BackgroundColor="{StaticResource PageBackgroundColorDark}">
+    <views:CreditCardsView />
+</ContentPage>
