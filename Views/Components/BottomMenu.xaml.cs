@@ -11,7 +11,7 @@ public partial class BottomMenu : ContentView
     private readonly Color ActiveColor = Color.FromArgb("#00E676");
     private readonly Color InactiveColor = Color.FromArgb("#64748B");
 
-    // Propriedade Bindable (Recebe aviso da Dashboard quando o usuário desliza o dedo)
+    // Propriedade Bindable
     public static readonly BindableProperty ActivePageProperty =
         BindableProperty.Create(nameof(ActivePage), typeof(string), typeof(BottomMenu), "Home", propertyChanged: OnActivePageChanged);
 
@@ -60,7 +60,7 @@ public partial class BottomMenu : ContentView
         }
     }
 
-    // --- NAVEGAÇÃO DAS TABS ---
+    // --- NAVEGAÇÃO DAS TABS (Mantendo seu padrão MessagingCenter) ---
     private void OnHomeClicked(object sender, EventArgs e)
     {
         MessagingCenter.Send(this, "NavigateTo", "Home");
@@ -95,45 +95,68 @@ public partial class BottomMenu : ContentView
 
     private async void OnNewIncomeClicked(object sender, EventArgs e)
     {
-        _isMenuOpen = false; await ToggleMenuAnimations();
+        _isMenuOpen = false;
+        await ToggleMenuAnimations(); // Fecha visualmente antes de navegar
         await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=RECEITA");
     }
 
     private async void OnNewExpenseClicked(object sender, EventArgs e)
     {
-        _isMenuOpen = false; await ToggleMenuAnimations();
+        _isMenuOpen = false;
+        await ToggleMenuAnimations(); // Fecha visualmente antes de navegar
         await Shell.Current.GoToAsync($"{nameof(TransactionAddPage)}?type=DESPESA");
     }
 
-    // Animações do FAB - Agora mostra verticalmente acima
+    // Animações do FAB
     private async Task ToggleMenuAnimations()
     {
         if (_isMenuOpen)
         {
-            BtnIncome.InputTransparent = false; BtnExpense.InputTransparent = false;
-            BtnIncome.Opacity = 1; GridIncome.Opacity = 1;
-            BtnExpense.Opacity = 1; GridExpense.Opacity = 1;
+            // PREPARA PARA ABRIR: Torna visível e clicável
+            BtnIncome.InputTransparent = false;
+            BtnExpense.InputTransparent = false;
 
+            // Define opacidade inicial para 0 caso não esteja, mas o FadeTo cuida disso
+            // A animação começa:
             await Task.WhenAll(
+                // 1. Receita sobe para -70
                 BtnIncome.TranslateTo(0, -70, 250, Easing.CubicOut),
+                BtnIncome.FadeTo(1, 250, Easing.CubicOut),
                 GridIncome.TranslateTo(0, -70, 250, Easing.CubicOut),
+                GridIncome.FadeTo(1, 250, Easing.CubicOut),
+
+                // 2. Despesa sobe mais alto para -140
                 BtnExpense.TranslateTo(0, -140, 250, Easing.CubicOut),
+                BtnExpense.FadeTo(1, 250, Easing.CubicOut),
                 GridExpense.TranslateTo(0, -140, 250, Easing.CubicOut),
-                FabButton.RotateTo(45, 250, Easing.CubicOut)
+                GridExpense.FadeTo(1, 250, Easing.CubicOut),
+
+                // 3. Ícone gira 45 graus (vira um X) - IMPORTANTE: Girar FabIcon, não FabButton
+                FabIcon.RotateTo(45, 250, Easing.CubicOut)
             );
         }
         else
         {
+            // FECHAR
             await Task.WhenAll(
+                // 1. Volta posições para 0
                 BtnIncome.TranslateTo(0, 0, 250, Easing.CubicIn),
+                BtnIncome.FadeTo(0, 250, Easing.CubicIn),
                 GridIncome.TranslateTo(0, 0, 250, Easing.CubicIn),
+                GridIncome.FadeTo(0, 250, Easing.CubicIn),
+
                 BtnExpense.TranslateTo(0, 0, 250, Easing.CubicIn),
+                BtnExpense.FadeTo(0, 250, Easing.CubicIn),
                 GridExpense.TranslateTo(0, 0, 250, Easing.CubicIn),
-                FabButton.RotateTo(0, 250, Easing.CubicIn)
+                GridExpense.FadeTo(0, 250, Easing.CubicIn),
+
+                // 2. Gira de volta para 0
+                FabIcon.RotateTo(0, 250, Easing.CubicIn)
             );
-            BtnIncome.Opacity = 0; GridIncome.Opacity = 0;
-            BtnExpense.Opacity = 0; GridExpense.Opacity = 0;
-            BtnIncome.InputTransparent = true; BtnExpense.InputTransparent = true;
+
+            // Reseta estados para garantir que não fiquem clicáveis
+            BtnIncome.InputTransparent = true;
+            BtnExpense.InputTransparent = true;
         }
     }
 }

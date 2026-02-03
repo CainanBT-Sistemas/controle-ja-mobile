@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
+using Microcharts; // Necessário para o gráfico
 
 namespace controle_ja_mobile.Models
 {
@@ -28,11 +24,18 @@ namespace controle_ja_mobile.Models
         public int BestDay { get; set; }
 
         // --- Helpers Visuais ---
+
         [JsonIgnore]
-        public string FormattedTotalLimit => $"Limite Total: {TotalLimit:C}";
+        public decimal UsedAmount => TotalLimit - CurrentLimit;
+
+        [JsonIgnore]
+        public string FormattedTotalLimit => $"Limite: {TotalLimit:C}";
 
         [JsonIgnore]
         public string FormattedAvailable => $"{CurrentLimit:C}";
+
+        [JsonIgnore]
+        public string FormattedUsed => $"{UsedAmount:C}";
 
         [JsonIgnore]
         public string InvoiceInfo => $"Fecha dia {CloseDay} • Melhor dia {BestDay}";
@@ -44,12 +47,18 @@ namespace controle_ja_mobile.Models
             get
             {
                 if (TotalLimit == 0) return 0;
-                // Se Total = 1000 e Atual = 200, Usado = 800. Progresso = 0.8
                 return (double)(TotalLimit - CurrentLimit) / (double)TotalLimit;
             }
         }
 
         [JsonIgnore]
         public string UsedPercentageText => $"{LimitProgress * 100:F0}% usado";
+
+        // --- Propriedades para o Gráfico ---
+        [JsonIgnore]
+        public Chart CategoryChart { get; set; }
+
+        [JsonIgnore]
+        public bool HasChartData { get; set; }
     }
 }

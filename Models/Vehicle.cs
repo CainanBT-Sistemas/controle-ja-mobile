@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
+using Microcharts; // Necessário para o gráfico
 
 namespace controle_ja_mobile.Models
 {
@@ -30,7 +26,7 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("currentOdometer")]
         public decimal CurrentOdometer { get; set; }
 
-        // Campos de Inteligência (podem vir nulos)
+        // Campos de Inteligência
         [JsonPropertyName("avgGasoline")]
         public double? AvgGasoline { get; set; }
 
@@ -38,7 +34,7 @@ namespace controle_ja_mobile.Models
         public double? AvgEthanol { get; set; }
 
         [JsonIgnore]
-        public string FullDescription => $"{Brand} {Model}";
+        public string FullDescription => $"{Brand} {Model} - {Year}";
 
         [JsonIgnore]
         public string FormattedOdometer => $"{CurrentOdometer:N0} km";
@@ -49,12 +45,18 @@ namespace controle_ja_mobile.Models
             get
             {
                 string info = "";
-                // Verifica se tem média e formata
-                if (AvgGasoline > 0) info += $"Gas: {AvgGasoline:F1} km/L  ";
+                if (AvgGasoline > 0) info += $"Gas: {AvgGasoline:F1} km/L\n";
                 if (AvgEthanol > 0) info += $"Eta: {AvgEthanol:F1} km/L";
-
-                return string.IsNullOrWhiteSpace(info) ? "Sem dados de consumo" : info;
+                return string.IsNullOrWhiteSpace(info) ? "Sem dados" : info.Trim();
             }
         }
+
+        // Simulação de Custo Mensal (futuramente virá da API)
+        [JsonIgnore]
+        public string MonthlyCost { get; set; } = "R$ 0,00";
+
+        // --- Gráfico de Histórico ---
+        [JsonIgnore]
+        public Chart ExpensesChart { get; set; }
     }
 }

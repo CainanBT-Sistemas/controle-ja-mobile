@@ -3,15 +3,15 @@ using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
 using controle_ja_mobile.Views.Privates;
+using Microcharts;
+using SkiaSharp;
 using System.Collections.ObjectModel;
 
 namespace controle_ja_mobile.ViewModels
 {
     public partial class VehiclesViewModel : BaseViewModel
     {
-       
         private readonly VehicleService _vehicleService;
-
         public ObservableCollection<Vehicle> Vehicles { get; } = new();
 
         [ObservableProperty] private bool isRefreshing;
@@ -40,7 +40,11 @@ namespace controle_ja_mobile.ViewModels
                     Vehicles.Clear();
                     if (list != null)
                     {
-                        foreach (var v in list) Vehicles.Add(v);
+                        foreach (var v in list)
+                        {
+                            CalculateStatsAndChart(v);
+                            Vehicles.Add(v);
+                        }
                     }
                 }
                 finally
@@ -48,6 +52,31 @@ namespace controle_ja_mobile.ViewModels
                     IsRefreshing = false;
                 }
             }, showLoading: false);
+        }
+
+        private void CalculateStatsAndChart(Vehicle vehicle)
+        {
+            // MOCK: Dados de custo mensal fictícios
+            // (Futuramente isso virá do cálculo de abastecimentos da API)
+            vehicle.MonthlyCost = "R$ 450,00";
+
+            // Gráfico de Barras: Gastos últimos 3 meses (Simulado)
+            var entries = new List<ChartEntry>
+            {
+                new ChartEntry(320) { Label = "Dez", ValueLabel = "320", Color = SKColor.Parse("#FFAB00") },
+                new ChartEntry(450) { Label = "Jan", ValueLabel = "450", Color = SKColor.Parse("#FF5252") },
+                new ChartEntry(150) { Label = "Fev", ValueLabel = "150", Color = SKColor.Parse("#00E676") }
+            };
+
+            vehicle.ExpensesChart = new BarChart
+            {
+                Entries = entries,
+                BackgroundColor = SKColors.Transparent,
+                LabelTextSize = 22,
+                LabelColor = SKColor.Parse("#94A3B8"),
+                ValueLabelOrientation = Orientation.Horizontal,
+                LabelOrientation = Orientation.Horizontal
+            };
         }
 
         [RelayCommand]
@@ -81,7 +110,6 @@ namespace controle_ja_mobile.ViewModels
                 {
                     await App.Current.MainPage.DisplayAlert("Sucesso", "Veículo cadastrado!", "OK");
 
-                    // Limpar
                     NewName = string.Empty;
                     NewBrand = string.Empty;
                     NewModel = string.Empty;

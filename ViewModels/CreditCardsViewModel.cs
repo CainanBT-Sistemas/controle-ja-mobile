@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
 using controle_ja_mobile.Views.Privates;
+using Microcharts;
+using SkiaSharp;
 using System.Collections.ObjectModel;
 
 namespace controle_ja_mobile.ViewModels
@@ -28,18 +30,54 @@ namespace controle_ja_mobile.ViewModels
         [RelayCommand]
         public async Task LoadCardsAsync()
         {
-            // Passamos 'false' no showLoading se estivermos usando o RefreshView, 
-            // senão o loading global aparece em cima do spinner nativo.
             await ExecuteWithErrorHandlingAsync(async () =>
             {
                 var cards = await _creditCardService.GetCreditCardsAsync();
                 Cards.Clear();
                 if (cards != null)
                 {
-                    foreach (var card in cards) Cards.Add(card);
+                    foreach (var card in cards)
+                    {
+                        GenerateCardChart(card); // Gera o gráfico
+                        Cards.Add(card);
+                    }
                 }
                 IsRefreshing = false;
             }, showLoading: false);
+        }
+
+        private void GenerateCardChart(CreditCard card)
+        {
+            // Se o cartão tem uso, geramos um gráfico fictício para ilustrar
+            if (card.UsedAmount > 0)
+            {
+                card.HasChartData = true;
+
+                // Cores do tema
+                var colors = new[] { SKColor.Parse("#00E676"), SKColor.Parse("#2979FF"), SKColor.Parse("#FFAB00"), SKColor.Parse("#FF5252") };
+
+                // Dados Simulados (distribui o valor usado em categorias fictícias por enquanto)
+                var entries = new List<ChartEntry>
+                {
+                    new ChartEntry((float)(card.UsedAmount * 0.4m)) { Label = "Mercado", ValueLabel = "40%", Color = colors[0], ValueLabelColor = colors[0] },
+                    new ChartEntry((float)(card.UsedAmount * 0.3m)) { Label = "Lazer", ValueLabel = "30%", Color = colors[1], ValueLabelColor = colors[1] },
+                    new ChartEntry((float)(card.UsedAmount * 0.2m)) { Label = "Transp.", ValueLabel = "20%", Color = colors[2], ValueLabelColor = colors[2] },
+                    new ChartEntry((float)(card.UsedAmount * 0.1m)) { Label = "Outros", ValueLabel = "10%", Color = colors[3], ValueLabelColor = colors[3] },
+                };
+
+                card.CategoryChart = new DonutChart
+                {
+                    Entries = entries,
+                    BackgroundColor = SKColors.Transparent,
+                    LabelTextSize = 20,
+                    HoleRadius = 0.60f,
+                    LabelColor = SKColor.Parse("#94A3B8") // Cinza claro
+                };
+            }
+            else
+            {
+                card.HasChartData = false;
+            }
         }
 
         [RelayCommand]
@@ -91,7 +129,6 @@ namespace controle_ja_mobile.ViewModels
                 {
                     await App.Current.MainPage.DisplayAlert("Sucesso", "Cartão adicionado!", "OK");
 
-                    // Limpa campos
                     NewCardName = "";
                     NewCardLimit = "";
                     NewCardCloseDay = "";
