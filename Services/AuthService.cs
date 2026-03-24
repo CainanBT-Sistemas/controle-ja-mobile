@@ -25,7 +25,7 @@ namespace controle_ja_mobile.Services
             try
             {
                 var loginData = new { email, password };
-                var result = await _apiService.PostAsync<string>("auth/login", loginData);
+                var result = await _apiService.PostAsync<string>("auth", loginData);
                 if (!string.IsNullOrEmpty(result))
                 {
                     var userResponse = JsonSerializer.Deserialize<UserResponse>(result);

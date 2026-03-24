@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using controle_ja_mobile.Helpers;
 using controle_ja_mobile.ViewModels;
 using controle_ja_mobile.Views.Components;
 using controle_ja_mobile.Views.Privates.Tabs;
@@ -17,7 +19,7 @@ public partial class DashboardPage : ContentPage
         var vehiclesView = new VehicleListView { BindingContext = vehiclesVm };
         var settingsView = new SettingsView { BindingContext = settingsVm };
 
-        // 2. Adiciona ao Carrossel (Agora ele acha o MainCarousel por causa do x:Name)
+        // 2. Adiciona ao Carrossel
         MainCarousel.ItemsSource = new List<ContentView>
         {
             homeView,
@@ -27,10 +29,12 @@ public partial class DashboardPage : ContentPage
             settingsView
         };
 
-        // 3. Inscreve no MessagingCenter
-        MessagingCenter.Subscribe<BottomMenu, string>(this, "NavigateTo", (sender, target) =>
+        // 3. Inscreve no Messenger UMA ÚNICA VEZ
+        WeakReferenceMessenger.Default.Register<NavigationMessage>(this, (recipient, message) =>
         {
-            switch (target)
+            string targetPage = message.Value;
+
+            switch (targetPage)
             {
                 case "Home": MainCarousel.Position = 0; break;
                 case "Transactions": MainCarousel.Position = 1; break;
@@ -39,21 +43,10 @@ public partial class DashboardPage : ContentPage
                 case "Settings": MainCarousel.Position = 4; break;
             }
         });
-
-        // Also subscribe to messages from SettingsViewModel
-        MessagingCenter.Subscribe<SettingsViewModel, string>(this, "NavigateTo", (sender, target) =>
-        {
-            switch (target)
-            {
-                case "Cards": MainCarousel.Position = 2; break;
-                case "Vehicles": MainCarousel.Position = 3; break;
-            }
-        });
     }
 
     private void OnPositionChanged(object sender, PositionChangedEventArgs e)
     {
-        // Agora ele acha o MyBottomMenu por causa do x:Name
         if (MyBottomMenu != null)
         {
             switch (e.CurrentPosition)

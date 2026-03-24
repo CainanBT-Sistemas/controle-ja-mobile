@@ -22,6 +22,7 @@ namespace controle_ja_mobile
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
                 });
             builder.Services.AddSingleton<BiometricAuthService>();
             builder.Services.AddSingleton<AccountService>();
@@ -43,6 +44,7 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<SettingsViewModel>();
             builder.Services.AddTransient<AccountsViewModel>();
             builder.Services.AddTransient<CategoriesViewModel>();
+            builder.Services.AddTransient<CategoryAddViewModel>();
 
 
             //Views
@@ -57,6 +59,7 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<ManageVehiclesPage>();
             builder.Services.AddTransient<ManageAccountsPage>();
             builder.Services.AddTransient<ManageCategoriesPage>();
+            builder.Services.AddTransient<CategoryAddPage>();
 
 
 

@@ -11,8 +11,8 @@ namespace controle_ja_mobile.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            // Retorna caractere de seta ou nome de imagem dependendo se está expandido (true)
-            return (bool)value ? "▼" : "▶";
+            // Retorna seta para baixo se true (expandido), ou seta para direita se false
+            return (value is bool b && b) ? "▼" : "▶";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => null;

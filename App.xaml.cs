@@ -1,5 +1,6 @@
 ﻿using controle_ja_mobile.Configs;
 using controle_ja_mobile.Services;
+using controle_ja_mobile.Views.Privates.Management;
 using controle_ja_mobile.Views.Publics;
 
 namespace controle_ja_mobile
@@ -13,7 +14,6 @@ namespace controle_ja_mobile
             MainPage = new NavigationPage(new WelcomePage(
                 IPlatformApplication.Current?.Services.GetService<AuthService>(),
                 IPlatformApplication.Current?.Services.GetService<BiometricAuthService>()));
-
         }
 
     }

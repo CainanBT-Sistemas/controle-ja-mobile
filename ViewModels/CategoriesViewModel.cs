@@ -2,8 +2,10 @@
 using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
+using controle_ja_mobile.Views.Privates.Management;
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace controle_ja_mobile.ViewModels
 {
@@ -11,11 +13,16 @@ namespace controle_ja_mobile.ViewModels
     {
         private readonly ApiService _apiService;
 
-        // Lista de Grupos (Pai)
-        public ObservableCollection<CategoryGroup> CategoryGroups { get; } = new();
+        public ObservableCollection<Category> DisplayedCategories { get; } = new();
 
-        [ObservableProperty] private bool isRefreshing;
-        [ObservableProperty] private bool isEmptyStateVisible;
+        private List<Category> _allExpenses = new();
+        private List<Category> _allIncomes = new();
+
+        [ObservableProperty]
+        private bool isRefreshing;
+
+        [ObservableProperty]
+        private bool isExpensesSelected = true;
 
         public CategoriesViewModel(ApiService apiService)
         {
@@ -27,86 +34,83 @@ namespace controle_ja_mobile.ViewModels
         {
             await ExecuteWithErrorHandlingAsync(async () =>
             {
-                // 1. Busca o JSON puro como string (já que seu método retorna string por padrão)
                 string jsonString = await _apiService.GetAsync<string>("categories");
 
-                List<Category> categoriesList = new List<Category>();
+                List<Category> fullList = new();
 
-                // 2. Converte (Deserializa) a String para Lista de Categorias
                 if (!string.IsNullOrWhiteSpace(jsonString))
                 {
                     try
                     {
-                        var options = new System.Text.Json.JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        };
-
-                        categoriesList = System.Text.Json.JsonSerializer.Deserialize<List<Category>>(jsonString, options)
-                                         ?? new List<Category>();
+                        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                        options.Converters.Add(new JsonStringEnumConverter());
+                        fullList = JsonSerializer.Deserialize<List<Category>>(jsonString, options) ?? new();
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        // Se o JSON vier inválido, mantemos a lista vazia para não quebrar a tela
-                        categoriesList = new List<Category>();
+                        System.Diagnostics.Debug.WriteLine($"ERRO JSON: {ex.Message}");
                     }
                 }
 
-                // 3. Limpa e popula os grupos visuais
-                CategoryGroups.Clear();
+                // MONTAGEM DA ÁRVORE
+                var rootCategories = fullList.Where(c => c.ParentId == null).ToList();
+                var subCategories = fullList.Where(c => c.ParentId != null).ToList();
 
-                if (categoriesList != null && categoriesList.Any())
+                foreach (var root in rootCategories) root.SubCategories.Clear();
+
+                foreach (var sub in subCategories)
                 {
-                    IsEmptyStateVisible = false;
-
-                    // Agora 'categoriesList' é uma Lista real, então o .Where funciona corretamente
-                    var receitas = categoriesList.Where(c => c.Type == TransactionType.RECEITA).ToList();
-                    var despesas = categoriesList.Where(c => c.Type == TransactionType.DESPESA).ToList();
-
-                    if (receitas.Any())
-                        CategoryGroups.Add(new CategoryGroup("Receitas", "Entradas", receitas));
-
-                    if (despesas.Any())
-                        CategoryGroups.Add(new CategoryGroup("Despesas", "Saídas", despesas));
+                    var parent = rootCategories.FirstOrDefault(p => p.Id == sub.ParentId);
+                    if (parent != null)
+                    {
+                        parent.SubCategories.Add(sub);
+                    }
                 }
-                else
+
+                _allExpenses = rootCategories.Where(c => c.Type == TransactionType.DESPESA).ToList();
+                _allIncomes = rootCategories.Where(c => c.Type == TransactionType.RECEITA).ToList();
+
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    IsEmptyStateVisible = true;
-                }
+                    UpdateDisplayedList();
+                });
 
                 IsRefreshing = false;
             });
         }
 
-        // Comando para abrir/fechar o grupo
         [RelayCommand]
-        public void ToggleGroup(CategoryGroup group)
+        public void SwitchTab(string type)
         {
-            group.ToggleExpand();
+            IsExpensesSelected = type == "DESPESA";
+            UpdateDisplayedList();
+        }
+
+        private void UpdateDisplayedList()
+        {
+            DisplayedCategories.Clear();
+            var source = IsExpensesSelected ? _allExpenses : _allIncomes;
+
+            // EXIBE APENAS AS RAÍZES
+            foreach (var item in source.Where(c => c.ParentId == null))
+            {
+                DisplayedCategories.Add(item);
+            }
         }
 
         [RelayCommand]
-        public async Task EditCategory(Category category)
+        public async Task OpenCategoryDetails(Category category)
         {
-            await Shell.Current.DisplayAlert("Editar", $"Editar {category.Name}", "OK");
+            await Shell.Current.GoToAsync($"{nameof(CategoryAddPage)}?id={category.Id}");
         }
 
         [RelayCommand]
-        public async Task DeleteCategory(Category category)
+        public async Task GoToAddRootCategory()
         {
-            bool confirm = await Shell.Current.DisplayAlert("Excluir", $"Apagar {category.Name}?", "Sim", "Não");
-            if (!confirm) return;
-
-            await ExecuteWithErrorHandlingAsync(async () => {
-                var success = await _apiService.DeleteAsync($"categories/{category.Id}");
-                if (!string.IsNullOrWhiteSpace(success)) await LoadCategories();
-            });
+            await Shell.Current.GoToAsync(nameof(CategoryAddPage));
         }
 
         [RelayCommand]
         public async Task GoBack() => await Shell.Current.GoToAsync("..");
-
-        [RelayCommand]
-        public async Task GoToAddCategory() => await Shell.Current.DisplayAlert("Adicionar", "Em breve", "OK");
     }
 }

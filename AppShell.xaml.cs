@@ -33,6 +33,7 @@ namespace controle_ja_mobile
             Routing.RegisterRoute(nameof(ManageVehiclesPage), typeof(ManageVehiclesPage));
             Routing.RegisterRoute(nameof(ManageAccountsPage), typeof(ManageAccountsPage));
             Routing.RegisterRoute(nameof(ManageCategoriesPage), typeof(ManageCategoriesPage));
+            Routing.RegisterRoute(nameof(CategoryAddPage), typeof(CategoryAddPage));
         }
 
         // Esse método é chamado toda vez que você troca de tela

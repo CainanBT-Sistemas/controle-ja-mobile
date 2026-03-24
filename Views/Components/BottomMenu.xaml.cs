@@ -1,5 +1,7 @@
 using controle_ja_mobile.Views.Privates;
 using Microsoft.Maui.Graphics;
+using CommunityToolkit.Mvvm.Messaging;
+using controle_ja_mobile.Helpers;
 
 namespace controle_ja_mobile.Views.Components;
 
@@ -35,55 +37,55 @@ public partial class BottomMenu : ContentView
     // Pinta os ícones baseados na página atual
     private void UpdateVisualState()
     {
-        if (PathHome == null) return; // Proteção
+        if (IconHome == null) return; // Proteção
 
         // 1. Reseta tudo
-        PathHome.Fill = InactiveColor; LblHome.TextColor = InactiveColor;
-        PathTransactions.Fill = InactiveColor; LblTransactions.TextColor = InactiveColor;
-        PathCards.Fill = InactiveColor; LblCards.TextColor = InactiveColor;
-        PathVehicles.Fill = InactiveColor; LblVehicles.TextColor = InactiveColor;
-        PathSettings.Fill = InactiveColor; LblSettings.TextColor = InactiveColor;
+        IconHome.TextColor = InactiveColor; LblHome.TextColor = InactiveColor;
+        IconTransactions.TextColor = InactiveColor; LblTransactions.TextColor = InactiveColor;
+        IconCards.TextColor = InactiveColor; LblCards.TextColor = InactiveColor;
+        IconVehicles.TextColor = InactiveColor; LblVehicles.TextColor = InactiveColor;
+        IconSettings.TextColor = InactiveColor; LblSettings.TextColor = InactiveColor;
 
         // 2. Pinta o ativo
         switch (ActivePage)
         {
             case "Home":
-                PathHome.Fill = ActiveColor; LblHome.TextColor = ActiveColor; break;
+                IconHome.TextColor = ActiveColor; LblHome.TextColor = ActiveColor; break;
             case "Transactions":
-                PathTransactions.Fill = ActiveColor; LblTransactions.TextColor = ActiveColor; break;
+                IconTransactions.TextColor = ActiveColor; LblTransactions.TextColor = ActiveColor; break;
             case "Cards":
-                PathCards.Fill = ActiveColor; LblCards.TextColor = ActiveColor; break;
+                IconCards.TextColor = ActiveColor; LblCards.TextColor = ActiveColor; break;
             case "Vehicles":
-                PathVehicles.Fill = ActiveColor; LblVehicles.TextColor = ActiveColor; break;
+                IconVehicles.TextColor = ActiveColor; LblVehicles.TextColor = ActiveColor; break;
             case "Settings":
-                PathSettings.Fill = ActiveColor; LblSettings.TextColor = ActiveColor; break;
+                IconSettings.TextColor = ActiveColor; LblSettings.TextColor = ActiveColor; break;
         }
     }
 
-    // --- NAVEGAÇÃO DAS TABS (Mantendo seu padrão MessagingCenter) ---
+    // --- NAVEGAÇÃO DAS TABS (Usando o novo WeakReferenceMessenger) ---
     private void OnHomeClicked(object sender, EventArgs e)
     {
-        MessagingCenter.Send(this, "NavigateTo", "Home");
+        WeakReferenceMessenger.Default.Send(new NavigationMessage("Home"));
     }
 
     private void OnTransactionsClicked(object sender, EventArgs e)
     {
-        MessagingCenter.Send(this, "NavigateTo", "Transactions");
+        WeakReferenceMessenger.Default.Send(new NavigationMessage("Transactions"));
     }
 
     private void OnCardsClicked(object sender, EventArgs e)
     {
-        MessagingCenter.Send(this, "NavigateTo", "Cards");
+        WeakReferenceMessenger.Default.Send(new NavigationMessage("Cards"));
     }
 
     private void OnVehiclesClicked(object sender, EventArgs e)
     {
-        MessagingCenter.Send(this, "NavigateTo", "Vehicles");
+        WeakReferenceMessenger.Default.Send(new NavigationMessage("Vehicles"));
     }
 
     private void OnSettingsClicked(object sender, EventArgs e)
     {
-        MessagingCenter.Send(this, "NavigateTo", "Settings");
+        WeakReferenceMessenger.Default.Send(new NavigationMessage("Settings"));
     }
 
     // --- LÓGICA DO FAB (Botão +) ---

@@ -40,8 +40,6 @@ namespace controle_ja_mobile.ViewModels
                 else
                 {
                     var currentPage = App.Current.MainPage;
-                    if (currentPage != null)
-                        await currentPage.DisplayAlert("Erro", "E-mail ou senha incorretos", "OK");
                 }
             });
         }

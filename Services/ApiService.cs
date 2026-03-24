@@ -3,6 +3,7 @@ using controle_ja_mobile.Helpers;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Net.Http.Headers;
 
 namespace controle_ja_mobile.Services
 {
@@ -22,47 +23,81 @@ namespace controle_ja_mobile.Services
             };
         }
 
+        // Padronizei o PostAsync para Task<string> para bater com seu ViewModel
         public async Task<string> PostAsync<T>(string endpoint, object data)
         {
-            AddAuthenticationHeaderAsync(endpoint);
+            await AddAuthenticationHeaderAsync(endpoint);
             var response = await _httpClient.PostAsJsonAsync(endpoint, data);
             if (!response.IsSuccessStatusCode)
             {
-                HandlerErrors(response);
+                await HandlerErrors(response);
             }
             return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<String> GetAsync<T>(string endpoint)
+        public async Task<string> GetAsync<T>(string endpoint)
         {
-            AddAuthenticationHeaderAsync(endpoint);
-            var response =  await _httpClient.GetAsync(endpoint);
+            await AddAuthenticationHeaderAsync(endpoint);
+            var response = await _httpClient.GetAsync(endpoint);
             if (!response.IsSuccessStatusCode)
             {
-                HandlerErrors(response);
+                await HandlerErrors(response);
             }
             return await response.Content.ReadAsStringAsync();
         }
 
-        private async void HandlerErrors(HttpResponseMessage response)
+        // CORRIGIDO: Adicionado Autenticação e HandlerErrors para ficar igual aos outros
+        public async Task<string> PutAsync<T>(string endpoint, object data)
         {
-            var errorResponse = await response.Content.ReadFromJsonAsync<UserFriendlyError>();
-            if (errorResponse != null) {
-                string errors = "";
-                foreach (var e in errorResponse.Message.Split(", "))
+            await AddAuthenticationHeaderAsync(endpoint);
+            var response = await _httpClient.PutAsJsonAsync(endpoint, data);
+            if (!response.IsSuccessStatusCode)
+            {
+                await HandlerErrors(response);
+            }
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> DeleteAsync(string endpoint)
+        {
+            await AddAuthenticationHeaderAsync(endpoint);
+            var response = await _httpClient.DeleteAsync(endpoint);
+            if (!response.IsSuccessStatusCode)
+            {
+                await HandlerErrors(response);
+            }
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        // Mudado para Task para podermos dar 'await' nas chamadas
+        private async Task HandlerErrors(HttpResponseMessage response)
+        {
+            try
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<UserFriendlyError>();
+                if (errorResponse != null)
                 {
-                    if (!string.IsNullOrEmpty(e))
+                    string errors = "";
+                    foreach (var e in errorResponse.Message.Split(", "))
                     {
-                        errors += string.IsNullOrEmpty(errors) ? e : "\n" + e;
+                        if (!string.IsNullOrEmpty(e))
+                        {
+                            errors += string.IsNullOrEmpty(errors) ? e : "\n" + e;
+                        }
                     }
+                    await App.Current.MainPage.DisplayAlert(errorResponse.Title, errors, "OK");
                 }
-                await App.Current.MainPage.DisplayAlert(errorResponse.Title, errors, "OK");
+            }
+            catch
+            {
+                await App.Current.MainPage.DisplayAlert("Erro", "Ocorreu um erro inesperado.", "OK");
             }
         }
 
         private async Task AddAuthenticationHeaderAsync(string endpoint)
         {
-            if(endpoint.Contains("/auth") || endpoint.Contains("/users/register"))
+            // Ajustado para ignorar rotas de login/registro
+            if (endpoint.Contains("/auth") || endpoint.Contains("/users/register"))
             {
                 return;
             }
@@ -71,19 +106,8 @@ namespace controle_ja_mobile.Services
 
             if (!string.IsNullOrEmpty(token))
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
-        }
-
-        internal async Task<string> DeleteAsync(string endpoint)
-        {
-            AddAuthenticationHeaderAsync(endpoint);
-            var response = await _httpClient.DeleteAsync(endpoint);
-            if (!response.IsSuccessStatusCode)
-            {
-                HandlerErrors(response);
-            }
-            return await response.Content.ReadAsStringAsync();
         }
     }
 }
