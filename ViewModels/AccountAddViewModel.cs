@@ -19,14 +19,18 @@ namespace controle_ja_mobile.ViewModels
         [ObservableProperty] private string accountId;
         [ObservableProperty] private string name;
         [ObservableProperty] private string institution;
-        [ObservableProperty] private decimal balance;
+
+        // 1. Alterado para string para aceitar a máscara formatada (R$ 0,00)
+        [ObservableProperty] private string balance;
+
         [ObservableProperty] private bool isDefault;
 
         [ObservableProperty] private bool isEditMode = false;
 
         public bool CanDelete => IsEditMode && !IsDefault;
 
-        public List<string> AccountTypes { get; } = new() { "Carteira", "Banco", "Poupança", "Cartão de Crédito" };
+        // 2. Removido o "Cartão de Crédito"
+        public List<string> AccountTypes { get; } = new() { "Carteira", "Banco", "Poupança" };
         [ObservableProperty] private string selectedAccountType = "Banco";
 
         public ObservableCollection<string> AvailableIcons { get; } = new(UIConstants.AvailableIcons);
@@ -42,6 +46,29 @@ namespace controle_ja_mobile.ViewModels
             _apiService = apiService;
             SelectedIcon = "account_balance";
             SelectedColor = AvailableColors.FirstOrDefault(c => c == "#42A5F5") ?? AvailableColors.First();
+        }
+
+        // 3. Gatilho da máscara de dinheiro em tempo real
+        partial void OnBalanceChanged(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return;
+
+            // Extrai apenas os números do que o usuário digitou
+            var digitsOnly = new string(value.Where(char.IsDigit).ToArray());
+            if (string.IsNullOrEmpty(digitsOnly)) return;
+
+            // Divide por 100 para criar os centavos e aplica a formatação brasileira
+            if (decimal.TryParse(digitsOnly, out decimal parsed))
+            {
+                parsed /= 100;
+                string formatted = parsed.ToString("N2", new System.Globalization.CultureInfo("pt-BR"));
+
+                // Previne o loop infinito
+                if (Balance != formatted)
+                {
+                    Balance = formatted;
+                }
+            }
         }
 
         partial void OnAccountIdChanged(string value)
@@ -70,7 +97,10 @@ namespace controle_ja_mobile.ViewModels
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
                             Name = account.Name;
-                            Balance = account.Balance;
+
+                            // 4. Carrega o saldo formatado. (Use account.CurrentBalance se o modelo Account usar esse nome em vez de Balance)
+                            Balance = account.Balance.ToString("N2", new System.Globalization.CultureInfo("pt-BR"));
+
                             Institution = account.Institution;
                             SelectedIcon = account.Icon ?? "account_balance";
                             SelectedColor = account.Color ?? "#42A5F5";
@@ -81,7 +111,6 @@ namespace controle_ja_mobile.ViewModels
                                 AccountType.WALLET => "Carteira",
                                 AccountType.BANK => "Banco",
                                 AccountType.SAVINGS => "Poupança",
-                                AccountType.CREDIT_CARD => "Cartão de Crédito",
                                 _ => "Banco"
                             };
 
@@ -108,25 +137,29 @@ namespace controle_ja_mobile.ViewModels
                 return;
             }
 
+            // 5. Converte o texto com vírgula de volta para decimal antes de enviar para a API
+            if (!decimal.TryParse(Balance, System.Globalization.NumberStyles.Number, new System.Globalization.CultureInfo("pt-BR"), out decimal balanceValue))
+            {
+                balanceValue = 0; // Previne crash se o campo estiver vazio
+            }
+
             await ExecuteWithErrorHandlingAsync(async () =>
             {
                 string enumType = SelectedAccountType switch
                 {
                     "Carteira" => "WALLET",
                     "Poupança" => "SAVINGS",
-                    "Cartão de Crédito" => "CREDIT_CARD",
                     _ => "BANK"
                 };
 
-                // Formato idêntico ao seu AccountDTO
                 var dto = new
                 {
                     name = Name.Trim(),
                     type = enumType,
                     institution = Institution?.Trim(),
-                    initialBalance = Balance,
-                    icon = SelectedIcon, // O BackEnd precisa ter esse campo
-                    color = SelectedColor, // O BackEnd precisa ter esse campo
+                    initialBalance = balanceValue, // Usando o decimal convertido
+                    icon = SelectedIcon,
+                    color = SelectedColor,
                     isDefault = IsDefault
                 };
 
@@ -134,7 +167,7 @@ namespace controle_ja_mobile.ViewModels
                 if (string.IsNullOrEmpty(AccountId))
                     result = await _apiService.PostAsync<object>("accounts", dto);
                 else
-                    result = await _apiService.PutAsync<object>($"accounts/{AccountId}", dto); // Nota: Backend Java atual ignora o initialBalance no Update, o que está correto!
+                    result = await _apiService.PutAsync<object>($"accounts/{AccountId}", dto);
 
                 if (!string.IsNullOrEmpty(result))
                     await Shell.Current.GoToAsync("..");
