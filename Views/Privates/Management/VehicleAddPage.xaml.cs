@@ -1,10 +1,10 @@
 using controle_ja_mobile.ViewModels;
 
-namespace controle_ja_mobile.Views.Privates;
+namespace controle_ja_mobile.Views.Privates.Management;
 
 public partial class VehicleAddPage : ContentPage
 {
-    public VehicleAddPage(VehiclesViewModel vm)
+    public VehicleAddPage(VehicleAddViewModel vm)
     {
         InitializeComponent();
         BindingContext = vm;

@@ -1,9 +1,92 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             xmlns:models="clr-namespace:controle_ja_mobile.Models"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="controle_ja_mobile.Views.Privates.Management.ManageVehiclesPage"
-             xmlns:views="clr-namespace:controle_ja_mobile.Views.Privates.Tabs"
-             Title="Meus Veículos"
-             BackgroundColor="{StaticResource PageBackgroundColorDark}">
-    <views:VehicleListView />
+             BackgroundColor="#001524" 
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto, *">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="15,20,15,10">
+            <ImageButton Grid.Column="0" Source="arrow_back_36dp.png" Command="{Binding GoBackCommand}" HeightRequest="24" HorizontalOptions="Start" Aspect="AspectFit">
+                <ImageButton.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="White" />
+                </ImageButton.Behaviors>
+            </ImageButton>
+            <Label Grid.Column="1" Text="Veículos" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Border Grid.Column="2" BackgroundColor="#00E676" StrokeThickness="0" HeightRequest="36" WidthRequest="36" StrokeShape="RoundRectangle 18">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToAddPageCommand}"/>
+                </Border.GestureRecognizers>
+                <Label Text="+" TextColor="#001524" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" FontSize="22" Margin="0,-2,0,0"/>
+            </Border>
+        </Grid>
+
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadVehiclesCommand}" RefreshColor="#00E676">
+            <CollectionView ItemsSource="{Binding Vehicles}" Margin="0,10,0,0">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="0"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20" Margin="0,50,0,0">
+                        <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="100" WidthRequest="100" StrokeShape="RoundRectangle 50">
+                            <Label Text="&#xe531;" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="50" HorizontalOptions="Center" VerticalOptions="Center" Opacity="0.5"/>
+                        </Border>
+                        <Label Text="Nenhum veículo cadastrado" TextColor="#64748B" FontSize="16" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Vehicle">
+                        <VerticalStackLayout>
+                            <Border StrokeThickness="0" BackgroundColor="Transparent" Padding="15">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VehiclesViewModel}}, Path=OpenVehicleDetailsCommand}" CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="#151F2D" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+
+                                <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="60, *, Auto">
+                                    <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" HeightRequest="46" WidthRequest="46" StrokeShape="RoundRectangle 8" BackgroundColor="#2D3A4F" StrokeThickness="0" HorizontalOptions="Start" VerticalOptions="Center">
+                                        <Label Text="&#xe531;" FontFamily="MaterialIcons" TextColor="White" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Row="0" Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Name}" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                                        <Label Text="{Binding FullDescription}" TextColor="#64748B" FontSize="12"/>
+                                    </VerticalStackLayout>
+
+                                    <Label Grid.Row="0" Grid.Column="2" Text="&#xe5cc;" FontFamily="MaterialIcons" TextColor="#3F3F46" FontSize="24" VerticalOptions="Center" HorizontalOptions="End"/>
+
+                                    <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,10,0,0" Spacing="15">
+                                        <VerticalStackLayout>
+                                            <Label Text="Placa" TextColor="#A1A1AA" FontSize="10"/>
+                                            <Label Text="{Binding Plate}" TextColor="White" FontSize="12" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout>
+                                            <Label Text="Odômetro" TextColor="#A1A1AA" FontSize="10"/>
+                                            <Label Text="{Binding FormattedOdometer}" TextColor="#00E676" FontSize="12" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </HorizontalStackLayout>
+                                </Grid>
+                            </Border>
+                            <BoxView HeightRequest="1" Color="#1E2A3A" Margin="15,0,15,0"/>
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
 </ContentPage>

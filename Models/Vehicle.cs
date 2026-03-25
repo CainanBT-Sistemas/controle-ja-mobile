@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-using Microcharts; // Necessário para o gráfico
+using Microcharts;
+using System.Globalization; // NOVO: IMPORT NECESSÁRIO
 
 namespace controle_ja_mobile.Models
 {
@@ -36,8 +37,9 @@ namespace controle_ja_mobile.Models
         [JsonIgnore]
         public string FullDescription => $"{Brand} {Model} - {Year}";
 
+        // FIX: Força formatação brasileira de inteiro (Ex: 179.327 km, not 179,327 km)
         [JsonIgnore]
-        public string FormattedOdometer => $"{CurrentOdometer:N0} km";
+        public string FormattedOdometer => CurrentOdometer.ToString("N0", new CultureInfo("pt-BR")) + " km";
 
         [JsonIgnore]
         public string ConsumptionInfo
@@ -51,11 +53,9 @@ namespace controle_ja_mobile.Models
             }
         }
 
-        // Simulação de Custo Mensal (futuramente virá da API)
         [JsonIgnore]
         public string MonthlyCost { get; set; } = "R$ 0,00";
 
-        // --- Gráfico de Histórico ---
         [JsonIgnore]
         public Chart ExpensesChart { get; set; }
     }

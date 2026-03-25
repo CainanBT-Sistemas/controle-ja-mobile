@@ -1,9 +1,6 @@
 ﻿using controle_ja_mobile.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -25,7 +22,7 @@ namespace controle_ja_mobile.Services
                 var response = await _apiService.GetAsync<string>("vehicles");
                 if (!string.IsNullOrWhiteSpace(response))
                 {
-                    var vehiclesResponse = JsonSerializer.Deserialize<List<Vehicle>>(response);
+                    var vehiclesResponse = JsonSerializer.Deserialize<List<Vehicle>>(response, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     if (vehiclesResponse != null)
                     {
                         return vehiclesResponse;
@@ -45,15 +42,37 @@ namespace controle_ja_mobile.Services
             try
             {
                 var response = await _apiService.PostAsync<string>("vehicles", vehicle);
-                if (!string.IsNullOrWhiteSpace(response))
-                {
-                    var vehicleResponse = JsonSerializer.Deserialize<Vehicle>(response);
-                    if (vehicleResponse != null)
-                    {
-                        return true;
-                    }
-                }
+                return !string.IsNullOrWhiteSpace(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
                 return false;
+            }
+        }
+
+        // --- NOVOS MÉTODOS ADICIONADOS ---
+
+        public async Task<bool> UpdateVehicleAsync(string id, Vehicle vehicle)
+        {
+            try
+            {
+                var response = await _apiService.PutAsync<string>($"vehicles/{id}", vehicle);
+                return !string.IsNullOrWhiteSpace(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteVehicleAsync(string id)
+        {
+            try
+            {
+                var response = await _apiService.DeleteAsync($"vehicles/{id}");
+                return !string.IsNullOrWhiteSpace(response);
             }
             catch (Exception ex)
             {

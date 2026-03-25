@@ -47,6 +47,8 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<CategoryAddViewModel>();
             builder.Services.AddTransient<AccountAddViewModel>();
             builder.Services.AddTransient<CreditCardAddViewModel>();
+            builder.Services.AddTransient<VehicleAddViewModel>();
+
 
 
             //Views
