@@ -45,10 +45,11 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<AccountsViewModel>();
             builder.Services.AddTransient<CategoriesViewModel>();
             builder.Services.AddTransient<CategoryAddViewModel>();
+            builder.Services.AddTransient<AccountAddViewModel>();
+            builder.Services.AddTransient<CreditCardAddViewModel>();
 
 
             //Views
-            builder.Services.AddTransient<CreditCardAddPage>();
             builder.Services.AddTransient<DashboardPage>();
             builder.Services.AddTransient<TransactionAddPage>();
             builder.Services.AddTransient<LoginPage>();
@@ -60,6 +61,8 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<ManageAccountsPage>();
             builder.Services.AddTransient<ManageCategoriesPage>();
             builder.Services.AddTransient<CategoryAddPage>();
+            builder.Services.AddTransient<AccountAddPage>();
+            builder.Services.AddTransient<CreditCardAddPage>();
 
 
 

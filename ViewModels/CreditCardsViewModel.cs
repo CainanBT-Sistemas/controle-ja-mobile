@@ -2,29 +2,25 @@
 using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
-using controle_ja_mobile.Views.Privates;
+using controle_ja_mobile.Views.Privates.Management;
 using Microcharts;
 using SkiaSharp;
 using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace controle_ja_mobile.ViewModels
 {
     public partial class CreditCardsViewModel : BaseViewModel
     {
-        private readonly CreditCardService _creditCardService;
+        private readonly ApiService _apiService;
         public ObservableCollection<CreditCard> Cards { get; } = new();
 
         [ObservableProperty] private bool isRefreshing;
 
-        // Campos do Formulário
-        [ObservableProperty] private string newCardName;
-        [ObservableProperty] private string newCardLimit;
-        [ObservableProperty] private string newCardCloseDay;
-        [ObservableProperty] private string newCardBestDay;
-
-        public CreditCardsViewModel(CreditCardService creditCardService)
+        public CreditCardsViewModel(ApiService apiService)
         {
-            _creditCardService = creditCardService;
+            _apiService = apiService;
         }
 
         [RelayCommand]
@@ -32,31 +28,36 @@ namespace controle_ja_mobile.ViewModels
         {
             await ExecuteWithErrorHandlingAsync(async () =>
             {
-                var cards = await _creditCardService.GetCreditCardsAsync();
-                Cards.Clear();
-                if (cards != null)
+                var response = await _apiService.GetAsync<string>("cards");
+
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    foreach (var card in cards)
+                    Cards.Clear();
+                    if (!string.IsNullOrEmpty(response))
                     {
-                        GenerateCardChart(card); // Gera o gráfico
-                        Cards.Add(card);
+                        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                        var list = JsonSerializer.Deserialize<List<CreditCard>>(response, options);
+
+                        if (list != null)
+                        {
+                            foreach (var card in list)
+                            {
+                                GenerateCardChart(card); // Gerando o gráfico novamente
+                                Cards.Add(card);
+                            }
+                        }
                     }
-                }
+                });
                 IsRefreshing = false;
-            }, showLoading: false);
+            });
         }
 
         private void GenerateCardChart(CreditCard card)
         {
-            // Se o cartão tem uso, geramos um gráfico fictício para ilustrar
             if (card.UsedAmount > 0)
             {
                 card.HasChartData = true;
-
-                // Cores do tema
                 var colors = new[] { SKColor.Parse("#00E676"), SKColor.Parse("#2979FF"), SKColor.Parse("#FFAB00"), SKColor.Parse("#FF5252") };
-
-                // Dados Simulados (distribui o valor usado em categorias fictícias por enquanto)
                 var entries = new List<ChartEntry>
                 {
                     new ChartEntry((float)(card.UsedAmount * 0.4m)) { Label = "Mercado", ValueLabel = "40%", Color = colors[0], ValueLabelColor = colors[0] },
@@ -71,7 +72,7 @@ namespace controle_ja_mobile.ViewModels
                     BackgroundColor = SKColors.Transparent,
                     LabelTextSize = 20,
                     HoleRadius = 0.60f,
-                    LabelColor = SKColor.Parse("#94A3B8") // Cinza claro
+                    LabelColor = SKColor.Parse("#94A3B8")
                 };
             }
             else
@@ -87,61 +88,12 @@ namespace controle_ja_mobile.ViewModels
         }
 
         [RelayCommand]
-        public async Task SaveCardAsync()
+        public async Task OpenCardDetails(CreditCard card)
         {
-            if (string.IsNullOrWhiteSpace(NewCardName) || string.IsNullOrWhiteSpace(NewCardLimit) ||
-                string.IsNullOrWhiteSpace(NewCardCloseDay) || string.IsNullOrWhiteSpace(NewCardBestDay))
-            {
-                await App.Current.MainPage.DisplayAlert("Atenção", "Preencha todos os campos do cartão.", "OK");
-                return;
-            }
-
-            if (!decimal.TryParse(NewCardLimit, out decimal limit))
-            {
-                await App.Current.MainPage.DisplayAlert("Erro", "Limite inválido. Digite apenas números.", "OK");
-                return;
-            }
-
-            if (!int.TryParse(NewCardCloseDay, out int closeDay) || closeDay < 1 || closeDay > 31)
-            {
-                await App.Current.MainPage.DisplayAlert("Erro", "Dia de fechamento inválido (1-31).", "OK");
-                return;
-            }
-
-            if (!int.TryParse(NewCardBestDay, out int bestDay) || bestDay < 1 || bestDay > 31)
-            {
-                await App.Current.MainPage.DisplayAlert("Erro", "Dia de vencimento inválido (1-31).", "OK");
-                return;
-            }
-
-            var newCard = new CreditCard
-            {
-                Name = NewCardName,
-                TotalLimit = limit,
-                CloseDay = closeDay,
-                BestDay = bestDay
-            };
-
-            await ExecuteWithErrorHandlingAsync(async () =>
-            {
-                var success = await _creditCardService.SaveCreditCardAsync(newCard);
-                if (success)
-                {
-                    await App.Current.MainPage.DisplayAlert("Sucesso", "Cartão adicionado!", "OK");
-
-                    NewCardName = "";
-                    NewCardLimit = "";
-                    NewCardCloseDay = "";
-                    NewCardBestDay = "";
-
-                    await Shell.Current.GoToAsync("..");
-                    await LoadCardsAsync();
-                }
-                else
-                {
-                    await App.Current.MainPage.DisplayAlert("Ops", "Não foi possível criar o cartão.", "OK");
-                }
-            });
+            await Shell.Current.GoToAsync($"{nameof(CreditCardAddPage)}?id={card.Id}");
         }
+
+        [RelayCommand]
+        public async Task GoBack() => await Shell.Current.GoToAsync("..");
     }
 }

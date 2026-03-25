@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-using Microcharts; // Necessário para o gráfico
+using System.Globalization;
+using Microcharts; 
 
 namespace controle_ja_mobile.Models
 {
@@ -9,13 +10,14 @@ namespace controle_ja_mobile.Models
         public Guid Id { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; } // Ex: Nubank
+        public string Name { get; set; }
 
-        [JsonPropertyName("limit")]
+        // CORREÇÃO: O nome no JSON que vem do Java é "totalLimit"
+        [JsonPropertyName("totalLimit")]
         public decimal TotalLimit { get; set; }
 
         [JsonPropertyName("currentLimit")]
-        public decimal CurrentLimit { get; set; } // Limite Disponível
+        public decimal CurrentLimit { get; set; }
 
         [JsonPropertyName("closeDay")]
         public int CloseDay { get; set; }
@@ -23,38 +25,35 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("bestDay")]
         public int BestDay { get; set; }
 
+        [JsonPropertyName("icon")]
+        public string Icon { get; set; } = "credit_card";
+
+        [JsonPropertyName("color")]
+        public string Color { get; set; } = "#9C27B0";
+
         // --- Helpers Visuais ---
 
         [JsonIgnore]
-        public decimal UsedAmount => TotalLimit - CurrentLimit;
+        public decimal UsedAmount => Math.Max(0, TotalLimit - CurrentLimit);
 
         [JsonIgnore]
-        public string FormattedTotalLimit => $"Limite: {TotalLimit:C}";
+        public string FormattedTotalLimit => TotalLimit.ToString("C", new CultureInfo("pt-BR"));
 
         [JsonIgnore]
-        public string FormattedAvailable => $"{CurrentLimit:C}";
+        public string FormattedAvailable => CurrentLimit.ToString("C", new CultureInfo("pt-BR"));
 
         [JsonIgnore]
-        public string FormattedUsed => $"{UsedAmount:C}";
+        public string FormattedUsed => UsedAmount.ToString("C", new CultureInfo("pt-BR"));
 
         [JsonIgnore]
-        public string InvoiceInfo => $"Fecha dia {CloseDay} • Melhor dia {BestDay}";
-
-        // Calcula porcentagem usada para a barra de progresso (0 a 1)
-        [JsonIgnore]
-        public double LimitProgress
-        {
-            get
-            {
-                if (TotalLimit == 0) return 0;
-                return (double)(TotalLimit - CurrentLimit) / (double)TotalLimit;
-            }
-        }
+        public string InvoiceInfo => $"Fecha dia {CloseDay} • Vence dia {BestDay}";
 
         [JsonIgnore]
-        public string UsedPercentageText => $"{LimitProgress * 100:F0}% usado";
+        public double LimitProgress => TotalLimit == 0 ? 0 : (double)UsedAmount / (double)TotalLimit;
 
-        // --- Propriedades para o Gráfico ---
+        [JsonIgnore]
+        public string UsedPercentageText => $"{LimitProgress * 100:F0}% utilizado";
+
         [JsonIgnore]
         public Chart CategoryChart { get; set; }
 

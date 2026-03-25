@@ -36,20 +36,8 @@ namespace controle_ja_mobile.ViewModels
 
         public ObservableCollection<Category> SubCategories { get; } = new();
 
-        public ObservableCollection<string> AvailableIcons { get; } = new()
-        {
-            MaterialIcons.Restaurant, MaterialIcons.DirectionsCar, MaterialIcons.Home,
-            MaterialIcons.AttachMoney, MaterialIcons.Category, "shopping_cart",
-            "pets", "checkroom", "flight", "fitness_center", "local_hospital", "school",
-            "computer", "phone_iphone", "brush", "coffee", "movie", "bolt"
-        };
-
-        public ObservableCollection<string> AvailableColors { get; } = new()
-        {
-            "#FF5252", "#FFCA28", "#66BB6A", "#42A5F5", "#AB47BC",
-            "#EC407A", "#26A69A", "#795548", "#BDBDBD", "#00E676",
-            "#FF9800", "#9C27B0", "#00BCD4", "#8BC34A", "#607D8B"
-        };
+        public ObservableCollection<string> AvailableIcons { get; } = new(UIConstants.AvailableIcons);
+        public ObservableCollection<string> AvailableColors { get; } = new(UIConstants.AvailableColors);
 
         public CategoryAddViewModel(ApiService apiService)
         {

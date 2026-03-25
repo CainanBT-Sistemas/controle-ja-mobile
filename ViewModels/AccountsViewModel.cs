@@ -2,13 +2,10 @@
 using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
-using System;
-using System.Collections.Generic;
+using controle_ja_mobile.Views.Privates.Management;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace controle_ja_mobile.ViewModels
 {
@@ -30,23 +27,30 @@ namespace controle_ja_mobile.ViewModels
         {
             await ExecuteWithErrorHandlingAsync(async () =>
             {
-                List<Account> accountsList = null;
                 var result = await _apiService.GetAsync<string>("accounts");
-                if(!string.IsNullOrWhiteSpace(result))
+                List<Account> accountsList = null;
+
+                if (!string.IsNullOrWhiteSpace(result))
                 {
-                    accountsList = JsonSerializer.Deserialize<List<Account>>(result);
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    options.Converters.Add(new JsonStringEnumConverter());
+                    accountsList = JsonSerializer.Deserialize<List<Account>>(result, options);
                 }
-                Accounts.Clear();
-                if (accountsList != null && accountsList.Any())
+
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    IsEmptyStateVisible = false;
-                    foreach (var acc in accountsList) Accounts.Add(acc);
-                }
-                else
-                {
-                    IsEmptyStateVisible = true;
-                }
-                
+                    Accounts.Clear();
+                    if (accountsList != null && accountsList.Any())
+                    {
+                        IsEmptyStateVisible = false;
+                        foreach (var acc in accountsList) Accounts.Add(acc);
+                    }
+                    else
+                    {
+                        IsEmptyStateVisible = true;
+                    }
+                });
+
                 IsRefreshing = false;
             });
         }
@@ -54,31 +58,14 @@ namespace controle_ja_mobile.ViewModels
         [RelayCommand]
         public async Task GoToAddAccount()
         {
-             await Shell.Current.DisplayAlert("Adicionar", "Em breve", "OK");
+            await Shell.Current.GoToAsync(nameof(AccountAddPage));
         }
 
         [RelayCommand]
-        public async Task EditAccount(Account account)
+        public async Task OpenAccountDetails(Account account)
         {
-             await Shell.Current.DisplayAlert("Editar", $"Editar {account.Name}", "OK");
-        }
-
-        [RelayCommand]
-        public async Task DeleteAccount(Account account)
-        {
-             bool confirm = await Shell.Current.DisplayAlert("Excluir", $"Apagar {account.Name}?", "Sim", "Não");
-             if(!confirm) return;
-
-             await ExecuteWithErrorHandlingAsync(async () => {
-                 var result = await _apiService.DeleteAsync($"accounts/{account.Id}");
-                 if (!string.IsNullOrWhiteSpace(result))
-                 {
-                     if (result.Contains("Registro excluído com sucesso."))
-                     {
-                         await LoadAccounts();
-                     }
-                 }
-             });
+            // Abre a tela de Edição/Detalhes
+            await Shell.Current.GoToAsync($"{nameof(AccountAddPage)}?id={account.Id}");
         }
 
         [RelayCommand]

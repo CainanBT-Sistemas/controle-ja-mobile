@@ -13,7 +13,6 @@ public partial class ManageCreditCardsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        // Garante que recarrega a lista e gráficos ao entrar
         if (BindingContext is CreditCardsViewModel vm)
         {
             await vm.LoadCardsCommand.ExecuteAsync(null);

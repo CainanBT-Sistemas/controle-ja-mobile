@@ -26,7 +26,6 @@ namespace controle_ja_mobile
         private void RegisterRoutes()
         {
             // Registra as páginas que não estão nas abas principais (páginas de navegação interna)
-            Routing.RegisterRoute(nameof(CreditCardAddPage), typeof(CreditCardAddPage));
             Routing.RegisterRoute(nameof(VehicleAddPage), typeof(VehicleAddPage));
             Routing.RegisterRoute(nameof(TransactionAddPage), typeof(TransactionAddPage));            
             Routing.RegisterRoute(nameof(ManageCreditCardsPage), typeof(ManageCreditCardsPage));
@@ -34,6 +33,8 @@ namespace controle_ja_mobile
             Routing.RegisterRoute(nameof(ManageAccountsPage), typeof(ManageAccountsPage));
             Routing.RegisterRoute(nameof(ManageCategoriesPage), typeof(ManageCategoriesPage));
             Routing.RegisterRoute(nameof(CategoryAddPage), typeof(CategoryAddPage));
+            Routing.RegisterRoute(nameof(AccountAddPage), typeof(AccountAddPage));
+            Routing.RegisterRoute(nameof(CreditCardAddPage), typeof(CreditCardAddPage));
         }
 
         // Esse método é chamado toda vez que você troca de tela

@@ -3,78 +3,84 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
              xmlns:models="clr-namespace:controle_ja_mobile.Models"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="controle_ja_mobile.Views.Privates.Management.ManageAccountsPage"
-             Title="Minhas Contas"
-             BackgroundColor="{StaticResource PageBackgroundColorDark}"
+             BackgroundColor="#001524" 
              NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="Auto, *">
-        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="15,20,15,15" BackgroundColor="#0F172A">
-            <Border StrokeThickness="0" BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoBackCommand}"/>
-                </Border.GestureRecognizers>
-                <Path Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" Fill="White" Aspect="Uniform" HeightRequest="24" HorizontalOptions="Center" VerticalOptions="Center"/>
-            </Border>
-            <Label Grid.Column="1" Text="Contas" TextColor="White" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center"/>
-            <Border Grid.Column="2" StrokeThickness="0" BackgroundColor="{StaticResource Primary}" HeightRequest="35" WidthRequest="35" StrokeShape="RoundRectangle 17.5">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="15,20,15,10">
+            <ImageButton Grid.Column="0" Source="arrow_back_36dp.png" Command="{Binding GoBackCommand}" HeightRequest="24" HorizontalOptions="Start" Aspect="AspectFit">
+                <ImageButton.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="White" />
+                </ImageButton.Behaviors>
+            </ImageButton>
+            <Label Grid.Column="1" Text="Contas e Carteiras" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Border Grid.Column="2" BackgroundColor="#00E676" StrokeThickness="0" HeightRequest="36" WidthRequest="36" StrokeShape="RoundRectangle 18">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding GoToAddAccountCommand}"/>
                 </Border.GestureRecognizers>
-                <Label Text="+" TextColor="Black" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,-2,0,0"/>
+                <Label Text="+" TextColor="#001524" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" FontSize="22" Margin="0,-2,0,0"/>
             </Border>
         </Grid>
 
-        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadAccountsCommand}" RefreshColor="{StaticResource Primary}">
-            <CollectionView ItemsSource="{Binding Accounts}" Margin="20">
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadAccountsCommand}" RefreshColor="#00E676">
+            <CollectionView ItemsSource="{Binding Accounts}" Margin="0,10,0,0">
                 <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="15"/>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="0"/>
                 </CollectionView.ItemsLayout>
 
                 <CollectionView.EmptyView>
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20">
-                        <Border BackgroundColor="#1E293B" StrokeThickness="0" HeightRequest="100" WidthRequest="100" StrokeShape="RoundRectangle 50">
-                            <Path Data="M2,20H20V22H2V20M4,12H6V19H4V12M9,12H11V19H9V12M13,12H15V19H13V12M19,4H5V9H19V4M4,4H20V2H4V4Z" Fill="#64748B" Aspect="Uniform" Margin="25" Opacity="0.5"/>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20" Margin="0,50,0,0">
+                        <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="100" WidthRequest="100" StrokeShape="RoundRectangle 50">
+                            <Label Text="&#xe84f;" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="50" HorizontalOptions="Center" VerticalOptions="Center" Opacity="0.5"/>
                         </Border>
-                        <Label Text="Nenhuma conta encontrada" TextColor="#94A3B8" FontSize="16" HorizontalOptions="Center"/>
+                        <Label Text="Nenhuma conta cadastrada" TextColor="#64748B" FontSize="16" HorizontalOptions="Center"/>
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Account">
-                        <SwipeView>
-                            <SwipeView.RightItems>
-                                <SwipeItems>
-                                    <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AccountsViewModel}}, Path=DeleteAccountCommand}" CommandParameter="{Binding .}">
-
-                                        <Border BackgroundColor="#EF4444" WidthRequest="70" StrokeThickness="0">
-                                            <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="0,15,15,0"/>
-                                            </Border.StrokeShape>
-                                            <Path Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" Fill="White" HeightRequest="24" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        </Border>
-
-                                    </SwipeItemView>
-                                </SwipeItems>
-                            </SwipeView.RightItems>
-
-                            <Border StrokeShape="RoundRectangle 15" StrokeThickness="0" BackgroundColor="#1E293B" Padding="15">
+                        <VerticalStackLayout>
+                            <Border StrokeThickness="0" BackgroundColor="Transparent" HeightRequest="80">
                                 <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AccountsViewModel}}, Path=EditAccountCommand}" CommandParameter="{Binding .}"/>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AccountsViewModel}}, Path=OpenAccountDetailsCommand}" CommandParameter="{Binding .}"/>
                                 </Border.GestureRecognizers>
-                                <Grid ColumnDefinitions="*, Auto">
-                                    <VerticalStackLayout>
+
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="#151F2D" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+
+                                <Grid ColumnDefinitions="70, *, Auto, 40" Padding="15,0">
+
+                                    <Border Grid.Column="0" HeightRequest="46" WidthRequest="46" StrokeShape="RoundRectangle 23" BackgroundColor="{Binding Color}" StrokeThickness="0" HorizontalOptions="Start" VerticalOptions="Center">
+                                        <Label Text="{Binding Icon}" FontFamily="MaterialIcons" TextColor="#001524" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                         <Label Text="{Binding Name}" TextColor="White" FontSize="16" FontAttributes="Bold"/>
-                                        <Label Text="Saldo Atual" TextColor="#94A3B8" FontSize="12"/>
+                                        <Label Text="{Binding Institution}" TextColor="#64748B" FontSize="12" IsVisible="{Binding Institution, Converter={StaticResource IsNotNullOrEmptyConverter}}"/>
+                                        <Label Text="Carteira Física" TextColor="#64748B" FontSize="12" IsVisible="{Binding Institution, Converter={StaticResource IsNullOrEmptyConverter}}"/>
                                     </VerticalStackLayout>
-                                    <Label Grid.Column="1" Text="{Binding Balance, StringFormat='{0:C}'}" TextColor="{StaticResource Primary}" FontAttributes="Bold" FontSize="16" VerticalOptions="Center"/>
+
+                                    <Label Grid.Column="2" Text="{Binding FormattedBalance}" TextColor="#00E676" FontSize="16" FontAttributes="Bold" VerticalOptions="Center"/>
+
+                                    <Label Grid.Column="3" Text="&#xe5cc;" FontFamily="MaterialIcons" TextColor="#3F3F46" FontSize="24" VerticalOptions="Center" HorizontalOptions="Center"/>
                                 </Grid>
                             </Border>
-                        </SwipeView>
+
+                            <BoxView HeightRequest="1" Color="#1E2A3A" Margin="15,0,15,0"/>
+                        </VerticalStackLayout>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </RefreshView>
     </Grid>
 </ContentPage>
-    
