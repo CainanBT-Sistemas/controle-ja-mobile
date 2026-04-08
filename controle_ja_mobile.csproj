@@ -85,4 +85,16 @@
     <PackageReference Include="Plugin.Fingerprint" Version="3.0.0-beta.1" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <MauiXaml Update="Views\Privates\ChangePasswordPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Privates\ItemSelectionPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Privates\ProfilePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>

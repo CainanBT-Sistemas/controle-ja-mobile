@@ -58,14 +58,22 @@ namespace controle_ja_mobile.Services
             return await response.Content.ReadAsStringAsync();
         }
 
+        public async Task<string> DeleteAsync<T>(string endpoint)
+        {
+            return await DeleteAsync(endpoint);
+        }
+
+        // Versão 2: Método base sem tipo (usado por todos os outros Services e ViewModels)
         public async Task<string> DeleteAsync(string endpoint)
         {
             await AddAuthenticationHeaderAsync(endpoint);
             var response = await _httpClient.DeleteAsync(endpoint);
+
             if (!response.IsSuccessStatusCode)
             {
                 await HandlerErrors(response);
             }
+
             return await response.Content.ReadAsStringAsync();
         }
 

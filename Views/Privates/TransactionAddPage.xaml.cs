@@ -4,9 +4,17 @@ namespace controle_ja_mobile.Views.Privates;
 
 public partial class TransactionAddPage : ContentPage
 {
-    public TransactionAddPage(TransactionAddViewModel vm)
+    public TransactionAddPage(ViewModels.TransactionAddViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = vm;
+        BindingContext = viewModel;
+    }
+
+    private void OnDateSelected(object sender, DateChangedEventArgs e)
+    {
+        if (BindingContext is ViewModels.TransactionAddViewModel vm)
+        {
+            vm.Date = e.NewDate;
+        }
     }
 }

@@ -10,9 +10,16 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
             <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <converters:FirstLetterConverter x:Key="FirstLetterConverter" />
             <converters:TypeToIconConverter x:Key="TypeToIconConverter" />
+            <converters:IsNotNullOrEmptyConverter x:Key="IsNotNullOrEmptyConverter" />
+            <converters:IsNullOrEmptyConverter x:Key="IsNullOrEmptyConverter" />
+            <converters:BoolToArrowConverter x:Key="BoolToArrowConverter" />
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+            <converters:StringToIconConverter x:Key="StringToIconConverter" />
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

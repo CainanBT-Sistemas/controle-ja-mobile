@@ -32,5 +32,16 @@ namespace controle_ja_mobile.Models
 
         [JsonIgnore]
         public string FormattedBalance => $"{(Balance >= 0 ? "" : "-")}R$ {Math.Abs(Balance):N2}";
+
+        [JsonIgnore]
+        public string TypeDisplay => Type.ToString() switch
+        {
+            "BANK" => "Conta Bancária",
+            "WALLET" => "Carteira Física",
+            "SAVINGS" => "Conta Poupança",
+            "INVESTMENT" => "Investimento",
+            "CREDIT_CARD" => "Cartão de Crédito",
+            _ => "Outros"
+        };
     }
 }

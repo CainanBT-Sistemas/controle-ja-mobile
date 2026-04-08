@@ -33,6 +33,9 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("accountId")]
         public Guid AccountId { get; set; }
 
+        [JsonPropertyName("targetAccountId")]
+        public Guid? TargetAccountId { get; set; }
+
         [JsonPropertyName("categoryId")]
         public Guid CategoryId { get; set; }
 
@@ -45,8 +48,17 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("isRecurring")]
         public bool IsRecurring { get; set; }
 
+        [JsonPropertyName("isFixed")]
+        public bool IsFixed { get; set; }
+
+        private int _installments = 1;
+
         [JsonPropertyName("installments")]
-        public int Installments { get; set; }
+        public int Installments
+        {
+            get => _installments;
+            set => _installments = value < 1 ? 1 : value;
+        }
 
         [JsonPropertyName("creditCardId")]
         public Guid? CreditCardId { get; set; }
@@ -64,7 +76,7 @@ namespace controle_ja_mobile.Models
         public double? Liters { get; set; }
 
         [JsonPropertyName("fuelType")]
-        public FuelType FuelType { get; set; }
+        public FuelType? FuelType { get; set; }
 
         [JsonPropertyName("efficiency")]
         public double? Efficiency { get; set; }

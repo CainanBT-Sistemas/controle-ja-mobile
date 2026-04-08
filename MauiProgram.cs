@@ -3,6 +3,7 @@ using controle_ja_mobile.Services;
 using controle_ja_mobile.ViewModels;
 using controle_ja_mobile.Views.Privates;
 using controle_ja_mobile.Views.Privates.Management;
+using controle_ja_mobile.Views.Privates.Tabs;
 using controle_ja_mobile.Views.Publics;
 using Microcharts.Maui;
 using Microsoft.Extensions.Logging;
@@ -40,6 +41,7 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<RegisterViewModel>();
             builder.Services.AddTransient<TransactionAddViewModel>();
+            builder.Services.AddTransient<TransactionsViewModel>();
             builder.Services.AddTransient<VehiclesViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
             builder.Services.AddTransient<AccountsViewModel>();
@@ -48,12 +50,14 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<AccountAddViewModel>();
             builder.Services.AddTransient<CreditCardAddViewModel>();
             builder.Services.AddTransient<VehicleAddViewModel>();
-
-
+            builder.Services.AddTransient<ProfileViewModel>();
+            builder.Services.AddTransient<ChangePasswordViewModel>();
+            builder.Services.AddTransient<ItemSelectionViewModel>();
 
             //Views
             builder.Services.AddTransient<DashboardPage>();
             builder.Services.AddTransient<TransactionAddPage>();
+            builder.Services.AddTransient<TransactionsListView>();
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RegisterPage>(); 
             builder.Services.AddTransient<VehicleAddPage>();
@@ -65,6 +69,10 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<CategoryAddPage>();
             builder.Services.AddTransient<AccountAddPage>();
             builder.Services.AddTransient<CreditCardAddPage>();
+            builder.Services.AddTransient<ProfilePage>();
+            builder.Services.AddTransient<ChangePasswordPage>();
+            builder.Services.AddTransient<ItemSelectionPage>();
+
 
 
 

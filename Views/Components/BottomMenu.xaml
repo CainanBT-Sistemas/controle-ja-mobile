@@ -4,107 +4,65 @@
              xmlns:icons="clr-namespace:controle_ja_mobile.Helpers"
              x:Class="controle_ja_mobile.Views.Components.BottomMenu">
 
-    <Grid VerticalOptions="End" HeightRequest="100" InputTransparent="False">
+    <Grid VerticalOptions="Fill" HorizontalOptions="Fill">
 
-        <Path Fill="#1E293B" StrokeThickness="0" Aspect="Fill" VerticalOptions="End" HeightRequest="80" HorizontalOptions="Fill">
-            <Path.Data>
-                <GeometryGroup>
-                    <PathGeometry Figures="M 0,0 L 0,80 L 400,80 L 400,0 Z"/>
-                </GeometryGroup>
-            </Path.Data>
-            <Path.Shadow>
-                <Shadow Brush="Black" Offset="0,-2" Radius="10" Opacity="0.2"/>
-            </Path.Shadow>
-        </Path>
+        <Grid VerticalOptions="End" HeightRequest="120" ZIndex="2">
 
-        <Grid ColumnDefinitions="*,*,*,*,*" Padding="0,20,0,0" VerticalOptions="End" HeightRequest="80">
+            <Grid.Shadow>
+                <Shadow Brush="Black" Offset="0,-5" Radius="15" Opacity="0.5"/>
+            </Grid.Shadow>
 
-            <Grid Grid.Column="0" HorizontalOptions="Center" VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnHomeClicked"/>
-                </Grid.GestureRecognizers>
-                <Label x:Name="IconHome" Text="{x:Static icons:MaterialIcons.Home}" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center" VerticalOptions="Start"/>
-                <Label x:Name="LblHome" Text="Início" TextColor="#64748B" FontSize="10" FontAttributes="Bold" Margin="0,30,0,0" HorizontalOptions="Center"/>
-            </Grid>
+            <Border BackgroundColor="#0A0F17" WidthRequest="85" HeightRequest="85" StrokeShape="RoundRectangle 42.5" StrokeThickness="0" VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,22" />
 
-            <Grid Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnTransactionsClicked"/>
-                </Grid.GestureRecognizers>
-                <Label x:Name="IconTransactions" Text="{x:Static icons:MaterialIcons.ReceiptLong}" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center" VerticalOptions="Start"/>
-                <Label x:Name="LblTransactions" Text="Extrato" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
-            </Grid>
+            <Border BackgroundColor="#0A0F17" VerticalOptions="End" HeightRequest="70" StrokeThickness="0" StrokeShape="RoundRectangle 15,15,0,0">
+                <Grid ColumnDefinitions="*,*,*,*,*" Padding="0,5,0,0">
 
-            <Grid Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnCardsClicked"/>
-                </Grid.GestureRecognizers>
-                <Label x:Name="IconCards" Text="{x:Static icons:MaterialIcons.CreditCard}" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center" VerticalOptions="Start"/>
-                <Label x:Name="LblCards" Text="Cartões" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
-            </Grid>
+                    <Grid Grid.Column="0" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnHomeClicked"/>
+                        </Grid.GestureRecognizers>
+                        <Label x:Name="IconHome" Text="{x:Static icons:MaterialIcons.Home}" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center"/>
+                        <Label x:Name="LblHome" Text="Principal" TextColor="#64748B" FontSize="10" FontAttributes="Bold" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                    </Grid>
 
-            <Grid Grid.Column="3" HorizontalOptions="Center" VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnVehiclesClicked"/>
-                </Grid.GestureRecognizers>
-                <Label x:Name="IconVehicles" Text="{x:Static icons:MaterialIcons.DirectionsCar}" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center" VerticalOptions="Start"/>
-                <Label x:Name="LblVehicles" Text="Veículos" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
-            </Grid>
+                    <Grid Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnTransactionsClicked"/>
+                        </Grid.GestureRecognizers>
+                        <Label x:Name="IconTransactions" Text="{x:Static icons:MaterialIcons.ReceiptLong}" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center"/>
+                        <Label x:Name="LblTransactions" Text="Transações" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                    </Grid>
 
-            <Grid Grid.Column="4" HorizontalOptions="Center" VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnSettingsClicked"/>
-                </Grid.GestureRecognizers>
-                <Label x:Name="IconSettings" Text="{x:Static icons:MaterialIcons.Person}" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center" VerticalOptions="Start"/>
-                <Label x:Name="LblSettings" Text="Perfil" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
-            </Grid>
+                    <Grid Grid.Column="2" />
+
+                    <Grid Grid.Column="3" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnVehiclesClicked"/>
+                        </Grid.GestureRecognizers>
+                        <Label x:Name="IconVehicles" Text="{x:Static icons:MaterialIcons.DirectionsCar}" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center"/>
+                        <Label x:Name="LblVehicles" Text="Planejamento" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                    </Grid>
+
+                    <Grid Grid.Column="4" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnSettingsClicked"/>
+                        </Grid.GestureRecognizers>
+                        <Label x:Name="IconSettings" Text="menu" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center"/>
+                        <Label x:Name="LblSettings" Text="Mais" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
+                    </Grid>
+                </Grid>
+            </Border>
         </Grid>
 
-        <Grid VerticalOptions="End" HorizontalOptions="End" Margin="0,0,15,80" InputTransparent="True" CascadeInputTransparent="False">
+        <Border x:Name="MainFabBorder" BackgroundColor="#00E676" StrokeThickness="0" HeightRequest="64" WidthRequest="64" StrokeShape="RoundRectangle 32" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,32" ZIndex="5">
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.4"/>
+            </Border.Shadow>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnMainFabClicked"/>
+            </Border.GestureRecognizers>
+            <Label x:Name="MainFabIcon" Text="{x:Static icons:MaterialIcons.Add}" FontFamily="MaterialIcons" TextColor="#121214" FontSize="36" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+        </Border>
 
-            <Button x:Name="BtnIncome" Clicked="OnNewIncomeClicked" BackgroundColor="#00E676" HeightRequest="50" WidthRequest="50" CornerRadius="25" Opacity="0" InputTransparent="True"/>
-            <Grid x:Name="GridIncome" HeightRequest="50" WidthRequest="50" HorizontalOptions="Center" VerticalOptions="Center" Opacity="0" InputTransparent="True">
-                <Label Text="{x:Static icons:MaterialIcons.TrendingUp}" 
-                       FontFamily="MaterialIcons" 
-                       TextColor="#001524" 
-                       FontSize="26" 
-                       HorizontalOptions="Center" 
-                       VerticalOptions="Center"
-                       HorizontalTextAlignment="Center"
-                       VerticalTextAlignment="Center"/>
-            </Grid>
-
-            <Button x:Name="BtnExpense" Clicked="OnNewExpenseClicked" BackgroundColor="#FF5252" HeightRequest="50" WidthRequest="50" CornerRadius="25" Opacity="0" InputTransparent="True"/>
-            <Grid x:Name="GridExpense" HeightRequest="50" WidthRequest="50" HorizontalOptions="Center" VerticalOptions="Center" Opacity="0" InputTransparent="True">
-                <Label Text="{x:Static icons:MaterialIcons.TrendingDown}" 
-                       FontFamily="MaterialIcons" 
-                       TextColor="#FFFFFF" 
-                       FontSize="26" 
-                       HorizontalOptions="Center" 
-                       VerticalOptions="Center"
-                       HorizontalTextAlignment="Center"
-                       VerticalTextAlignment="Center"/>
-            </Grid>
-
-            <Grid HeightRequest="60" WidthRequest="60" Margin="0,0,0,10" HorizontalOptions="Center" VerticalOptions="Center">
-
-                <Button x:Name="FabButton" 
-                        Clicked="OnFabClicked" 
-                        BackgroundColor="#00E676" 
-                        CornerRadius="30" />
-
-                <Label x:Name="FabIcon" 
-                       Text="{x:Static icons:MaterialIcons.Add}" 
-                       FontFamily="MaterialIcons" 
-                       TextColor="#001524" 
-                       FontSize="34" 
-                       HorizontalOptions="Center" 
-                       VerticalOptions="Center" 
-                       HorizontalTextAlignment="Center"
-                       VerticalTextAlignment="Center"
-                       InputTransparent="True" />
-            </Grid>
-
-        </Grid>
     </Grid>
 </ContentView>

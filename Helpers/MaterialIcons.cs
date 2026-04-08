@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace controle_ja_mobile.Helpers
 {
-    class MaterialIcons
+    // AQUI ESTAVA O ERRO: Precisa ser 'public static class' para o XAML enxergar
+    public static class MaterialIcons
     {
         // Menu Inferior
         public const string Home = "\ue88a";          // Casa (Início)
@@ -25,5 +26,13 @@ namespace controle_ja_mobile.Helpers
         public const string School = "\ue80c";
         public const string AttachMoney = "\ue227";
         public const string Category = "\ue574";
+
+        public const string CheckCircleOutline = "check_circle_outline";
+        public const string CalendarToday = "calendar_today";
+        public const string Notes = "notes";
+        public const string Label = "label";
+        public const string AccountBalanceWallet = "account_balance_wallet";
+        public const string Repeat = "repeat";
+        public const string Check = "check";
     }
 }

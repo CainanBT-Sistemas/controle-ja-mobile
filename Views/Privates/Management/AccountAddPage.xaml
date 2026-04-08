@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:behaviors="clr-namespace:controle_ja_mobile.Behaviors"
              x:Class="controle_ja_mobile.Views.Privates.Management.AccountAddPage"
              x:Name="RootPage"
              BackgroundColor="#001524" 
@@ -54,7 +55,11 @@
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Saldo Atual" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
                         <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 8" Padding="15,0">
-                            <Entry Text="{Binding Balance}" IsEnabled="{Binding IsEditMode, Converter={toolkit:InvertedBoolConverter}}" Keyboard="Numeric" Placeholder="0.00" PlaceholderColor="#64748B" TextColor="#00E676" FontAttributes="Bold" FontSize="16" BackgroundColor="Transparent"/>
+                            <Entry Text="{Binding Balance}" IsEnabled="{Binding IsEditMode, Converter={toolkit:InvertedBoolConverter}}" Keyboard="Numeric" Placeholder="0.00" PlaceholderColor="#64748B" TextColor="#00E676" FontAttributes="Bold" FontSize="16" BackgroundColor="Transparent">
+                                <Entry.Behaviors>
+                                    <behaviors:CurrencyMaskBehavior />
+                                </Entry.Behaviors>
+                            </Entry>
                         </Border>
                     </VerticalStackLayout>
 

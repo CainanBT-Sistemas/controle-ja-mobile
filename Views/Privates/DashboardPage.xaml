@@ -8,6 +8,7 @@
              BackgroundColor="#0F172A">
 
     <Grid>
+
         <CarouselView x:Name="MainCarousel"
                       Loop="False"
                       IsSwipeEnabled="True"
@@ -21,12 +22,9 @@
                     <ContentView Content="{Binding .}" VerticalOptions="Fill" HorizontalOptions="Fill"/>
                 </DataTemplate>
             </CarouselView.ItemTemplate>
-
         </CarouselView>
 
-        <Grid VerticalOptions="End">
-            <components:BottomMenu x:Name="MyBottomMenu" />
-        </Grid>
+        <components:BottomMenu x:Name="MyBottomMenu" VerticalOptions="Fill" HorizontalOptions="Fill" />
 
         <IndicatorView x:Name="Indicator" IsVisible="False" />
     </Grid>

@@ -9,10 +9,12 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("id")]
         public Guid Id { get; set; }
 
+        [JsonPropertyName("accountId")]
+        public Guid AccountId { get; set; }
+
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        // CORREÇÃO: O nome no JSON que vem do Java é "totalLimit"
         [JsonPropertyName("totalLimit")]
         public decimal TotalLimit { get; set; }
 

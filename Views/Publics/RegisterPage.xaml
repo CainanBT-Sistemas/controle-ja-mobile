@@ -6,77 +6,85 @@
              x:Class="controle_ja_mobile.Views.Publics.RegisterPage"
              x:DataType="vm:RegisterViewModel"
              NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#001524"
              Title="Registrar">
 
-    <ContentPage.Background>
-        <RadialGradientBrush Center="0.5, 0.2" Radius="0.8">
-            <GradientStop Color="#1E293B" Offset="0.0" />
-            <GradientStop Color="#0F172A" Offset="0.4" />
-            <GradientStop Color="#002118" Offset="1.0" />
-        </RadialGradientBrush>
-    </ContentPage.Background>
-
-    <!-- ScrollView funcional -->
     <ScrollView VerticalOptions="FillAndExpand">
         <ScrollView.Behaviors>
             <behaviors:KeyboardAvoidanceBehavior />
         </ScrollView.Behaviors>
 
-        <!-- Layout interno -->
-        <VerticalStackLayout Padding="30" Spacing="25" HorizontalOptions="FillAndExpand">
+        <VerticalStackLayout Padding="30" Spacing="15" VerticalOptions="Center" MinimumHeightRequest="650">
 
-            <!-- Logo -->
-            <Image Source="logo_controle.png" 
-                   HeightRequest="100" 
-                   Aspect="AspectFit" />
+            <Image Source="logo_controle.png" HeightRequest="80" Aspect="AspectFit" Margin="0,10,0,10"/>
 
-            <!-- Título -->
-            <Label Text="Crie sua conta" 
-                   TextColor="#FFFFFF" 
-                   FontSize="26" 
-                   FontAttributes="Bold" />
+            <VerticalStackLayout Spacing="5" Margin="0,0,0,15">
+                <Label Text="Crie sua conta" 
+                       TextColor="White" 
+                       FontSize="26" 
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"/>
+                <Label Text="Junte-se a nós e assuma o controle" 
+                       TextColor="#94A3B8" 
+                       FontSize="14" 
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
 
-            <!-- Campos de Entrada -->
-            <Entry Placeholder="Nome Completo" 
-                   Text="{Binding Name}" 
-                   Keyboard="Default" 
-                   TextColor="#FFFFFF" 
-                   PlaceholderColor="#AAAAAA"/>
+            <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 12" Padding="15,0">
+                <Entry Placeholder="Nome Completo" 
+                       Text="{Binding Name}" 
+                       Keyboard="Default" 
+                       TextColor="White" 
+                       PlaceholderColor="#64748B"
+                       BackgroundColor="Transparent"/>
+            </Border>
 
-            <Entry Placeholder="E-mail" 
-                   Text="{Binding Email}" 
-                   Keyboard="Email" 
-                   TextColor="#FFFFFF" 
-                   PlaceholderColor="#AAAAAA"/>
+            <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 12" Padding="15,0">
+                <Entry Placeholder="E-mail" 
+                       Text="{Binding Email}" 
+                       Keyboard="Email" 
+                       TextColor="White" 
+                       PlaceholderColor="#64748B"
+                       BackgroundColor="Transparent"/>
+            </Border>
 
-            <Entry Placeholder="Senha" 
-                   Text="{Binding Password}" 
-                   IsPassword="True" 
-                   TextColor="#FFFFFF" 
-                   PlaceholderColor="#AAAAAA"/>
+            <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 12" Padding="15,0">
+                <Entry Placeholder="Senha" 
+                       Text="{Binding Password}" 
+                       IsPassword="True" 
+                       TextColor="White" 
+                       PlaceholderColor="#64748B"
+                       BackgroundColor="Transparent"/>
+            </Border>
 
-            <Entry Placeholder="Confirme sua senha" 
-                   Text="{Binding ConfirmPassword}" 
-                   IsPassword="True" 
-                   TextColor="#FFFFFF" 
-                   PlaceholderColor="#AAAAAA"/>
+            <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 12" Padding="15,0">
+                <Entry Placeholder="Confirme sua senha" 
+                       Text="{Binding ConfirmPassword}" 
+                       IsPassword="True" 
+                       TextColor="White" 
+                       PlaceholderColor="#64748B"
+                       BackgroundColor="Transparent"/>
+            </Border>
 
-            <!-- Botões -->
             <Button Text="REGISTRAR" 
                     Command="{Binding RegisterCommand}" 
-                    BackgroundColor="#00FF00" 
-                    TextColor="#000000" 
-                    CornerRadius="10"
-                    HeightRequest="50"/>
+                    BackgroundColor="#00E676" 
+                    TextColor="#001524" 
+                    FontAttributes="Bold"
+                    FontSize="16"
+                    CornerRadius="12"
+                    HeightRequest="55"
+                    Margin="0,15,0,0"/>
 
             <Button Text="Voltar para Login" 
                     Command="{Binding GoBackCommand}" 
                     BackgroundColor="Transparent" 
-                    TextColor="#FFFFFF"
-                    BorderColor="#FFFFFF"
-                    BorderWidth="1"
-                    CornerRadius="10" 
-                    HeightRequest="40"/>
+                    TextColor="#A1A1AA"
+                    FontAttributes="Bold"
+                    FontSize="14"
+                    HeightRequest="50"
+                    Margin="0,5,0,0"/>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

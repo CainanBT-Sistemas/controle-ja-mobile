@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using controle_ja_mobile.Helpers;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
 using controle_ja_mobile.Views.Privates.Management;
@@ -23,6 +25,7 @@ namespace controle_ja_mobile.ViewModels
 
         [ObservableProperty]
         private bool isExpensesSelected = true;
+
 
         public CategoriesViewModel(ApiService apiService)
         {

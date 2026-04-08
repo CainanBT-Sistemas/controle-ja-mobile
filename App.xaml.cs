@@ -14,6 +14,12 @@ namespace controle_ja_mobile
             MainPage = new NavigationPage(new WelcomePage(
                 IPlatformApplication.Current?.Services.GetService<AuthService>(),
                 IPlatformApplication.Current?.Services.GetService<BiometricAuthService>()));
+            Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
+            {
+#if ANDROID
+                handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+#endif
+            });
         }
 
     }
