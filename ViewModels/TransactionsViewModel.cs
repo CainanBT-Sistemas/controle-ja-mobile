@@ -12,16 +12,19 @@ namespace controle_ja_mobile.ViewModels
         private readonly TransactionService _transactionService;
         private readonly CultureInfo _culture = new CultureInfo("pt-BR");
 
-        public ObservableCollection<Transaction> Transactions { get; } = new();
+        // Lista agrupada que o XAML consome
+        public ObservableCollection<TransactionGroup> GroupedTransactions { get; } = new();
 
         [ObservableProperty] private DateTime currentDate = DateTime.Now;
         [ObservableProperty] private string currentMonthYear;
 
+        // Totais formatados para o cabeçalho
         [ObservableProperty] private string totalInFormatted = "R$ 0,00";
         [ObservableProperty] private string totalOutFormatted = "R$ 0,00";
         [ObservableProperty] private string balanceFormatted = "R$ 0,00";
         [ObservableProperty] private Color balanceColor = Color.FromArgb("#3B82F6");
 
+        // Controle de estados da tela
         [ObservableProperty] private bool isEmpty = true;
         [ObservableProperty] private bool hasTransactions = false;
 
@@ -31,6 +34,8 @@ namespace controle_ja_mobile.ViewModels
             UpdateMonthLabel();
             _ = LoadTransactions();
         }
+
+        // --- COMANDOS DE NAVEGAÇÃO DE MÊS ---
 
         [RelayCommand]
         public async Task PreviousMonth()
@@ -50,8 +55,11 @@ namespace controle_ja_mobile.ViewModels
 
         private void UpdateMonthLabel()
         {
+            // Deixa o mês em CapsLock elegante como no design
             CurrentMonthYear = CurrentDate.ToString("MMMM 'de' yyyy", _culture);
         }
+
+        // --- CARREGAMENTO DE DADOS ---
 
         [RelayCommand]
         public async Task LoadTransactions()
@@ -59,40 +67,50 @@ namespace controle_ja_mobile.ViewModels
             IsLoading = true;
             try
             {
-                // 1. Calcula o início e o fim do mês selecionado na tela
                 var firstDay = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
                 var lastDay = firstDay.AddMonths(1).AddSeconds(-1);
 
                 long startUnix = new DateTimeOffset(firstDay).ToUnixTimeMilliseconds();
                 long endUnix = new DateTimeOffset(lastDay).ToUnixTimeMilliseconds();
 
-                // 2. Manda a API buscar SÓ o que importa
                 var monthTransactions = await _transactionService.GetTransactionsAsync(startUnix, endUnix);
 
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    Transactions.Clear();
+                    GroupedTransactions.Clear();
 
                     if (monthTransactions != null && monthTransactions.Count > 0)
                     {
-                        foreach (var t in monthTransactions)
-                        {
-                            Transactions.Add(t);
-                        }
+                        // Ordena por data decrescente
+                        var sortedTransactions = monthTransactions.OrderByDescending(t => t.Date).ToList();
+
+                        // Agrupa por dia para o visual de "Timeline"
+                        var grouped = sortedTransactions.GroupBy(t => t.DateTimeObject.Date)
+                            .Select(g =>
+                            {
+                                string dayName = _culture.DateTimeFormat.GetAbbreviatedDayName(g.Key.DayOfWeek);
+                                dayName = char.ToUpper(dayName[0]) + dayName.Substring(1);
+
+                                // O segredo para remover o ponto da abreviação (Sáb. -> Sáb)
+                                dayName = dayName.Replace(".", "");
+
+                                string header = $"{dayName}, {g.Key:dd/MM/yyyy}";
+                                return new TransactionGroup(header, g.ToList());
+                            }).ToList();
+
+                        foreach (var group in grouped)
+                            GroupedTransactions.Add(group);
                     }
 
-                    IsEmpty = Transactions.Count == 0;
-                    HasTransactions = Transactions.Count > 0;
-
-                    CalculateTotals();
+                    IsEmpty = GroupedTransactions.Count == 0;
+                    HasTransactions = GroupedTransactions.Count > 0;
+                    CalculateTotals(monthTransactions ?? new List<Transaction>());
                 });
             }
             catch (Exception ex)
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    await App.Current.MainPage.DisplayAlert("Erro", "Erro ao carregar: " + ex.Message, "OK");
-                });
+                    await App.Current.MainPage.DisplayAlert("Erro", "Falha ao carregar: " + ex.Message, "OK"));
             }
             finally
             {
@@ -100,36 +118,46 @@ namespace controle_ja_mobile.ViewModels
             }
         }
 
-        private void CalculateTotals()
+        private void CalculateTotals(List<Transaction> flatTransactions)
         {
-            decimal totalIn = Transactions.Where(t => t.Type == TransactionType.RECEITA).Sum(t => t.Amount);
-            decimal totalOut = Transactions.Where(t => t.Type == TransactionType.DESPESA).Sum(t => t.Amount);
+            decimal totalIn = flatTransactions.Where(t => t.Type == TransactionType.RECEITA || t.Type == TransactionType.TRANSFERENCIA_ENTRADA).Sum(t => t.Amount);
+            decimal totalOut = flatTransactions.Where(t => t.Type == TransactionType.DESPESA || t.Type == TransactionType.TRANSFERENCIA_SAIDA).Sum(t => t.Amount);
             decimal balance = totalIn - totalOut;
 
             TotalInFormatted = totalIn.ToString("C", _culture);
             TotalOutFormatted = totalOut.ToString("C", _culture);
             BalanceFormatted = balance.ToString("C", _culture);
 
-            if (balance < 0) BalanceColor = Color.FromArgb("#FF5252");
-            else if (balance > 0) BalanceColor = Color.FromArgb("#00E676");
-            else BalanceColor = Color.FromArgb("#3B82F6");
+            // Muda a cor do balanço dinamicamente
+            if (balance < 0) BalanceColor = Color.FromArgb("#FF5252"); // Vermelho
+            else if (balance > 0) BalanceColor = Color.FromArgb("#00E676"); // Verde
+            else BalanceColor = Color.FromArgb("#3B82F6"); // Azul
         }
+
+        // --- COMANDOS FALTANTES QUE CAUSARAM O ERRO ---
 
         [RelayCommand]
         public async Task GoToFilters()
         {
-            await App.Current.MainPage.DisplayAlert("Filtros", "Página de filtros em breve!", "OK");
+            // Resolve o erro XFC0045
+            await App.Current.MainPage.DisplayAlert("Filtros", "A tela de filtros será implementada na próxima etapa!", "OK");
         }
 
-        // COMANDO DE EDIÇÃO ADICIONADO AQUI
         [RelayCommand]
         public async Task EditTransaction(Transaction transactionToEdit)
         {
-            var navParams = new Dictionary<string, object>
-            {
-                { "TransactionToEdit", transactionToEdit }
-            };
+            var navParams = new Dictionary<string, object> { { "TransactionToEdit", transactionToEdit } };
             await Shell.Current.GoToAsync(nameof(Views.Privates.TransactionAddPage), navParams);
+        }
+
+        [RelayCommand]
+        public async Task DeleteTransaction(Transaction transaction)
+        {
+            bool confirm = await App.Current.MainPage.DisplayAlert("Excluir", $"Deseja apagar '{transaction.Name}'?", "Sim", "Não");
+            if (!confirm) return;
+
+            var success = await _transactionService.DeleteTransactionAsync(transaction.Id.Value, false);
+            if (success) await LoadTransactions();
         }
     }
 }

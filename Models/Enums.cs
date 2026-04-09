@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace controle_ja_mobile.Models
 {
@@ -13,6 +8,8 @@ namespace controle_ja_mobile.Models
         RECEITA,
         DESPESA,
         TRANSFERENCIA,
+        TRANSFERENCIA_ENTRADA,
+        TRANSFERENCIA_SAIDA,
         PAGAMENTO_FATURA
     }
 
@@ -35,11 +32,23 @@ namespace controle_ja_mobile.Models
         ELETRICO,
         OUTRO
     }
+
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum UserRole
     {
         USER,
         ADMIN,
         MANAGER
+    }
+
+    // NOVO: Necessário para as Transações Fixas (Netflix, etc)
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum RecurrenceFrequency
+    {
+        DAILY,
+        WEEKLY,
+        BIWEEKLY,
+        MONTHLY,
+        YEARLY
     }
 }

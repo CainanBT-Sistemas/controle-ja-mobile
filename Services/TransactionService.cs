@@ -10,13 +10,12 @@ namespace controle_ja_mobile.Services
     public class TransactionService
     {
         private readonly ApiService _apiService;
-        private readonly JsonSerializerOptions _jsonOptions; // <-- Tradutor criado
+        private readonly JsonSerializerOptions _jsonOptions;
 
         public TransactionService(ApiService apiService)
         {
             _apiService = apiService;
 
-            // Aqui nós ensinamos o C# a ler "RECEITA" e a ignorar letras maiúsculas/minúsculas no JSON
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -30,7 +29,6 @@ namespace controle_ja_mobile.Services
             {
                 string url = "transactions";
 
-                // Se o ViewModel mandar as datas, adiciona na URL
                 if (start.HasValue && end.HasValue)
                 {
                     url += $"?start={start}&end={end}";
@@ -56,14 +54,8 @@ namespace controle_ja_mobile.Services
         {
             try
             {
-                // Usamos as opções aqui também para garantir que ele envie "RECEITA" como texto para o Java
                 var response = await _apiService.PostAsync<string>("transactions", transaction);
-
-                if (!string.IsNullOrWhiteSpace(response))
-                {
-                    return true;
-                }
-                return false;
+                return !string.IsNullOrWhiteSpace(response);
             }
             catch (Exception ex)
             {
@@ -72,17 +64,32 @@ namespace controle_ja_mobile.Services
             }
         }
 
-        public async Task<bool> UpdateTransactionAsync(Guid id, Transaction transaction)
+        // NOVO: Aceita o parâmetro do Efeito Cascata
+        public async Task<bool> UpdateTransactionAsync(Guid id, Transaction transaction, bool updateFuture = false)
         {
             try
             {
-                var response = await _apiService.PutAsync<string>($"transactions/{id}", transaction);
-                if (!string.IsNullOrWhiteSpace(response)) return true;
-                return false;
+                var response = await _apiService.PutAsync<string>($"transactions/{id}?updateFuture={updateFuture}", transaction);
+                return !string.IsNullOrWhiteSpace(response);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("==== ERRO AO ATUALIZAR: " + ex.Message + " ====");
+                return false;
+            }
+        }
+
+        // NOVO: Método de Deleção com Cancelamento de Cascata
+        public async Task<bool> DeleteTransactionAsync(Guid id, bool cancelFuture = false)
+        {
+            try
+            {
+                var response = await _apiService.DeleteAsync($"transactions/{id}?cancelFuture={cancelFuture}");
+                return !string.IsNullOrWhiteSpace(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("==== ERRO AO DELETAR: " + ex.Message + " ====");
                 return false;
             }
         }

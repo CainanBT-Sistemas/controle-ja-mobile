@@ -2,196 +2,252 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
-             xmlns:behaviors="clr-namespace:controle_ja_mobile.Behaviors"
              x:Class="controle_ja_mobile.Views.Privates.TransactionAddPage"
              x:DataType="vm:TransactionAddViewModel"
              Shell.NavBarIsVisible="False"
              BackgroundColor="#121214">
 
-    <Grid RowDefinitions="Auto, *">
+    <Grid>
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnBackgroundTapped" />
+        </Grid.GestureRecognizers>
 
-        <VerticalStackLayout Grid.Row="0" Padding="20,20,20,10" Spacing="0">
-            <Grid>
-                <Label Text="arrow_back" FontFamily="MaterialIcons" TextColor="White" FontSize="24" HorizontalOptions="Start" VerticalOptions="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding CancelCommand}"/>
-                    </Label.GestureRecognizers>
-                </Label>
-                <Label Text="{Binding AmountTitle}" TextColor="White" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
-            </Grid>
+        <Grid RowDefinitions="Auto, *">
+            <VerticalStackLayout Grid.Row="0" Padding="20,20,20,10" Spacing="0">
+                <Grid>
+                    <Label Text="arrow_back" FontFamily="MaterialIcons" TextColor="White" FontSize="24" HorizontalOptions="Start" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CancelCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label Text="{Binding AmountTitle}" TextColor="White" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Grid>
 
-            <Label Text="Valor da transação" TextColor="#A1A1AA" FontSize="12" Margin="0,30,0,0"/>
-            <Grid ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center" Margin="0,5,0,10">
-                <Label Grid.Column="0" Text="R$" TextColor="White" FontSize="24" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,5,0"/>
+                <Label Text="Valor da transação" TextColor="#A1A1AA" FontSize="12" Margin="0,30,0,0"/>
 
-                <Entry Grid.Column="1" Text="{Binding Amount}" Placeholder="0,00" FontSize="42" FontAttributes="Bold" TextColor="{Binding SemanticColor}" Keyboard="Numeric" BackgroundColor="Transparent">
-                    <Entry.Behaviors>
-                        <behaviors:CurrencyMaskBehavior />
-                    </Entry.Behaviors>
-                </Entry>
+                <Grid ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center" Margin="0,5,0,10">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleCalculatorCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Label Grid.Column="0" Text="R$" TextColor="White" FontSize="24" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,5,0"/>
+                    <Label Grid.Column="1" Text="{Binding Amount}" FontSize="42" FontAttributes="Bold" TextColor="{Binding SemanticColor}" VerticalOptions="Center"/>
+                    <Label Grid.Column="2" Text="BRL ▼" TextColor="#64748B" FontSize="14" FontAttributes="Bold" VerticalOptions="Center"/>
+                </Grid>
+            </VerticalStackLayout>
 
-                <Label Grid.Column="2" Text="BRL ▼" TextColor="#64748B" FontSize="14" FontAttributes="Bold" VerticalOptions="Center"/>
-            </Grid>
-        </VerticalStackLayout>
+            <ScrollView Grid.Row="1">
+                <Border BackgroundColor="#202024" StrokeThickness="0" StrokeShape="RoundRectangle 25" Padding="0" Margin="0,0,0,20" VerticalOptions="Start">
+                    <VerticalStackLayout Padding="20,10,20,25" Spacing="0">
 
-        <ScrollView Grid.Row="1">
-
-            <Border BackgroundColor="#202024" StrokeThickness="0" StrokeShape="RoundRectangle 25" Padding="0" Margin="0,0,0,20" VerticalOptions="Start">
-                <VerticalStackLayout Padding="20,10,20,25" Spacing="0">
-
-                    <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsVisible="{Binding IsCreationMode}">
-                        <Label Grid.Column="0" Text="swap_vert" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="24" VerticalOptions="Center" HorizontalOptions="Center"/>
-                        <Picker Grid.Column="1" Grid.ColumnSpan="2" Title="Selecione o Tipo..." ItemsSource="{Binding TransactionTypes}" SelectedItem="{Binding SelectedTransactionType}" TextColor="White" TitleColor="#A1A1AA" BackgroundColor="Transparent" VerticalOptions="Center" Margin="10,0,0,0" />
-                    </Grid>
-
-                    <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsVisible="{Binding IsCreationMode, Converter={StaticResource InvertedBoolConverter}}">
-                        <Label Grid.Column="0" Text="swap_vert" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="24" VerticalOptions="Center" HorizontalOptions="Center"/>
-                        <Label Grid.Column="1" Text="{Binding SelectedTransactionType}" TextColor="White" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0"/>
-                    </Grid>
-
-                    <VerticalStackLayout IsVisible="{Binding HasTypeSelected}" Spacing="0">
-
-                        <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0"/>
-
-                        <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto">
-                            <Label Grid.Column="0" Text="check_circle_outline" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
-                            <Label Grid.Column="1" Text="{Binding PaidLabelText}" TextColor="White" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0"/>
-                            <Switch Grid.Column="2" IsToggled="{Binding IsPaid}" OnColor="{Binding SemanticColor}" ThumbColor="White" VerticalOptions="Center"/>
+                        <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsVisible="{Binding IsCreationMode}">
+                            <Label Grid.Column="0" Text="swap_vert" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="24" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Picker Grid.Column="1" Grid.ColumnSpan="2" Title="Selecione o Tipo..." ItemsSource="{Binding TransactionTypes}" SelectedItem="{Binding SelectedTransactionType}" TextColor="White" TitleColor="#A1A1AA" BackgroundColor="Transparent" VerticalOptions="Center" Margin="10,0,0,0" />
                         </Grid>
-                        <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0"/>
-
-                        <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto">
-                            <Label Grid.Column="0" Text="calendar_today" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="20" VerticalOptions="Center" HorizontalOptions="Center"/>
-                            <Label Grid.Column="1" Text="{Binding FormattedDate}" TextColor="White" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0" InputTransparent="True"/>
-
-                            <DatePicker Grid.Column="1" Grid.ColumnSpan="2" Date="{Binding Date, Mode=TwoWay}" DateSelected="OnDateSelected" Opacity="0.01" BackgroundColor="Transparent" HorizontalOptions="Fill" VerticalOptions="Fill"/>
-                        </Grid>
-                        <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0"/>
-
-                        <Grid HeightRequest="65" ColumnDefinitions="40, *">
-                            <Label Grid.Column="0" Text="mic_none" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
-                            <Entry Grid.Column="1" Text="{Binding Description}" Placeholder="Descrição" TextColor="White" PlaceholderColor="#A1A1AA" FontSize="15" BackgroundColor="Transparent" VerticalOptions="Center" Margin="10,0,0,0"/>
-                        </Grid>
-                        <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0"/>
-
-                        <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsVisible="{Binding IsCategoryVisible}">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding GoToSelectCategoryCommand}"/>
-                            </Grid.GestureRecognizers>
-                            <Label Grid.Column="0" Text="bookmark_border" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
-                            <Label Grid.Column="1" Text="Selecionar Categoria" TextColor="#A1A1AA" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0" IsVisible="{Binding IsCategoryEmpty}"/>
-                            <Border Grid.Column="1" Stroke="{Binding SelectedCategory.Color}" StrokeThickness="1" BackgroundColor="Transparent" StrokeShape="RoundRectangle 16" HorizontalOptions="Start" VerticalOptions="Center" Padding="12,6" Margin="10,0,0,0" IsVisible="{Binding HasCategory}">
-                                <HorizontalStackLayout Spacing="8">
-                                    <Label Text="{Binding SelectedCategory.Icon}" FontFamily="MaterialIcons" TextColor="{Binding SelectedCategory.Color}" FontSize="16" VerticalOptions="Center"/>
-                                    <Label Text="{Binding SelectedCategory.Name}" TextColor="White" FontSize="13" VerticalOptions="Center"/>
-                                </HorizontalStackLayout>
-                            </Border>
-                            <Label Grid.Column="2" Text="chevron_right" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="24" VerticalOptions="Center"/>
-                        </Grid>
-                        <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0" IsVisible="{Binding IsCategoryVisible}"/>
-
-                        <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding GoToSelectSourceCommand}"/>
-                            </Grid.GestureRecognizers>
-                            <Label Grid.Column="0" Text="account_balance_wallet" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
-                            <Label Grid.Column="1" Text="{Binding SourceAccountTitle}" TextColor="#A1A1AA" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0" IsVisible="{Binding IsSourceEmpty}"/>
-                            <Border Grid.Column="1" Stroke="{Binding SelectedSource.Color}" StrokeThickness="1" BackgroundColor="Transparent" StrokeShape="RoundRectangle 16" HorizontalOptions="Start" VerticalOptions="Center" Padding="12,6" Margin="10,0,0,0" IsVisible="{Binding HasSource}">
-                                <HorizontalStackLayout Spacing="8">
-                                    <Label Text="{Binding SelectedSource.Icon}" FontFamily="MaterialIcons" TextColor="{Binding SelectedSource.Color}" FontSize="16" VerticalOptions="Center"/>
-                                    <Label Text="{Binding SelectedSource.Name}" TextColor="White" FontSize="13" VerticalOptions="Center"/>
-                                </HorizontalStackLayout>
-                            </Border>
-                            <Label Grid.Column="2" Text="chevron_right" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="24" VerticalOptions="Center"/>
-                        </Grid>
-                        <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0"/>
-
-                        <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsVisible="{Binding IsTransfer}">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding GoToSelectDestinationCommand}"/>
-                            </Grid.GestureRecognizers>
-                            <Label Grid.Column="0" Text="login" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
-                            <Label Grid.Column="1" Text="Conta de destino" TextColor="#A1A1AA" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0" IsVisible="{Binding IsDestinationEmpty}"/>
-                            <Border Grid.Column="1" Stroke="{Binding SelectedDestination.Color}" StrokeThickness="1" BackgroundColor="Transparent" StrokeShape="RoundRectangle 16" HorizontalOptions="Start" VerticalOptions="Center" Padding="12,6" Margin="10,0,0,0" IsVisible="{Binding HasDestination}">
-                                <HorizontalStackLayout Spacing="8">
-                                    <Label Text="{Binding SelectedDestination.Icon}" FontFamily="MaterialIcons" TextColor="{Binding SelectedDestination.Color}" FontSize="16" VerticalOptions="Center"/>
-                                    <Label Text="{Binding SelectedDestination.Name}" TextColor="White" FontSize="13" VerticalOptions="Center"/>
-                                </HorizontalStackLayout>
-                            </Border>
-                            <Label Grid.Column="2" Text="chevron_right" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="24" VerticalOptions="Center"/>
-                        </Grid>
-                        <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0" IsVisible="{Binding IsTransfer}"/>
-
-                        <Grid HeightRequest="60" Margin="0,15,0,0">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ToggleMoreDetailsCommand}"/>
-                            </Grid.GestureRecognizers>
-                            <Label Text="MAIS DETALHES" TextColor="{Binding SemanticColor}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsVisible="{Binding IsCreationMode, Converter={StaticResource InvertedBoolConverter}}">
+                            <Label Grid.Column="0" Text="swap_vert" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="24" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Label Grid.Column="1" Text="{Binding SelectedTransactionType}" TextColor="White" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0"/>
                         </Grid>
 
-                        <VerticalStackLayout IsVisible="{Binding ShowMoreDetails}">
+                        <VerticalStackLayout IsVisible="{Binding HasTypeSelected}" Spacing="0">
+                            <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0"/>
 
-                            <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsEnabled="{Binding IsCreationMode}">
-                                <Label Grid.Column="0" Text="push_pin" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
-                                <Label Grid.Column="1" Text="Lançamento fixo" TextColor="#A1A1AA" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0"/>
-                                <Switch Grid.Column="2" IsToggled="{Binding IsFixed}" OnColor="{Binding SemanticColor}" ThumbColor="White" VerticalOptions="Center"/>
+                            <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsVisible="{Binding IsStatusVisible}">
+                                <Label Grid.Column="0" Text="check_circle_outline" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Label Grid.Column="1" Text="{Binding PaidLabelText}" TextColor="White" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0"/>
+                                <Switch Grid.Column="2" IsToggled="{Binding IsPaid}" OnColor="{Binding SemanticColor}" ThumbColor="White" VerticalOptions="Center"/>
                             </Grid>
-                            <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0" />
+                            <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0" IsVisible="{Binding IsStatusVisible}"/>
 
-                            <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsEnabled="{Binding IsCreationMode}">
-                                <Label Grid.Column="0" Text="autorenew" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
-                                <Label Grid.Column="1" Text="Repetir" TextColor="#A1A1AA" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0"/>
-                                <Switch Grid.Column="2" IsToggled="{Binding IsRecurring}" OnColor="{Binding SemanticColor}" ThumbColor="White" VerticalOptions="Center"/>
+                            <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto">
+                                <Label Grid.Column="0" Text="calendar_today" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="20" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Label Grid.Column="1" Text="{Binding FormattedDate}" TextColor="White" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0" InputTransparent="True"/>
+                                <DatePicker Grid.Column="1" Grid.ColumnSpan="2" Date="{Binding Date, Mode=TwoWay}" DateSelected="OnDateSelected" Opacity="0.01" BackgroundColor="Transparent" HorizontalOptions="Fill" VerticalOptions="Fill"/>
                             </Grid>
+                            <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0"/>
 
-                            <Grid IsVisible="{Binding IsRecurring}" ColumnDefinitions="*, *" ColumnSpacing="15" Margin="50,0,0,15" IsEnabled="{Binding IsCreationMode}">
-                                <VerticalStackLayout Grid.Column="0" Spacing="5">
-                                    <Label Text="Quantidade" TextColor="#A1A1AA" FontSize="12"/>
-                                    <Border BackgroundColor="#121214" StrokeThickness="0" StrokeShape="RoundRectangle 8" HeightRequest="45" Padding="10,0">
-                                        <Entry Text="{Binding Installments}" Keyboard="Numeric" TextColor="White" BackgroundColor="Transparent" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                            <Grid HeightRequest="65" ColumnDefinitions="40, *">
+                                <Label Grid.Column="0" Text="label" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Entry Grid.Column="1" Text="{Binding TransactionName}" Placeholder="Nome (Ex: Supermercado)" TextColor="White" PlaceholderColor="#A1A1AA" FontSize="15" BackgroundColor="Transparent" VerticalOptions="Center" Margin="10,0,0,0"/>
+                            </Grid>
+                            <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0"/>
+
+                            <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsVisible="{Binding IsCategoryVisible}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding GoToSelectCategoryCommand}"/>
+                                </Grid.GestureRecognizers>
+                                <Label Grid.Column="0" Text="bookmark_border" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Grid Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="Selecionar Categoria" TextColor="#A1A1AA" FontSize="15" Margin="10,0,0,0" IsVisible="{Binding IsCategoryEmpty}"/>
+                                    <Border Stroke="{Binding SelectedCategory.Color}" StrokeThickness="1" BackgroundColor="Transparent" StrokeShape="RoundRectangle 16" HorizontalOptions="Start" Padding="12,6" Margin="10,0,0,0" IsVisible="{Binding HasCategory}">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="{Binding SelectedCategory.Icon}" FontFamily="MaterialIcons" TextColor="{Binding SelectedCategory.Color}" FontSize="16" VerticalOptions="Center"/>
+                                            <Label Text="{Binding SelectedCategory.Name}" TextColor="White" FontSize="13" VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
                                     </Border>
-                                </VerticalStackLayout>
-
-                                <VerticalStackLayout Grid.Column="1" Spacing="5">
-                                    <Label Text="Período" TextColor="#A1A1AA" FontSize="12"/>
-                                    <Border BackgroundColor="#121214" StrokeThickness="0" StrokeShape="RoundRectangle 8" HeightRequest="45" Padding="10,0">
-                                        <Picker ItemsSource="{Binding Periods}" SelectedItem="{Binding SelectedPeriod}" TextColor="White" BackgroundColor="Transparent" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
-                                    </Border>
-                                </VerticalStackLayout>
+                                </Grid>
+                                <Label Grid.Column="2" Text="chevron_right" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="24" VerticalOptions="Center"/>
                             </Grid>
+                            <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0" IsVisible="{Binding IsCategoryVisible}"/>
+
+                            <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding GoToSelectSourceCommand}"/>
+                                </Grid.GestureRecognizers>
+                                <Label Grid.Column="0" Text="account_balance_wallet" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Grid Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="{Binding SourceAccountTitle}" TextColor="#A1A1AA" FontSize="15" Margin="10,0,0,0" IsVisible="{Binding IsSourceEmpty}"/>
+                                    <Border Stroke="{Binding SelectedSource.Color}" StrokeThickness="1" BackgroundColor="Transparent" StrokeShape="RoundRectangle 16" HorizontalOptions="Start" VerticalOptions="Center" Padding="12,6" Margin="10,0,0,0" IsVisible="{Binding HasSource}">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="{Binding SelectedSource.Icon}" FontFamily="MaterialIcons" TextColor="{Binding SelectedSource.Color}" FontSize="16" VerticalOptions="Center"/>
+                                            <Label Text="{Binding SelectedSource.Name}" TextColor="White" FontSize="13" VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+                                    </Border>
+                                </Grid>
+                                <Label Grid.Column="2" Text="chevron_right" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="24" VerticalOptions="Center"/>
+                            </Grid>
+                            <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0"/>
+
+                            <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsVisible="{Binding IsCreditCardMode}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding GoToSelectInvoiceCommand}"/>
+                                </Grid.GestureRecognizers>
+                                <Label Grid.Column="0" Text="receipt_long" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Label Grid.Column="1" Text="{Binding SelectedInvoice}" TextColor="White" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0"/>
+                                <Label Grid.Column="2" Text="chevron_right" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="24" VerticalOptions="Center"/>
+                            </Grid>
+                            <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0" IsVisible="{Binding IsCreditCardMode}"/>
+
+                            <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsVisible="{Binding IsTransfer}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding GoToSelectDestinationCommand}"/>
+                                </Grid.GestureRecognizers>
+                                <Label Grid.Column="0" Text="login" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <Grid Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="Conta de destino" TextColor="#A1A1AA" FontSize="15" Margin="10,0,0,0" IsVisible="{Binding IsDestinationEmpty}"/>
+                                    <Border Stroke="{Binding SelectedDestination.Color}" StrokeThickness="1" BackgroundColor="Transparent" StrokeShape="RoundRectangle 16" HorizontalOptions="Start" VerticalOptions="Center" Padding="12,6" Margin="10,0,0,0" IsVisible="{Binding HasDestination}">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="{Binding SelectedDestination.Icon}" FontFamily="MaterialIcons" TextColor="{Binding SelectedDestination.Color}" FontSize="16" VerticalOptions="Center"/>
+                                            <Label Text="{Binding SelectedDestination.Name}" TextColor="White" FontSize="13" VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+                                    </Border>
+                                </Grid>
+                                <Label Grid.Column="2" Text="chevron_right" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="24" VerticalOptions="Center"/>
+                            </Grid>
+                            <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0" IsVisible="{Binding IsTransfer}"/>
+
+                            <Grid HeightRequest="60" Margin="0,15,0,0">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ToggleMoreDetailsCommand}"/>
+                                </Grid.GestureRecognizers>
+                                <Label Text="{Binding MoreDetailsText}" TextColor="{Binding SemanticColor}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Grid>
+
+                            <VerticalStackLayout IsVisible="{Binding ShowMoreDetails}">
+                                <Grid HeightRequest="65" ColumnDefinitions="40, *">
+                                    <Label Grid.Column="0" Text="notes" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                    <Entry Grid.Column="1" Text="{Binding Description}" Placeholder="Observações (Opcional)" TextColor="White" PlaceholderColor="#A1A1AA" FontSize="15" BackgroundColor="Transparent" VerticalOptions="Center" Margin="10,0,0,0"/>
+                                </Grid>
+                                <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0" />
+
+                                <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsEnabled="{Binding IsCreationMode}">
+                                    <Label Grid.Column="0" Text="autorenew" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                    <Label Grid.Column="1" Text="Assinatura Fixa" TextColor="#A1A1AA" FontSize="15" VerticalOptions="Center" Margin="10,0,0,0"/>
+                                    <Switch Grid.Column="2" IsToggled="{Binding IsFixed}" OnColor="{Binding SemanticColor}" ThumbColor="White" VerticalOptions="Center"/>
+                                </Grid>
+                                <Grid IsVisible="{Binding IsFixed}" Margin="50,0,0,15" IsEnabled="{Binding IsCreationMode}">
+                                    <VerticalStackLayout Spacing="5">
+                                        <Label Text="Frequência" TextColor="#A1A1AA" FontSize="12"/>
+                                        <Border BackgroundColor="#121214" StrokeThickness="0" StrokeShape="RoundRectangle 8" HeightRequest="45" Padding="10,0">
+                                            <Picker ItemsSource="{Binding Periods}" SelectedItem="{Binding SelectedPeriod}" TextColor="White" BackgroundColor="Transparent" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </Grid>
+                                <BoxView HeightRequest="1" Color="#323238" Margin="50,0,0,0" />
+
+                                <Grid HeightRequest="65" ColumnDefinitions="40, *, Auto" IsEnabled="{Binding IsCreationMode}">
+                                    <Label Grid.Column="0" Text="view_carousel" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                    <Label Grid.Column="1" Text="Parcelamento (Repetir)" TextColor="#A1A1AA" FontSize="14" VerticalOptions="Center" Margin="10,0,0,0"/>
+                                    <Switch Grid.Column="2" IsToggled="{Binding IsRecurring}" OnColor="{Binding SemanticColor}" ThumbColor="White" VerticalOptions="Center"/>
+                                </Grid>
+                                <Grid IsVisible="{Binding IsRecurring}" Margin="50,0,0,15" IsEnabled="{Binding IsCreationMode}">
+                                    <VerticalStackLayout Spacing="5">
+                                        <Label Text="Quantidade de Parcelas" TextColor="#A1A1AA" FontSize="12"/>
+                                        <Border BackgroundColor="#121214" StrokeThickness="0" StrokeShape="RoundRectangle 8" HeightRequest="45" Padding="10,0">
+                                            <Entry Text="{Binding Installments}" Keyboard="Numeric" TextColor="White" BackgroundColor="Transparent" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <Label Text="{Binding InstallmentSimulation}" TextColor="{Binding SemanticColor}" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center" Margin="0,5,0,0" IsVisible="{Binding IsCreditCardMode}"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Margin="0,30,0,0" Spacing="15" IsVisible="{Binding HasTypeSelected}">
+                                <Border BackgroundColor="{Binding SemanticColor}" StrokeThickness="0" HeightRequest="64" StrokeShape="RoundRectangle 32" HorizontalOptions="Fill">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SaveAndCloseCommand}"/>
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10">
+                                        <Label Text="check" FontFamily="MaterialIcons" TextColor="White" FontSize="24" VerticalOptions="Center"/>
+                                        <Label Text="Salvar Lançamento" TextColor="White" FontSize="16" FontAttributes="Bold" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </VerticalStackLayout>
 
                         </VerticalStackLayout>
                     </VerticalStackLayout>
-                    <VerticalStackLayout Margin="0,30,0,0" Spacing="15" IsVisible="{Binding HasTypeSelected}">
+                </Border>
+            </ScrollView>
+        </Grid>
 
-                        <Border BackgroundColor="{Binding SemanticColor}" StrokeThickness="0" HeightRequest="64" StrokeShape="RoundRectangle 32" HorizontalOptions="Fill">
+        <Grid BackgroundColor="#D9000000" IsVisible="{Binding IsCalculatorOpen}" ZIndex="98">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ToggleCalculatorCommand}"/>
+            </Grid.GestureRecognizers>
+            <Border BackgroundColor="#202024" VerticalOptions="End" StrokeThickness="0" Padding="25,30,25,30">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="30,30,0,0"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="15">
+                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center" Margin="0,0,0,10">
+                        <Label Grid.Column="0" Text="R$" TextColor="#A1A1AA" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,15,0">
+                            <Label Text="{Binding CalcEquation}" TextColor="#94A3B8" FontSize="14" HorizontalOptions="End"/>
+                            <Label Text="{Binding CalcDisplay}" TextColor="White" FontSize="48" FontAttributes="Bold" HorizontalOptions="End"/>
+                        </VerticalStackLayout>
+                        <Border Grid.Column="2" BackgroundColor="#323238" StrokeThickness="0" HeightRequest="44" WidthRequest="44" VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="22"/>
+                            </Border.StrokeShape>
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SaveAndCloseCommand}"/>
+                                <TapGestureRecognizer Command="{Binding CalcInputCommand}" CommandParameter="DEL"/>
                             </Border.GestureRecognizers>
-                            <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10">
-                                <Label Text="check" FontFamily="MaterialIcons" TextColor="White" FontSize="24" VerticalOptions="Center"/>
-                                <Label Text="Salvar Lançamento" TextColor="White" FontSize="16" FontAttributes="Bold" VerticalOptions="Center"/>
-                            </HorizontalStackLayout>
+                            <Label Text="backspace" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center"/>
                         </Border>
-
-                        <Border BackgroundColor="Transparent" StrokeThickness="1" Stroke="{Binding SemanticColor}" HeightRequest="64" StrokeShape="RoundRectangle 32" HorizontalOptions="Fill" IsVisible="{Binding IsCreationMode}">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SaveAndContinueCommand}"/>
-                            </Border.GestureRecognizers>
-                            <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10">
-                                <Label Text="add_circle_outline" FontFamily="MaterialIcons" TextColor="{Binding SemanticColor}" FontSize="24" VerticalOptions="Center"/>
-                                <Label Text="Lançar e Iniciar Novo" TextColor="{Binding SemanticColor}" FontSize="16" FontAttributes="Bold" VerticalOptions="Center"/>
-                            </HorizontalStackLayout>
-                        </Border>
-
-                    </VerticalStackLayout>
-
+                    </Grid>
+                    <BoxView HeightRequest="1" Color="#323238" Margin="0,0,0,10"/>
+                    <Grid RowDefinitions="65,65,65,65" ColumnDefinitions="*,*,*,*" RowSpacing="10" ColumnSpacing="10">
+                        <Button Grid.Row="0" Grid.Column="0" Text="7" TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="7"/>
+                        <Button Grid.Row="0" Grid.Column="1" Text="8" TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="8"/>
+                        <Button Grid.Row="0" Grid.Column="2" Text="9" TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="9"/>
+                        <Button Grid.Row="0" Grid.Column="3" Text="÷" TextColor="White" BackgroundColor="#323238" CornerRadius="20" FontSize="28" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="÷"/>
+                        <Button Grid.Row="1" Grid.Column="0" Text="4" TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="4"/>
+                        <Button Grid.Row="1" Grid.Column="1" Text="5" TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="5"/>
+                        <Button Grid.Row="1" Grid.Column="2" Text="6" TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="6"/>
+                        <Button Grid.Row="1" Grid.Column="3" Text="×" TextColor="White" BackgroundColor="#323238" CornerRadius="20" FontSize="28" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="×"/>
+                        <Button Grid.Row="2" Grid.Column="0" Text="1" TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="1"/>
+                        <Button Grid.Row="2" Grid.Column="1" Text="2" TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="2"/>
+                        <Button Grid.Row="2" Grid.Column="2" Text="3" TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="3"/>
+                        <Button Grid.Row="2" Grid.Column="3" Text="-" TextColor="White" BackgroundColor="#323238" CornerRadius="20" FontSize="28" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="-"/>
+                        <Button Grid.Row="3" Grid.Column="0" Text="0" TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="0"/>
+                        <Button Grid.Row="3" Grid.Column="1" Text="," TextColor="White" BackgroundColor="Transparent" FontSize="32" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter=","/>
+                        <Button Grid.Row="3" Grid.Column="2" Text="=" TextColor="White" BackgroundColor="{Binding SemanticColor}" CornerRadius="20" FontSize="28" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="="/>
+                        <Button Grid.Row="3" Grid.Column="3" Text="+" TextColor="White" BackgroundColor="#323238" CornerRadius="20" FontSize="28" FontAttributes="Bold" Command="{Binding CalcInputCommand}" CommandParameter="+"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,20,0,0">
+                        <Button Grid.Column="0" Text="CANCELAR" TextColor="{Binding SemanticColor}" BackgroundColor="Transparent" BorderColor="{Binding SemanticColor}" BorderWidth="1" CornerRadius="25" HeightRequest="50" FontAttributes="Bold" Command="{Binding ToggleCalculatorCommand}"/>
+                        <Button Grid.Column="1" Text="CONCLUÍDO" TextColor="White" BackgroundColor="{Binding SemanticColor}" CornerRadius="25" HeightRequest="50" FontAttributes="Bold" Command="{Binding ApplyCalculatorCommand}"/>
+                    </Grid>
                 </VerticalStackLayout>
             </Border>
-        </ScrollView>
-
-        <Grid Grid.RowSpan="2" BackgroundColor="#CC000000" IsVisible="{Binding IsLoading}" ZIndex="99">
-            <ActivityIndicator IsRunning="{Binding IsLoading}" Color="{Binding SemanticColor}" VerticalOptions="Center" HorizontalOptions="Center"/>
         </Grid>
     </Grid>
 </ContentPage>

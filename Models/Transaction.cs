@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace controle_ja_mobile.Models
 {
@@ -51,8 +47,16 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("isFixed")]
         public bool IsFixed { get; set; }
 
-        private int _installments = 1;
+        [JsonPropertyName("recurrenceFrequency")]
+        public RecurrenceFrequency? RecurrenceFrequency { get; set; }
 
+        [JsonPropertyName("recurrenceEndDate")]
+        public long? RecurrenceEndDate { get; set; }
+
+        [JsonPropertyName("recurrenceRuleId")]
+        public Guid? RecurrenceRuleId { get; set; }
+
+        private int _installments = 1;
         [JsonPropertyName("installments")]
         public int Installments
         {
@@ -82,18 +86,57 @@ namespace controle_ja_mobile.Models
         public double? Efficiency { get; set; }
 
         [JsonIgnore]
-        public string ColorHex => Type == TransactionType.RECEITA ? "#00E676" : "#EF4444";
-
-        [JsonIgnore]
         public string FormattedAmount => string.Format("{0:C}", Amount);
 
         [JsonIgnore]
-        public DateTime DateTimeObject
+        public DateTime DateTimeObject => DateTimeOffset.FromUnixTimeMilliseconds(Date).DateTime.ToLocalTime();
+
+        // --- MÁGICA VISUAL DO EXTRATO BANCÁRIO ---
+
+        [JsonIgnore]
+        public string ExtratoIcon => Type switch
+        {
+            TransactionType.RECEITA => "arrow_downward",
+            TransactionType.DESPESA => "trending_up",
+            TransactionType.TRANSFERENCIA => "swap_horiz",
+            TransactionType.TRANSFERENCIA_ENTRADA => "swap_horiz",
+            TransactionType.TRANSFERENCIA_SAIDA => "swap_horiz",
+            TransactionType.PAGAMENTO_FATURA => "receipt_long",
+            _ => "account_balance_wallet"
+        };
+
+        [JsonIgnore]
+        public string ExtratoAmount => (Type == TransactionType.RECEITA || Type == TransactionType.TRANSFERENCIA_ENTRADA)
+            ? FormattedAmount
+            : $"- {FormattedAmount}"; // Adiciona o negativo visual nas saídas
+
+        // AJUSTE: COR VERMELHA PARA AS SAÍDAS E VERDE PARA ENTRADAS
+        [JsonIgnore]
+        public string ExtratoAmountColor => (Type == TransactionType.RECEITA || Type == TransactionType.TRANSFERENCIA_ENTRADA)
+            ? "#00E676"  // Verde
+            : "#EF4444"; // Vermelho
+
+        [JsonIgnore]
+        public string ColorHex => (Type == TransactionType.RECEITA || Type == TransactionType.TRANSFERENCIA_ENTRADA)
+            ? "#00E676"
+            : "#EF4444";
+
+        // AJUSTE: LEGENDA INTELIGENTE DA CONTA
+        [JsonIgnore]
+        public string SubtitleDisplay
         {
             get
             {
-                // Converte timestamp (ms) para DateTime
-                return DateTimeOffset.FromUnixTimeMilliseconds(Date).DateTime.ToLocalTime();
+                string catName = string.IsNullOrEmpty(CategoryName) ? "Outros" : CategoryName;
+                string accName = string.IsNullOrEmpty(AccountName) ? "Conta" : AccountName;
+
+                if (Type == TransactionType.TRANSFERENCIA_SAIDA)
+                    return $"Saiu de: {accName}";
+
+                if (Type == TransactionType.TRANSFERENCIA_ENTRADA)
+                    return $"Entrou em: {accName}";
+
+                return $"{catName} • {accName}";
             }
         }
     }

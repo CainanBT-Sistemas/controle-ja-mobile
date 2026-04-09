@@ -14,15 +14,30 @@ namespace controle_ja_mobile.ViewModels
 
         [ObservableProperty] private SelectionItem currentSelection;
 
+        // Controla se estamos na lista de categorias para mostrar a engrenagem
+        [ObservableProperty] private bool isCategorySelection;
+
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            if (query.ContainsKey("Title")) PageTitle = query["Title"].ToString();
+            if (query.ContainsKey("Title"))
+            {
+                PageTitle = query["Title"].ToString();
+                // Se o título for "Categoria", a engrenagem aparece
+                IsCategorySelection = PageTitle == "Categoria";
+            }
 
             if (query.ContainsKey("Items") && query["Items"] is IEnumerable<SelectionItem> items)
             {
                 Items.Clear();
                 foreach (var item in items) Items.Add(item);
             }
+        }
+
+        [RelayCommand]
+        public async Task GoToManageCategories()
+        {
+            // Navega para a tela de gerenciamento de categorias
+            await Shell.Current.GoToAsync("ManageCategoriesPage");
         }
 
         [RelayCommand]
@@ -34,14 +49,17 @@ namespace controle_ja_mobile.ViewModels
         [RelayCommand]
         public void SelectItem(SelectionItem item)
         {
-            // Limpa a seleção de todos (pais e filhos)
+            // Limpa seleções anteriores para garantir seleção única
             foreach (var i in Items)
             {
                 i.IsSelected = false;
-                foreach (var sub in i.SubItems) sub.IsSelected = false;
+                foreach (var sub in i.SubItems)
+                {
+                    sub.IsSelected = false;
+                    foreach (var neto in sub.SubItems) neto.IsSelected = false;
+                }
             }
 
-            // Marca apenas o clicado
             item.IsSelected = true;
             CurrentSelection = item;
         }
@@ -55,7 +73,6 @@ namespace controle_ja_mobile.ViewModels
                 return;
             }
 
-            // Devolve o objeto original via mensageria e fecha a tela
             WeakReferenceMessenger.Default.Send(new ItemSelectedMessage(CurrentSelection.OriginalObject));
             await Shell.Current.GoToAsync("..");
         }

@@ -25,6 +25,32 @@ namespace controle_ja_mobile
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                     fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
                 });
+
+            // =========================================================
+            // MÁGICA PARA REMOVER AS LINHAS ROXAS DO ANDROID
+            // =========================================================
+            Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
+            {
+#if ANDROID
+                handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+#endif
+            });
+
+            Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
+            {
+#if ANDROID
+                handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+#endif
+            });
+
+            Microsoft.Maui.Handlers.DatePickerHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
+            {
+#if ANDROID
+                handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+#endif
+            });
+            // =========================================================
+
             builder.Services.AddSingleton<BiometricAuthService>();
             builder.Services.AddSingleton<AccountService>();
             builder.Services.AddSingleton<ApiService>();
@@ -59,7 +85,7 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<TransactionAddPage>();
             builder.Services.AddTransient<TransactionsListView>();
             builder.Services.AddTransient<LoginPage>();
-            builder.Services.AddTransient<RegisterPage>(); 
+            builder.Services.AddTransient<RegisterPage>();
             builder.Services.AddTransient<VehicleAddPage>();
             builder.Services.AddTransient<WelcomePage>();
             builder.Services.AddTransient<ManageCreditCardsPage>();
@@ -72,9 +98,6 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<ProfilePage>();
             builder.Services.AddTransient<ChangePasswordPage>();
             builder.Services.AddTransient<ItemSelectionPage>();
-
-
-
 
 #if DEBUG
             builder.Logging.AddDebug();
