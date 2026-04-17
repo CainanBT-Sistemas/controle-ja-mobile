@@ -6,34 +6,31 @@ using controle_ja_mobile.Services;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Maui.Views;
 
 namespace controle_ja_mobile.ViewModels
 {
-    [QueryProperty(nameof(AccountId), "id")]
     public partial class AccountAddViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
+
+        public Popup? PopupInstance { get; set; }
 
         [ObservableProperty] private string title = "Nova Conta";
         [ObservableProperty] private string accountId;
         [ObservableProperty] private string name;
         [ObservableProperty] private string institution;
-
-        // 1. Alterado para string para aceitar a máscara formatada (R$ 0,00)
         [ObservableProperty] private string balance;
-
         [ObservableProperty] private bool isDefault;
-
         [ObservableProperty] private bool isEditMode = false;
-
         public bool CanDelete => IsEditMode && !IsDefault;
 
-        // 2. Removido o "Cartão de Crédito"
         public List<string> AccountTypes { get; } = new() { "Carteira", "Banco", "Poupança" };
         [ObservableProperty] private string selectedAccountType = "Banco";
 
-        public ObservableCollection<string> AvailableIcons { get; } = new(UIConstants.AvailableIcons);
+        // MÁGICA DA PERFORMANCE AQUI:
+        public ObservableCollection<string> AvailableIcons { get; } = new(UIConstants.AccountIcons);
         public ObservableCollection<string> AvailableColors { get; } = new(UIConstants.AvailableColors);
 
         [ObservableProperty] private string selectedIcon;
@@ -48,22 +45,17 @@ namespace controle_ja_mobile.ViewModels
             SelectedColor = AvailableColors.FirstOrDefault(c => c == "#42A5F5") ?? AvailableColors.First();
         }
 
-        // 3. Gatilho da máscara de dinheiro em tempo real
         partial void OnBalanceChanged(string value)
         {
             if (string.IsNullOrEmpty(value)) return;
-
-            // Extrai apenas os números do que o usuário digitou
             var digitsOnly = new string(value.Where(char.IsDigit).ToArray());
             if (string.IsNullOrEmpty(digitsOnly)) return;
 
-            // Divide por 100 para criar os centavos e aplica a formatação brasileira
             if (decimal.TryParse(digitsOnly, out decimal parsed))
             {
                 parsed /= 100;
                 string formatted = parsed.ToString("N2", new System.Globalization.CultureInfo("pt-BR"));
 
-                // Previne o loop infinito
                 if (Balance != formatted)
                 {
                     Balance = formatted;
@@ -77,7 +69,7 @@ namespace controle_ja_mobile.ViewModels
             {
                 Title = "Editar Conta";
                 IsEditMode = true;
-                _ = LoadAccountData(value);
+                Task.Run(() => LoadAccountData(value));
             }
         }
 
@@ -97,15 +89,11 @@ namespace controle_ja_mobile.ViewModels
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
                             Name = account.Name;
-
-                            // 4. Carrega o saldo formatado. (Use account.CurrentBalance se o modelo Account usar esse nome em vez de Balance)
                             Balance = account.Balance.ToString("N2", new System.Globalization.CultureInfo("pt-BR"));
-
                             Institution = account.Institution;
                             SelectedIcon = account.Icon ?? "account_balance";
                             SelectedColor = account.Color ?? "#42A5F5";
                             IsDefault = account.IsDefault;
-
                             SelectedAccountType = account.Type switch
                             {
                                 AccountType.WALLET => "Carteira",
@@ -113,7 +101,6 @@ namespace controle_ja_mobile.ViewModels
                                 AccountType.SAVINGS => "Poupança",
                                 _ => "Banco"
                             };
-
                             OnPropertyChanged(nameof(CanDelete));
                         });
                     }
@@ -133,14 +120,13 @@ namespace controle_ja_mobile.ViewModels
         {
             if (string.IsNullOrWhiteSpace(Name))
             {
-                await Shell.Current.DisplayAlert("Aviso", "Por favor, informe o nome da conta.", "OK");
+                await App.Current.MainPage.DisplayAlert("Aviso", "Por favor, informe o nome da conta.", "OK");
                 return;
             }
 
-            // 5. Converte o texto com vírgula de volta para decimal antes de enviar para a API
             if (!decimal.TryParse(Balance, System.Globalization.NumberStyles.Number, new System.Globalization.CultureInfo("pt-BR"), out decimal balanceValue))
             {
-                balanceValue = 0; // Previne crash se o campo estiver vazio
+                balanceValue = 0;
             }
 
             await ExecuteWithErrorHandlingAsync(async () =>
@@ -157,7 +143,7 @@ namespace controle_ja_mobile.ViewModels
                     name = Name.Trim(),
                     type = enumType,
                     institution = Institution?.Trim(),
-                    initialBalance = balanceValue, // Usando o decimal convertido
+                    initialBalance = balanceValue,
                     icon = SelectedIcon,
                     color = SelectedColor,
                     isDefault = IsDefault
@@ -170,14 +156,17 @@ namespace controle_ja_mobile.ViewModels
                     result = await _apiService.PutAsync<object>($"accounts/{AccountId}", dto);
 
                 if (!string.IsNullOrEmpty(result))
-                    await Shell.Current.GoToAsync("..");
+                {
+                    WeakReferenceMessenger.Default.Send(new GlobalRefreshMessage());
+                    PopupInstance?.Close();
+                }
             });
         }
 
         [RelayCommand]
         private async Task Delete()
         {
-            bool confirm = await Shell.Current.DisplayAlert("Excluir Conta", $"Deseja apagar a conta '{Name}' e as transações ligadas a ela?", "Sim", "Não");
+            bool confirm = await App.Current.MainPage.DisplayAlert("Excluir Conta", $"Deseja apagar a conta '{Name}' e as transações ligadas a ela?", "Sim", "Não");
             if (!confirm) return;
 
             await ExecuteWithErrorHandlingAsync(async () =>
@@ -185,12 +174,13 @@ namespace controle_ja_mobile.ViewModels
                 var result = await _apiService.DeleteAsync($"accounts/{AccountId}");
                 if (!string.IsNullOrEmpty(result))
                 {
-                    await Shell.Current.GoToAsync("..");
+                    WeakReferenceMessenger.Default.Send(new GlobalRefreshMessage());
+                    PopupInstance?.Close();
                 }
             });
         }
 
         [RelayCommand]
-        private async Task GoBack() => await Shell.Current.GoToAsync("..");
+        private void GoBack() => PopupInstance?.Close();
     }
 }

@@ -35,9 +35,12 @@ namespace controle_ja_mobile.Models
         private bool isExpanded = false;
 
         [JsonIgnore]
-        public bool HasChildren => SubCategories != null && SubCategories.Any();
+        public bool HasChildren => SubCategories != null && SubCategories.Count > 0;
 
         [JsonIgnore]
         public int ChildrenCount => SubCategories?.Count ?? 0;
+
+        [JsonIgnore]
+        public string ParentColor { get; set; }
     }
 }

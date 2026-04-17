@@ -9,23 +9,10 @@
 
     <Grid>
 
-        <CarouselView x:Name="MainCarousel"
-                      Loop="False"
-                      IsSwipeEnabled="True"
-                      IndicatorView="Indicator"
-                      PositionChanged="OnPositionChanged"
-                      VerticalOptions="Fill" 
-                      HorizontalOptions="Fill">
-
-            <CarouselView.ItemTemplate>
-                <DataTemplate>
-                    <ContentView Content="{Binding .}" VerticalOptions="Fill" HorizontalOptions="Fill"/>
-                </DataTemplate>
-            </CarouselView.ItemTemplate>
-        </CarouselView>
+        <Grid x:Name="TabContainer" VerticalOptions="Fill" HorizontalOptions="Fill">
+        </Grid>
 
         <components:BottomMenu x:Name="MyBottomMenu" VerticalOptions="Fill" HorizontalOptions="Fill" />
 
-        <IndicatorView x:Name="Indicator" IsVisible="False" />
     </Grid>
 </ContentPage>

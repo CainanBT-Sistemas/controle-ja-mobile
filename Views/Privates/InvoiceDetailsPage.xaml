@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             xmlns:models="clr-namespace:controle_ja_mobile.Models"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:components="clr-namespace:controle_ja_mobile.Views.Components"
+             x:Class="controle_ja_mobile.Views.Privates.InvoiceDetailsPage"
+             x:DataType="vm:InvoiceDetailsViewModel"
+             BackgroundColor="#0F172A"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto, Auto, *, Auto">
+
+        <Grid Grid.Row="0" RowDefinitions="Auto, Auto" Padding="20,20,20,10">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto">
+                <ImageButton Grid.Column="0" Source="arrow_back_36dp.png" Command="{Binding GoBackCommand}" HeightRequest="24" HorizontalOptions="Start" Aspect="AspectFit">
+                    <ImageButton.Behaviors>
+                        <toolkit:IconTintColorBehavior TintColor="White" />
+                    </ImageButton.Behaviors>
+                </ImageButton>
+
+                <Label Grid.Column="1" Text="{Binding Title}" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+
+                <Label Grid.Column="2" Text="more_vert" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="28" VerticalOptions="Center" HorizontalOptions="End" IsVisible="{Binding HasInvoiceData}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenMenuActionsCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" Margin="0,25,0,0">
+                <Label Grid.Column="0" Text="chevron_left" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="36" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding PreviousMonthCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="1" Text="{Binding CurrentMonthDisplay}" TextColor="White" FontSize="15" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+                <Label Grid.Column="2" Text="chevron_right" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="36" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NextMonthCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+        </Grid>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="8" Padding="0,20,0,30" HorizontalOptions="Center">
+            <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" TextTransform="Uppercase"/>
+            <Label Text="{Binding TotalAmount}" TextColor="White" FontSize="42" FontAttributes="Bold" HorizontalOptions="Center"/>
+            <Label Text="{Binding DatesInfo}" TextColor="#94A3B8" FontSize="13" HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+
+        <Border Grid.Row="2" BackgroundColor="#121214" StrokeThickness="0" Padding="0" VerticalOptions="Fill" HorizontalOptions="Fill">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="25,25,0,0" />
+            </Border.StrokeShape>
+            <Grid>
+
+                <VerticalStackLayout IsVisible="{Binding IsLoading}" Spacing="0" Padding="0,15,0,0">
+                    <components:SkeletonItem />
+                    <components:SkeletonItem />
+                    <components:SkeletonItem />
+                    <components:SkeletonItem />
+                </VerticalStackLayout>
+
+                <Grid IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
+                    <VerticalStackLayout IsVisible="{Binding IsInvoiceEmpty}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="15" Margin="0,-40,0,0">
+                        <Label Text="receipt_long" FontFamily="MaterialIcons" TextColor="#334155" FontSize="60" HorizontalOptions="Center" Opacity="0.5"/>
+                        <Label Text="Nenhum gasto nesta fatura." TextColor="#64748B" FontSize="15" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+
+                    <RefreshView Command="{Binding LoadInvoiceDataCommand}" RefreshColor="#00E676" IsVisible="{Binding HasInvoiceData}">
+                        <CollectionView ItemsSource="{Binding InvoiceItems}" SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:InvoiceItemDTO">
+                                    <VerticalStackLayout>
+                                        <Grid ColumnDefinitions="60, *, Auto" Padding="20,15" BackgroundColor="Transparent">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InvoiceDetailsViewModel}}, Path=OpenItemActionsCommand}" CommandParameter="{Binding .}"/>
+                                            </Grid.GestureRecognizers>
+
+                                            <Label Grid.Column="0" Text="{Binding FormattedDate}" TextColor="#64748B" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Start"/>
+                                            <Label Grid.Column="1" Text="{Binding DisplayName}" TextColor="White" FontSize="15" FontAttributes="Bold" VerticalOptions="Center" LineBreakMode="TailTruncation"/>
+                                            <Label Grid.Column="2" Text="{Binding FormattedAmount}" TextColor="{Binding AmountColor}" FontSize="15" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="End"/>
+                                        </Grid>
+                                        <BoxView HeightRequest="1" Color="#1E2A3A" Margin="20,0"/>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </RefreshView>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="3" BackgroundColor="#121214" StrokeThickness="0" Padding="20,15,20,30" IsVisible="{Binding IsPayButtonVisible}">
+            <Button Text="PAGAR FATURA" 
+                    Command="{Binding PayInvoiceCommand}" 
+                    BackgroundColor="#00E676" 
+                    TextColor="#001524" 
+                    FontAttributes="Bold" 
+                    FontSize="15" 
+                    HeightRequest="55" 
+                    CornerRadius="12"/>
+        </Border>
+
+    </Grid>
+</ContentPage>

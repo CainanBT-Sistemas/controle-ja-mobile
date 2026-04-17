@@ -1,3 +1,4 @@
+using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -33,7 +34,6 @@ namespace controle_ja_mobile.ViewModels
             });
         }
 
-        // Método extraído para poder ser chamado sempre que a tela aparecer
         public void LoadUserData()
         {
             UserName = Preferences.Get("UserName", "Usuário");
@@ -43,35 +43,53 @@ namespace controle_ja_mobile.ViewModels
         [RelayCommand]
         public async Task GoToProfile()
         {
-            // Navega para a página de perfil
-            await Shell.Current.GoToAsync("ProfilePage");
+            await NavigateToAsync("ProfilePage");
         }
 
         [RelayCommand]
-        public async Task GoToAccounts()
+        public void GoToAccounts()
         {
-            await Shell.Current.GoToAsync(nameof(ManageAccountsPage));
+            var vm = IPlatformApplication.Current?.Services.GetService<AccountsViewModel>();
+            if (vm != null)
+            {
+                var popup = new Views.Popups.ManageAccountsPopup(vm);
+                Shell.Current.ShowPopup(popup);
+            }
         }
 
         [RelayCommand]
-        public async Task GoToCategories()
+        public void GoToCategories()
         {
-            await Shell.Current.GoToAsync(nameof(ManageCategoriesPage));
+            var vm = IPlatformApplication.Current?.Services.GetService<CategoriesViewModel>();
+            if (vm != null)
+            {
+                var popup = new Views.Popups.ManageCategoriesPopup(vm);
+                Shell.Current.ShowPopup(popup);
+            }
         }
 
         [RelayCommand]
-        public async Task GoToCreditCards()
+        public void GoToCreditCards()
         {
-            await Shell.Current.GoToAsync(nameof(ManageCreditCardsPage));
+            var vm = IPlatformApplication.Current?.Services.GetService<CreditCardsViewModel>();
+            if (vm != null)
+            {
+                var popup = new Views.Popups.ManageCreditCardsPopup(vm);
+                Shell.Current.ShowPopup(popup);
+            }
         }
 
         [RelayCommand]
-        public async Task GoToVehicles()
+        public void GoToVehicles()
         {
-            await Shell.Current.GoToAsync(nameof(ManageVehiclesPage));
+            var vm = IPlatformApplication.Current?.Services.GetService<VehiclesViewModel>();
+            if (vm != null)
+            {
+                var popup = new Views.Popups.ManageVehiclesPopup(vm);
+                Shell.Current.ShowPopup(popup);
+            }
         }
 
-        // O novo comando para Começar do Zero (Resetar dados)
         [RelayCommand]
         public async Task ResetData()
         {
@@ -92,9 +110,9 @@ namespace controle_ja_mobile.ViewModels
                 {
                     await Shell.Current.DisplayAlert("Conta resetada", "Sua conta foi resetada com sucesso. Faça login novamente", "OK");
 
-                    // Limpeza obrigatória de segurança no App
                     SecureStorage.RemoveAll();
                     Preferences.Clear();
+
                     var welcomePage = IPlatformApplication.Current.Services.GetService<WelcomePage>();
                     Application.Current.MainPage = new NavigationPage(welcomePage);
                 }
@@ -107,7 +125,6 @@ namespace controle_ja_mobile.ViewModels
             bool confirm = await Shell.Current.DisplayAlert("Sair", "Tem certeza que deseja desconectar da sua conta?", "Sim", "Não");
             if (!confirm) return;
 
-            // Limpa todos os dados locais e de sessão de forma segura
             SecureStorage.RemoveAll();
             Preferences.Clear();
 
@@ -122,5 +139,6 @@ namespace controle_ja_mobile.ViewModels
         }
     }
 
+    // CORREÇÃO: A classe responsável por carregar a mensagem na memória!
     public class ProfileUpdatedMessage { }
 }

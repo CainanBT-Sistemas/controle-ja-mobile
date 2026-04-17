@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using controle_ja_mobile.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Maui.Controls;
 
 namespace controle_ja_mobile.ViewModels
 {
@@ -13,7 +15,6 @@ namespace controle_ja_mobile.ViewModels
         [ObservableProperty]
         private bool _isBusy;
 
-        // Método centralizado para executar operações com tratamento de erro amigável
         protected async Task ExecuteWithErrorHandlingAsync(Func<Task> operation, bool showLoading = true)
         {
             if (IsBusy) return;
@@ -36,6 +37,30 @@ namespace controle_ja_mobile.ViewModels
                 IsBusy = false;
             }
         }
+
+        protected async Task NavigateToAsync(string route, IDictionary<string, object> parameters = null)
+        {
+            try
+            {
+                IsLoading = true;
+
+                if (parameters != null)
+                {
+                    await Shell.Current.GoToAsync(route, parameters);
+                }
+                else
+                {
+                    await Shell.Current.GoToAsync(route);
+                }
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Erro de Navegação", $"Falha ao abrir a tela: {ex.Message}", "OK");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
     }
 }
-

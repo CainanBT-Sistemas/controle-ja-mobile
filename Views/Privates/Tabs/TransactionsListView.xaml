@@ -3,11 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
              xmlns:models="clr-namespace:controle_ja_mobile.Models"
+             xmlns:components="clr-namespace:controle_ja_mobile.Views.Components"
              x:Class="controle_ja_mobile.Views.Privates.Tabs.TransactionsListView"
              x:DataType="vm:TransactionsViewModel"
              BackgroundColor="#0F172A">
 
     <Grid RowDefinitions="Auto, Auto, *">
+
         <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Padding="20,20,20,10">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                 <Label Text="Transações" TextColor="White" FontSize="24" FontAttributes="Bold"/>
@@ -48,99 +50,131 @@
                 <Grid Grid.Row="0" ColumnDefinitions="*, *, *" Padding="10,20">
                     <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="4">
                         <Label Text="Entradas" TextColor="#94A3B8" FontSize="11" HorizontalOptions="Center"/>
-                        <Label Text="{Binding TotalInFormatted, TargetNullValue='R$ 0,00', FallbackValue='R$ 0,00'}" TextColor="#00E676" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Text="{Binding TotalInFormatted, TargetNullValue='R$ 0,00', FallbackValue='R$ 0,00'}" TextColor="#00E676" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center" IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+                        <BoxView HeightRequest="14" WidthRequest="80" Color="#1E2A3A" CornerRadius="4" IsVisible="{Binding IsLoading}"/>
                     </VerticalStackLayout>
+
                     <BoxView Grid.Column="0" WidthRequest="1" Color="#202024" HorizontalOptions="End" VerticalOptions="Fill" Margin="0,5"/>
 
                     <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="4">
                         <Label Text="Saídas" TextColor="#94A3B8" FontSize="11" HorizontalOptions="Center"/>
-                        <Label Text="{Binding TotalOutFormatted, TargetNullValue='R$ 0,00', FallbackValue='R$ 0,00'}" TextColor="#FF5252" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Text="{Binding TotalOutFormatted, TargetNullValue='R$ 0,00', FallbackValue='R$ 0,00'}" TextColor="#FF5252" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center" IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+                        <BoxView HeightRequest="14" WidthRequest="80" Color="#1E2A3A" CornerRadius="4" IsVisible="{Binding IsLoading}"/>
                     </VerticalStackLayout>
+
                     <BoxView Grid.Column="1" WidthRequest="1" Color="#202024" HorizontalOptions="End" VerticalOptions="Fill" Margin="0,5"/>
 
                     <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="4">
                         <Label Text="Balanço" TextColor="#94A3B8" FontSize="11" HorizontalOptions="Center"/>
-                        <Label Text="{Binding BalanceFormatted, TargetNullValue='R$ 0,00', FallbackValue='R$ 0,00'}" TextColor="{Binding BalanceColor, TargetNullValue='#3B82F6', FallbackValue='#3B82F6'}" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Text="{Binding BalanceFormatted, TargetNullValue='R$ 0,00', FallbackValue='R$ 0,00'}" TextColor="{Binding BalanceColor, TargetNullValue='#3B82F6', FallbackValue='#3B82F6'}" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center" IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"/>
+                        <BoxView HeightRequest="14" WidthRequest="80" Color="#1E2A3A" CornerRadius="4" IsVisible="{Binding IsLoading}"/>
                     </VerticalStackLayout>
                 </Grid>
 
                 <BoxView Grid.Row="1" HeightRequest="1" Color="#202024" Margin="20,0"/>
 
                 <Grid Grid.Row="2" Padding="0,0,0,110">
-                    <VerticalStackLayout IsVisible="{Binding IsEmpty}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="20" Margin="20,-40,20,0">
-                        <Border HeightRequest="110" WidthRequest="110" BackgroundColor="#0F172A" StrokeThickness="0" HorizontalOptions="Center">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="55" />
-                            </Border.StrokeShape>
-                            <Label Text="search_off" FontFamily="MaterialIcons" TextColor="#3B82F6" FontSize="48" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        </Border>
-                        <VerticalStackLayout Spacing="5">
-                            <Label Text="Ops! Nenhuma transação." TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
-                            <Label Text="Você não possui transações neste mês.&#x0a;Clique no botão (+) para registrar." TextColor="#94A3B8" FontSize="14" HorizontalTextAlignment="Center" HorizontalOptions="Center"/>
+
+                    <VerticalStackLayout IsVisible="{Binding IsLoading}" Spacing="0">
+                        <VerticalStackLayout BackgroundColor="#121214" Padding="20,25,20,10">
+                            <BoxView HeightRequest="14" WidthRequest="120" Color="#1E2A3A" CornerRadius="4"/>
+                            <BoxView HeightRequest="1" Color="#202024" Margin="0,10,0,0"/>
                         </VerticalStackLayout>
+                        <components:SkeletonItem />
+                        <components:SkeletonItem />
+                        <components:SkeletonItem />
+                        <components:SkeletonItem />
+                        <components:SkeletonItem />
                     </VerticalStackLayout>
 
-                    <CollectionView ItemsSource="{Binding GroupedTransactions}" IsGrouped="True" IsVisible="{Binding HasTransactions}" SelectionMode="None">
+                    <Grid IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
 
-                        <CollectionView.GroupHeaderTemplate>
-                            <DataTemplate x:DataType="models:TransactionGroup">
-                                <VerticalStackLayout BackgroundColor="#121214" Padding="20,25,20,10">
-                                    <Label Text="{Binding DateHeader}" TextColor="#F8FAFC" FontSize="14" FontAttributes="Bold"/>
-                                    <BoxView HeightRequest="1" Color="#202024" Margin="0,10,0,0"/>
-                                </VerticalStackLayout>
-                            </DataTemplate>
-                        </CollectionView.GroupHeaderTemplate>
+                        <VerticalStackLayout IsVisible="{Binding IsEmpty}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="20" Margin="20,-40,20,0">
+                            <Border HeightRequest="110" WidthRequest="110" BackgroundColor="#0F172A" StrokeThickness="0" HorizontalOptions="Center">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="55" />
+                                </Border.StrokeShape>
+                                <Label Text="search_off" FontFamily="MaterialIcons" TextColor="#3B82F6" FontSize="48" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Border>
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="Ops! Nenhuma transação." TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                <Label Text="Você não possui transações neste mês.&#x0a;Clique no botão (+) para registrar." TextColor="#94A3B8" FontSize="14" HorizontalTextAlignment="Center" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
 
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="models:Transaction">
-                                <SwipeView BackgroundColor="#121214">
+                        <CollectionView ItemsSource="{Binding GroupedTransactions}" IsGrouped="True" IsVisible="{Binding HasTransactions}" SelectionMode="None">
 
-                                    <SwipeView.RightItems>
-                                        <SwipeItems>
-                                            <SwipeItem Text="Excluir" BackgroundColor="#FF5252"
-                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TransactionsViewModel}}, Path=DeleteTransactionCommand}"
-                                                       CommandParameter="{Binding .}"/>
-                                        </SwipeItems>
-                                    </SwipeView.RightItems>
+                            <CollectionView.GroupHeaderTemplate>
+                                <DataTemplate x:DataType="models:TransactionGroup">
+                                    <VerticalStackLayout BackgroundColor="#121214" Padding="20,25,20,10">
+                                        <Label Text="{Binding DateHeader}" TextColor="#F8FAFC" FontSize="14" FontAttributes="Bold"/>
+                                        <BoxView HeightRequest="1" Color="#202024" Margin="0,10,0,0"/>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.GroupHeaderTemplate>
 
-                                    <Grid ColumnDefinitions="Auto, *, Auto" Padding="20,12" BackgroundColor="Transparent">
-                                        <Grid.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TransactionsViewModel}}, Path=EditTransactionCommand}" CommandParameter="{Binding .}"/>
-                                        </Grid.GestureRecognizers>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:Transaction">
 
-                                        <Border Grid.Column="0" HeightRequest="44" WidthRequest="44" BackgroundColor="#202024" StrokeThickness="0" Margin="0,0,15,0">
-                                            <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="22" />
-                                            </Border.StrokeShape>
-                                            <Label Text="{Binding ExtratoIcon}" FontFamily="MaterialIcons" TextColor="{Binding ColorHex}" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        </Border>
+                                    <SwipeView BackgroundColor="#121214" Opacity="{Binding ItemOpacity}">
 
-                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                                            <Label Text="{Binding Name}" TextColor="White" FontSize="15" FontAttributes="Bold" LineBreakMode="TailTruncation"/>
-                                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                        <SwipeView.RightItems>
+                                            <SwipeItems>
+                                                <SwipeItem Text="Excluir" BackgroundColor="#FF5252"
+                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TransactionsViewModel}}, Path=DeleteTransactionCommand}"
+                                                           CommandParameter="{Binding .}"
+                                                           IsVisible="{Binding CanDelete}"/>
+                                            </SwipeItems>
+                                        </SwipeView.RightItems>
 
-                                                <Label Text="{Binding SubtitleDisplay}" TextColor="#94A3B8" FontSize="13" VerticalOptions="Center"/>
+                                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10" Padding="20,12" BackgroundColor="Transparent">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TransactionsViewModel}}, Path=EditTransactionCommand}" CommandParameter="{Binding .}"/>
+                                            </Grid.GestureRecognizers>
 
-                                                <Border BackgroundColor="#334155" StrokeThickness="0" Padding="6,2" IsVisible="{Binding IsFixed}">
+                                            <Grid Grid.Column="0" WidthRequest="44" HeightRequest="44" Margin="0,0,15,0" VerticalOptions="Center">
+                                                <Border BackgroundColor="#202024" StrokeThickness="0">
                                                     <Border.StrokeShape>
-                                                        <RoundRectangle CornerRadius="6"/>
+                                                        <RoundRectangle CornerRadius="22" />
                                                     </Border.StrokeShape>
-                                                    <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
-                                                        <Label Text="autorenew" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="10" VerticalOptions="Center"/>
-                                                        <Label Text="Fixo" TextColor="#A1A1AA" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
-                                                    </HorizontalStackLayout>
+                                                    <Label Text="{Binding ExtratoIcon}" FontFamily="MaterialIcons" TextColor="{Binding ColorHex}" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center"/>
                                                 </Border>
-                                            </HorizontalStackLayout>
-                                        </VerticalStackLayout>
 
-                                        <Label Grid.Column="2" Text="{Binding ExtratoAmount}" TextColor="{Binding ExtratoAmountColor}" FontSize="15" FontAttributes="Bold" VerticalOptions="Center"/>
-                                    </Grid>
-                                </SwipeView>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                                                <Border WidthRequest="14" HeightRequest="14" StrokeShape="RoundRectangle 7" BackgroundColor="#FF9800" Stroke="#121214" StrokeThickness="2" HorizontalOptions="End" VerticalOptions="Start" Margin="0,0,-2,0" IsVisible="{Binding IsPending}"/>
 
-                    <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="#00E676" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                <Border WidthRequest="14" HeightRequest="14" StrokeShape="RoundRectangle 7" BackgroundColor="#00E676" Stroke="#121214" StrokeThickness="2" HorizontalOptions="End" VerticalOptions="Start" Margin="0,0,-2,0" IsVisible="{Binding Paid}">
+                                                    <Label Text="check" FontFamily="MaterialIcons" TextColor="#09090B" FontSize="10" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold"/>
+                                                </Border>
+                                            </Grid>
+
+                                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                                <Label Text="{Binding Name}" TextColor="White" FontSize="15" FontAttributes="Bold" LineBreakMode="TailTruncation"/>
+                                                <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                                    <Label Text="{Binding SubtitleDisplay}" TextColor="#94A3B8" FontSize="13" VerticalOptions="Center"/>
+
+                                                    <Border BackgroundColor="#334155" StrokeThickness="0" Padding="6,2" IsVisible="{Binding IsFixed}">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="6"/>
+                                                        </Border.StrokeShape>
+                                                        <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                                                            <Label Text="autorenew" FontFamily="MaterialIcons" TextColor="#A1A1AA" FontSize="10" VerticalOptions="Center"/>
+                                                            <Label Text="Fixo" TextColor="#A1A1AA" FontSize="10" VerticalOptions="Center" FontAttributes="Bold"/>
+                                                        </HorizontalStackLayout>
+                                                    </Border>
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+
+                                            <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End" Spacing="2">
+                                                <Label Text="{Binding ExtratoAmount}" TextColor="{Binding AmountColor}" FontSize="15" FontAttributes="Bold" HorizontalOptions="End"/>
+                                                <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="10" FontAttributes="Bold" HorizontalOptions="End"/>
+                                            </VerticalStackLayout>
+
+                                        </Grid>
+                                    </SwipeView>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Grid>
 
                 </Grid>
             </Grid>

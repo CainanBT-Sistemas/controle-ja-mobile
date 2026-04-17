@@ -1,8 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using controle_ja_mobile.Helpers;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
-using controle_ja_mobile.Views.Privates.Management;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -12,6 +14,9 @@ namespace controle_ja_mobile.ViewModels
     public partial class AccountsViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
+
+        public Popup? PopupInstance { get; set; }
+
         public ObservableCollection<Account> Accounts { get; } = new();
 
         [ObservableProperty] private bool isRefreshing;
@@ -20,6 +25,15 @@ namespace controle_ja_mobile.ViewModels
         public AccountsViewModel(ApiService apiService)
         {
             _apiService = apiService;
+
+            // MÁGICA: Escuta quando alguém salva/deleta uma conta e recarrega a lista sozinho!
+            WeakReferenceMessenger.Default.Register<GlobalRefreshMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    _ = LoadAccounts();
+                });
+            });
         }
 
         [RelayCommand]
@@ -55,20 +69,37 @@ namespace controle_ja_mobile.ViewModels
             });
         }
 
-        [RelayCommand]
-        public async Task GoToAddAccount()
+        private void ShowAccountPopup(string? accountId = null)
         {
-            await Shell.Current.GoToAsync(nameof(AccountAddPage));
+            var vm = IPlatformApplication.Current?.Services.GetService<AccountAddViewModel>();
+            if (vm != null)
+            {
+                if (!string.IsNullOrEmpty(accountId))
+                {
+                    vm.AccountId = accountId;
+                }
+
+                var popup = new Views.Popups.AccountAddPopup(vm);
+                Shell.Current.ShowPopup(popup);
+            }
         }
 
         [RelayCommand]
-        public async Task OpenAccountDetails(Account account)
+        public void GoToAddAccount()
         {
-            // Abre a tela de Edição/Detalhes
-            await Shell.Current.GoToAsync($"{nameof(AccountAddPage)}?id={account.Id}");
+            ShowAccountPopup();
         }
 
         [RelayCommand]
-        public async Task GoBack() => await Shell.Current.GoToAsync("..");
+        public void OpenAccountDetails(Account account)
+        {
+            if (account != null)
+            {
+                ShowAccountPopup(account.Id.ToString());
+            }
+        }
+
+        [RelayCommand]
+        public void GoBack() => PopupInstance?.Close();
     }
 }

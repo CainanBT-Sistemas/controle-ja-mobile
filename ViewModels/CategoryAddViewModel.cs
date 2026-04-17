@@ -1,28 +1,27 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using controle_ja_mobile.Helpers;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
-using controle_ja_mobile.Views.Privates.Management;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace controle_ja_mobile.ViewModels
 {
-    [QueryProperty(nameof(ParentCategoryId), "parentId")]
-    [QueryProperty(nameof(ParentType), "parentType")]
-    [QueryProperty(nameof(CategoryId), "id")]
     public partial class CategoryAddViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
+
+        public Popup? PopupInstance { get; set; }
 
         [ObservableProperty] private string title = "Nova Categoria";
         [ObservableProperty] private string name;
         [ObservableProperty] private string categoryId;
         [ObservableProperty] private string parentCategoryId;
         [ObservableProperty] private string parentType;
-
         [ObservableProperty] private bool isEditMode = false;
 
         public List<string> TransactionTypes { get; } = new() { "Despesa", "Receita" };
@@ -33,10 +32,10 @@ namespace controle_ja_mobile.ViewModels
         [ObservableProperty] private string selectedColor;
         [ObservableProperty] private bool isColorSelectorOpen;
         [ObservableProperty] private bool isIconSelectorOpen;
-
         public ObservableCollection<Category> SubCategories { get; } = new();
 
-        public ObservableCollection<string> AvailableIcons { get; } = new(UIConstants.AvailableIcons);
+        // MÁGICA DA PERFORMANCE AQUI:
+        public ObservableCollection<string> AvailableIcons { get; } = new(UIConstants.CategoryIcons);
         public ObservableCollection<string> AvailableColors { get; } = new(UIConstants.AvailableColors);
 
         public CategoryAddViewModel(ApiService apiService)
@@ -65,7 +64,7 @@ namespace controle_ja_mobile.ViewModels
             {
                 Title = "Editar Categoria";
                 IsEditMode = true;
-                _ = LoadCategoryData(value);
+                Task.Run(() => LoadCategoryData(value));
             }
         }
 
@@ -93,7 +92,6 @@ namespace controle_ja_mobile.ViewModels
                     if (category != null)
                     {
                         var myChildren = fullList.Where(c => c.ParentId == category.Id).ToList();
-
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
                             Name = category.Name;
@@ -126,7 +124,7 @@ namespace controle_ja_mobile.ViewModels
         {
             if (string.IsNullOrWhiteSpace(Name))
             {
-                await Shell.Current.DisplayAlert("Aviso", "Por favor, digite o nome.", "OK");
+                await App.Current.MainPage.DisplayAlert("Aviso", "Por favor, digite o nome.", "OK");
                 return;
             }
 
@@ -148,14 +146,17 @@ namespace controle_ja_mobile.ViewModels
                     result = await _apiService.PutAsync<object>($"categories/{CategoryId}", dto);
 
                 if (!string.IsNullOrEmpty(result))
-                    await Shell.Current.GoToAsync("..");
+                {
+                    WeakReferenceMessenger.Default.Send(new GlobalRefreshMessage());
+                    PopupInstance?.Close();
+                }
             });
         }
 
         [RelayCommand]
         private async Task Delete()
         {
-            bool confirm = await Shell.Current.DisplayAlert("Excluir", $"Deseja apagar a categoria '{Name}'?", "Sim", "Não");
+            bool confirm = await App.Current.MainPage.DisplayAlert("Excluir", $"Deseja apagar a categoria '{Name}'?", "Sim", "Não");
             if (!confirm) return;
 
             await ExecuteWithErrorHandlingAsync(async () =>
@@ -163,32 +164,51 @@ namespace controle_ja_mobile.ViewModels
                 var result = await _apiService.DeleteAsync($"categories/{CategoryId}");
                 if (!string.IsNullOrEmpty(result))
                 {
-                    await Shell.Current.GoToAsync("..");
+                    WeakReferenceMessenger.Default.Send(new GlobalRefreshMessage());
+                    PopupInstance?.Close();
                 }
             });
         }
 
         [RelayCommand]
-        public async Task GoToAddSubCategory()
+        public void GoToAddSubCategory()
         {
+            if (!string.IsNullOrEmpty(ParentCategoryId))
+            {
+                App.Current.MainPage.DisplayAlert("Aviso", "O sistema permite apenas um nível de subcategorias.", "OK");
+                return;
+            }
+
             string typeStr = SelectedTransactionType == "Receita" ? "RECEITA" : "DESPESA";
-            await Shell.Current.GoToAsync($"{nameof(CategoryAddPage)}?parentId={CategoryId}&parentType={typeStr}");
+
+            var vm = IPlatformApplication.Current?.Services.GetService<CategoryAddViewModel>();
+            if (vm != null)
+            {
+                vm.ParentCategoryId = CategoryId;
+                vm.ParentType = typeStr;
+                var popup = new Views.Popups.CategoryAddPopup(vm);
+                Shell.Current.ShowPopup(popup);
+            }
         }
 
         [RelayCommand]
-        public async Task OpenCategoryDetails(Category category)
+        public void OpenCategoryDetails(Category category)
         {
-            await Shell.Current.GoToAsync($"{nameof(CategoryAddPage)}?id={category.Id}");
+            var vm = IPlatformApplication.Current?.Services.GetService<CategoryAddViewModel>();
+            if (vm != null)
+            {
+                vm.CategoryId = category.Id.ToString();
+                var popup = new Views.Popups.CategoryAddPopup(vm);
+                Shell.Current.ShowPopup(popup);
+            }
         }
 
         [RelayCommand]
-        private async Task GoBack() => await Shell.Current.GoToAsync("..");
+        private void GoBack() => PopupInstance?.Close();
 
-        // --- NOVO: MÉTODO QUE RECARREGA APENAS A LISTA DE FILHAS ---
         public async Task ReloadSubCategoriesAsync()
         {
             if (!IsEditMode || string.IsNullOrEmpty(CategoryId)) return;
-
             await ExecuteWithErrorHandlingAsync(async () =>
             {
                 var allCategoriesJson = await _apiService.GetAsync<string>("categories");
@@ -199,7 +219,6 @@ namespace controle_ja_mobile.ViewModels
                     options.Converters.Add(new JsonStringEnumConverter());
                     var fullList = JsonSerializer.Deserialize<List<Category>>(allCategoriesJson, options) ?? new();
 
-                    // Conecta as categorias para o "Badge" (contador) atualizar também
                     foreach (var sub in fullList.Where(c => c.ParentId != null))
                     {
                         var parent = fullList.FirstOrDefault(p => p.Id == sub.ParentId);
@@ -209,7 +228,6 @@ namespace controle_ja_mobile.ViewModels
                     if (Guid.TryParse(CategoryId, out Guid currentParentId))
                     {
                         var myChildren = fullList.Where(c => c.ParentId == currentParentId).ToList();
-
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
                             SubCategories.Clear();

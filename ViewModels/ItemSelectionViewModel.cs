@@ -1,43 +1,92 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using controle_ja_mobile.Helpers;
 using controle_ja_mobile.Models;
+using controle_ja_mobile.Services;
 using System.Collections.ObjectModel;
 
 namespace controle_ja_mobile.ViewModels
 {
-    public partial class ItemSelectionViewModel : BaseViewModel, IQueryAttributable
+    public partial class ItemSelectionViewModel : BaseViewModel
     {
+        private readonly CategoryService _categoryService;
+        private TransactionType? _currentTypeFilter;
+
+        public Popup? PopupInstance { get; set; }
+
         [ObservableProperty] private string pageTitle = "Selecione";
         public ObservableCollection<SelectionItem> Items { get; } = new();
-
         [ObservableProperty] private SelectionItem currentSelection;
-
-        // Controla se estamos na lista de categorias para mostrar a engrenagem
         [ObservableProperty] private bool isCategorySelection;
 
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        public ItemSelectionViewModel(CategoryService categoryService)
         {
-            if (query.ContainsKey("Title"))
-            {
-                PageTitle = query["Title"].ToString();
-                // Se o título for "Categoria", a engrenagem aparece
-                IsCategorySelection = PageTitle == "Categoria";
-            }
+            _categoryService = categoryService;
+        }
 
-            if (query.ContainsKey("Items") && query["Items"] is IEnumerable<SelectionItem> items)
+        // NOVO: Usado para inicializar os dados pelo Popup ao invés da navegação antiga
+        public void Initialize(string title, IEnumerable<SelectionItem> items)
+        {
+            PageTitle = title;
+            IsCategorySelection = title == "Categoria";
+            Items.Clear();
+            foreach (var item in items) Items.Add(item);
+
+            var firstCat = items.FirstOrDefault()?.OriginalObject as Category;
+            if (firstCat != null) _currentTypeFilter = firstCat.Type;
+        }
+
+        [RelayCommand]
+        public async Task ReloadCategories()
+        {
+            if (!IsCategorySelection || _currentTypeFilter == null) return;
+            await ExecuteWithErrorHandlingAsync(async () =>
             {
-                Items.Clear();
-                foreach (var item in items) Items.Add(item);
-            }
+                var cats = await _categoryService.GetCategoriesAsync();
+                if (cats == null) return;
+
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    Items.Clear();
+                    var list = cats
+                        .Where(c => c.ParentId == null && c.Type == _currentTypeFilter)
+                        .OrderBy(c => c.Name)
+                        .Select(cat =>
+                        {
+                            var nivel1 = new SelectionItem { Id = cat.Id, Name = cat.Name, Icon = cat.Icon, Color = cat.Color, OriginalObject = cat };
+                            var filhos = cats.Where(x => x.ParentId == cat.Id).OrderBy(s => s.Name).ToList();
+                            foreach (var sub in filhos)
+                            {
+                                nivel1.SubItems.Add(new SelectionItem
+                                {
+                                    Id = sub.Id,
+                                    Name = sub.Name,
+                                    Icon = sub.Icon,
+                                    Color = sub.Color,
+                                    ParentColor = cat.Color,
+                                    OriginalObject = sub,
+                                    IsSubItem = true
+                                });
+                            }
+                            return nivel1;
+                        }).ToList();
+
+                    foreach (var item in list) Items.Add(item);
+                });
+            }, showLoading: false);
         }
 
         [RelayCommand]
         public async Task GoToManageCategories()
         {
-            // Navega para a tela de gerenciamento de categorias
-            await Shell.Current.GoToAsync("ManageCategoriesPage");
+            PopupInstance?.Close();
+            await ExecuteWithErrorHandlingAsync(async () =>
+            {
+                await Task.Delay(50);
+                await Shell.Current.GoToAsync("ManageCategoriesPage");
+            });
         }
 
         [RelayCommand]
@@ -49,35 +98,24 @@ namespace controle_ja_mobile.ViewModels
         [RelayCommand]
         public void SelectItem(SelectionItem item)
         {
-            // Limpa seleções anteriores para garantir seleção única
             foreach (var i in Items)
             {
                 i.IsSelected = false;
-                foreach (var sub in i.SubItems)
-                {
-                    sub.IsSelected = false;
-                    foreach (var neto in sub.SubItems) neto.IsSelected = false;
-                }
+                foreach (var sub in i.SubItems) sub.IsSelected = false;
             }
-
             item.IsSelected = true;
             CurrentSelection = item;
         }
 
         [RelayCommand]
-        public async Task ConfirmSelection()
+        public void ConfirmSelection()
         {
-            if (CurrentSelection == null)
-            {
-                await App.Current.MainPage.DisplayAlert("Aviso", "Selecione um item para continuar.", "OK");
-                return;
-            }
-
+            if (CurrentSelection == null) { App.Current.MainPage.DisplayAlert("Aviso", "Selecione um item.", "OK"); return; }
             WeakReferenceMessenger.Default.Send(new ItemSelectedMessage(CurrentSelection.OriginalObject));
-            await Shell.Current.GoToAsync("..");
+            PopupInstance?.Close();
         }
 
         [RelayCommand]
-        public async Task Close() => await Shell.Current.GoToAsync("..");
+        public void Close() => PopupInstance?.Close();
     }
 }

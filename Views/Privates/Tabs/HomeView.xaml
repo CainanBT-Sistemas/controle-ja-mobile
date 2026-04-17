@@ -3,86 +3,294 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:micro="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
+             xmlns:models="clr-namespace:controle_ja_mobile.Models"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="controle_ja_mobile.Views.Privates.Tabs.HomeView"
-             x:DataType="vm:DashboardViewModel">
+             x:DataType="vm:DashboardViewModel"
+             BackgroundColor="#001524">
 
-    <Grid BackgroundColor="#001524">
+    <Grid RowDefinitions="Auto,*" Padding="0">
 
-        <ScrollView Padding="0,20,0,100">
-            <VerticalStackLayout Spacing="20">
+        <Grid Row="0" ColumnDefinitions="*,Auto" Padding="20,20,20,10" BackgroundColor="#001524" ZIndex="2">
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="{Binding UserName, StringFormat='Olá, {0}'}" TextColor="White" FontSize="20" FontAttributes="Bold"/>
+                <Label Text="Bem-vindo de volta" TextColor="#94A3B8" FontSize="12"/>
+            </VerticalStackLayout>
+            <ImageButton Grid.Column="1" Source="ic_settings.png" Command="{Binding ToggleSettingsMenuCommand}" HeightRequest="28" WidthRequest="28" BackgroundColor="Transparent" VerticalOptions="Center">
+                <ImageButton.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="White" />
+                </ImageButton.Behaviors>
+            </ImageButton>
+        </Grid>
 
-                <Grid Padding="25,0">
-                    <Border BackgroundColor="#1E2A3A" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="5">
-                        <Grid ColumnDefinitions="40, *, 40">
-                            <ImageButton Grid.Column="0" Source="arrow_left.png" Command="{Binding PreviousMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
-                            <Label Grid.Column="1" Text="{Binding CurrentMonthDisplay}" TextColor="#94A3B8" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextTransform="Uppercase" FontSize="14"/>
-                            <ImageButton Grid.Column="2" Source="arrow_right.png" Command="{Binding NextMonthCommand}" HeightRequest="20" HorizontalOptions="Center"/>
-                        </Grid>
-                    </Border>
-                </Grid>
-
-                <Grid Padding="25,5">
-                    <Border StrokeThickness="0" StrokeShape="RoundRectangle 20" HeightRequest="140">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#00E676" Offset="0.0" />
-                                <GradientStop Color="#00C853" Offset="1.0" />
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <VerticalStackLayout Padding="25" VerticalOptions="Center" Spacing="5">
-                            <Label Text="Patrimônio Total" TextColor="#003300" FontSize="14" FontAttributes="Bold" Opacity="0.8"/>
-                            <Label Text="{Binding Balance}" TextColor="#001524" FontSize="38" FontAttributes="Bold"/>
-                        </VerticalStackLayout>
-                    </Border>
-                </Grid>
-
-                <Grid ColumnDefinitions="*, *" ColumnSpacing="15" Padding="25,0">
-
-                    <Border Grid.Column="0" BackgroundColor="#1E2A3A" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="15" HeightRequest="90">
-                        <VerticalStackLayout Spacing="5" VerticalOptions="Center">
-                            <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
-                                <Path Data="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" Fill="#00E676" Aspect="Uniform" HeightRequest="14" WidthRequest="14" VerticalOptions="Center"/>
-                                <Label Text="Entradas" TextColor="#94A3B8" FontSize="13" VerticalOptions="Center"/>
-                            </HorizontalStackLayout>
-                            <Label Text="{Binding Income}" TextColor="#00E676" FontSize="18" FontAttributes="Bold"/>
-                        </VerticalStackLayout>
-                    </Border>
-
-                    <Border Grid.Column="1" BackgroundColor="#1E2A3A" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="15" HeightRequest="90">
-                        <VerticalStackLayout Spacing="5" VerticalOptions="Center">
-                            <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
-                                <Path Data="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" Fill="#EF4444" Aspect="Uniform" HeightRequest="14" WidthRequest="14" VerticalOptions="Center"/>
-                                <Label Text="Saídas" TextColor="#94A3B8" FontSize="13" VerticalOptions="Center"/>
-                            </HorizontalStackLayout>
-                            <Label Text="{Binding Expense}" TextColor="#EF4444" FontSize="18" FontAttributes="Bold"/>
-                        </VerticalStackLayout>
-                    </Border>
-
-                </Grid>
-
-                <VerticalStackLayout Padding="25,10,25,0" Spacing="10">
-                    <Label Text="ANÁLISE DE GASTOS" TextColor="#94A3B8" FontSize="12" FontAttributes="Bold"/>
-
-                    <Border BackgroundColor="#1E2A3A" StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="15" HeightRequest="250">
-                        <Grid>
-                            <micro:ChartView IsVisible="{Binding HasChartData}" Chart="{Binding ExpenseChart}" BackgroundColor="Transparent" />
-
-                            <VerticalStackLayout IsVisible="{Binding HasChartData, Converter={StaticResource InvertedBoolConverter}}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="15" Opacity="0.6">
-                                <Border HeightRequest="80" WidthRequest="80" StrokeShape="RoundRectangle 40" BackgroundColor="#2D3A4F" StrokeThickness="0">
-                                    <Label Text="!" FontSize="36" TextColor="#94A3B8" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                </Border>
-                                <Label Text="Sem despesas neste período" TextColor="#94A3B8" FontSize="14" HorizontalOptions="Center"/>
-                            </VerticalStackLayout>
-                        </Grid>
-                    </Border>
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsSettingsMenuVisible}" BackgroundColor="#B3000000" ZIndex="99" InputTransparent="False">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseSettingsMenuCommand}"/>
+            </Grid.GestureRecognizers>
+            <Border VerticalOptions="Start" HorizontalOptions="End" BackgroundColor="#1E2A3A" StrokeThickness="0" Margin="20,70,20,0" Padding="10" StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="5" WidthRequest="150">
+                    <Button Text="Meu Perfil" Command="{Binding GoToProfileCommand}" BackgroundColor="Transparent" TextColor="White" HorizontalOptions="Start"/>
+                    <BoxView HeightRequest="1" Color="#2D3A4F"/>
+                    <Button Text="Sair" Command="{Binding PerformLogoutCommand}" BackgroundColor="Transparent" TextColor="#FF5252" HorizontalOptions="Start" FontAttributes="Bold"/>
                 </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <ScrollView x:Name="DashboardSkeletonView" Grid.Row="1" IsVisible="{Binding IsLoading}" Padding="0,10,0,160">
+            <VerticalStackLayout Spacing="25">
+                <VerticalStackLayout Spacing="15" HorizontalOptions="Center" Padding="20">
+                    <BoxView HeightRequest="20" WidthRequest="120" Color="#1E2A3A" CornerRadius="4" HorizontalOptions="Center"/>
+                    <BoxView HeightRequest="40" WidthRequest="200" Color="#1E2A3A" CornerRadius="8" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="10" Padding="20,0">
+                    <BoxView HeightRequest="15" WidthRequest="150" Color="#1E2A3A" CornerRadius="4"/>
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                        <HorizontalStackLayout Spacing="12">
+                            <BoxView HeightRequest="100" WidthRequest="140" Color="#1E2A3A" CornerRadius="12"/>
+                            <BoxView HeightRequest="100" WidthRequest="140" Color="#1E2A3A" CornerRadius="12"/>
+                            <BoxView HeightRequest="100" WidthRequest="140" Color="#1E2A3A" CornerRadius="12"/>
+                        </HorizontalStackLayout>
+                    </ScrollView>
+                </VerticalStackLayout>
+
+                <BoxView HeightRequest="250" Color="#1E2A3A" CornerRadius="16" Margin="15,10,15,0"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <ScrollView Grid.Row="1" IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
+            <VerticalStackLayout Spacing="25" Padding="0,10,0,160">
+
+                <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="visibility" FontFamily="MaterialIcons" TextColor="#94A3B8" FontSize="16" VerticalOptions="Center"/>
+                        <Label Text="Saldo Disponível" TextColor="#94A3B8" FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                    <Label Text="{Binding AvailableBalance}" TextColor="White" FontSize="36" FontAttributes="Bold" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Pendências e Alertas" TextColor="#94A3B8" FontSize="14" FontAttributes="Bold" Margin="20,0"/>
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                        <HorizontalStackLayout Spacing="12" Padding="20,0">
+
+                            <Border BackgroundColor="#2D1B1B" StrokeThickness="1" Stroke="#FF5252" StrokeShape="RoundRectangle 12" Padding="15,12" WidthRequest="140" IsVisible="{Binding HasOverduePayables}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenAlertsCommand}" CommandParameter="OVERDUE_PAYABLES"/>
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="warning" FontFamily="MaterialIcons" TextColor="#FF5252" FontSize="20"/>
+                                    <Label Text="Contas Atrasadas" TextColor="#94A3B8" FontSize="11" FontAttributes="Bold"/>
+                                    <Label Text="{Binding TotalOverduePayables}" TextColor="#FF5252" FontSize="14" FontAttributes="Bold"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border BackgroundColor="#2D1B1B" StrokeThickness="1" Stroke="#FF5252" StrokeShape="RoundRectangle 12" Padding="15,12" WidthRequest="140" IsVisible="{Binding HasOverdueInvoices}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenAlertsCommand}" CommandParameter="OVERDUE_INVOICES"/>
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="credit_card_off" FontFamily="MaterialIcons" TextColor="#FF5252" FontSize="20"/>
+                                    <Label Text="Faturas Vencidas" TextColor="#94A3B8" FontSize="11" FontAttributes="Bold"/>
+                                    <Label Text="{Binding TotalOverdueInvoices}" TextColor="#FF5252" FontSize="14" FontAttributes="Bold"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border BackgroundColor="#1E2A3A" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="15,12" WidthRequest="140" IsVisible="{Binding HasPendingPayables}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenAlertsCommand}" CommandParameter="PAYABLES"/>
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="arrow_downward" FontFamily="MaterialIcons" TextColor="#FFAB00" FontSize="20"/>
+                                    <Label Text="A Pagar (Mês)" TextColor="#94A3B8" FontSize="11" FontAttributes="Bold"/>
+                                    <Label Text="{Binding TotalPendingPayables}" TextColor="White" FontSize="14" FontAttributes="Bold"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border BackgroundColor="#1E2A3A" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="15,12" WidthRequest="140" IsVisible="{Binding HasPendingReceivables}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenAlertsCommand}" CommandParameter="RECEIVABLES"/>
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="arrow_upward" FontFamily="MaterialIcons" TextColor="#00E676" FontSize="20"/>
+                                    <Label Text="A Receber (Mês)" TextColor="#94A3B8" FontSize="11" FontAttributes="Bold"/>
+                                    <Label Text="{Binding TotalPendingReceivables}" TextColor="White" FontSize="14" FontAttributes="Bold"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border BackgroundColor="#1E2A3A" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="15,12" WidthRequest="140" IsVisible="{Binding HasPendingInvoices}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenAlertsCommand}" CommandParameter="INVOICES"/>
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="credit_card" FontFamily="MaterialIcons" TextColor="#E040FB" FontSize="20"/>
+                                    <Label Text="Faturas Abertas" TextColor="#94A3B8" FontSize="11" FontAttributes="Bold"/>
+                                    <Label Text="{Binding TotalPendingInvoices}" TextColor="White" FontSize="14" FontAttributes="Bold"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                        </HorizontalStackLayout>
+                    </ScrollView>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding HasAccounts}">
+                    <Label Text="Minhas Contas" TextColor="#94A3B8" FontSize="14" FontAttributes="Bold" Margin="20,0"/>
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                        <HorizontalStackLayout BindableLayout.ItemsSource="{Binding Accounts}" Spacing="15" Padding="20,0">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:Account">
+                                    <Border BackgroundColor="#1E2A3A" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="15" WidthRequest="145">
+                                        <VerticalStackLayout Spacing="10">
+                                            <HorizontalStackLayout Spacing="10">
+                                                <Border HeightRequest="30" WidthRequest="30" StrokeShape="RoundRectangle 15" BackgroundColor="{Binding Color}" StrokeThickness="0">
+                                                    <Label Text="{Binding Icon}" FontFamily="MaterialIcons" TextColor="#001524" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                </Border>
+                                                <Label Text="{Binding Name}" TextColor="White" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" LineBreakMode="TailTruncation" WidthRequest="70"/>
+                                            </HorizontalStackLayout>
+                                            <Label Text="{Binding FormattedBalance}" TextColor="{Binding Color}" FontSize="15" FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </ScrollView>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5" IsVisible="{Binding HasCreditCards}">
+                    <Label Text="Cartões de Crédito" TextColor="#94A3B8" FontSize="14" FontAttributes="Bold" Margin="20,0"/>
+
+                    <CarouselView ItemsSource="{Binding CreditCards}" IndicatorView="CardsIndicator" IsSwipeEnabled="True" Loop="False" HeightRequest="175" Margin="20,0">
+                        <CarouselView.ItemTemplate>
+                            <DataTemplate x:DataType="models:CreditCard">
+                                <Border BackgroundColor="#1E2A3A" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="20">
+                                    <VerticalStackLayout Spacing="10">
+                                        <HorizontalStackLayout Spacing="15">
+                                            <Border HeightRequest="36" WidthRequest="36" StrokeShape="RoundRectangle 8" BackgroundColor="{Binding Color}" StrokeThickness="0">
+                                                <Label Text="{Binding Icon}" FontFamily="MaterialIcons" TextColor="White" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                            </Border>
+                                            <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                                                <Label Text="{Binding Name}" TextColor="White" FontSize="16" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                                <Label Text="{Binding InvoiceInfo}" TextColor="#64748B" FontSize="11"/>
+                                            </VerticalStackLayout>
+                                        </HorizontalStackLayout>
+
+                                        <VerticalStackLayout Spacing="6" Margin="0,15,0,0">
+                                            <Grid ColumnDefinitions="*, Auto">
+                                                <Label Grid.Column="0" Text="{Binding FormattedUsed, StringFormat='Usado: {0}'}" TextColor="#A1A1AA" FontSize="11"/>
+                                                <Label Grid.Column="1" Text="{Binding FormattedAvailable, StringFormat='Livre: {0}'}" TextColor="#00E676" FontSize="11" FontAttributes="Bold"/>
+                                            </Grid>
+                                            <ProgressBar Progress="{Binding LimitProgress}" ProgressColor="{Binding Color}" BackgroundColor="#001524" HeightRequest="6"/>
+
+                                            <Label Text="Acessar faturas" TextColor="{Binding Color}" FontSize="13" FontAttributes="Bold" HorizontalOptions="End" Margin="0,10,0,0">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=OpenInvoiceDetailsCommand}" CommandParameter="{Binding .}"/>
+                                                </Label.GestureRecognizers>
+                                            </Label>
+                                        </VerticalStackLayout>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CarouselView.ItemTemplate>
+                    </CarouselView>
+                    <IndicatorView x:Name="CardsIndicator" IndicatorsShape="Circle" IndicatorSize="8" IndicatorColor="#2D3A4F" SelectedIndicatorColor="#E040FB" HorizontalOptions="Center" Margin="0,5,0,10"/>
+                </VerticalStackLayout>
+
+                <Border BackgroundColor="#1E2A3A" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="15" Margin="15,10,15,0">
+                    <VerticalStackLayout Spacing="15">
+
+                        <Grid ColumnDefinitions="Auto, *, Auto">
+                            <Label Grid.Column="0" Text="chevron_left" FontFamily="MaterialIcons" TextColor="#94A3B8" FontSize="28" VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PreviousMonthCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Grid.Column="1" Text="{Binding CurrentMonthDisplay}" TextColor="White" FontSize="14" FontAttributes="Bold" TextTransform="Uppercase" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            <Label Grid.Column="2" Text="chevron_right" FontFamily="MaterialIcons" TextColor="#94A3B8" FontSize="28" VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding NextMonthCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </Grid>
+
+                        <BoxView HeightRequest="1" Color="#2D3A4F" Margin="0,-5,0,0"/>
+
+                        <VerticalStackLayout Spacing="0">
+                            <CarouselView ItemsSource="{Binding GeneralCharts}" IndicatorView="ChartIndicator" IsSwipeEnabled="True" Loop="False" HeightRequest="{Binding GeneralChartHeight}">
+                                <CarouselView.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ChartSlide">
+                                        <VerticalStackLayout Spacing="10" Padding="0,5,0,0" Margin="10,0" VerticalOptions="Center">
+                                            <Label Text="{Binding Title}" TextColor="{Binding TitleColor}" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                            <micro:ChartView Chart="{Binding ChartObj}" HeightRequest="200" IsVisible="{Binding HasData}" BackgroundColor="Transparent"/>
+                                            <Label Text="{Binding EmptyMessage}" IsVisible="{Binding HasData, Converter={StaticResource InvertedBoolConverter}}" TextColor="#64748B" FontSize="12" HorizontalOptions="Center" Margin="0,20"/>
+                                        </VerticalStackLayout>
+                                    </DataTemplate>
+                                </CarouselView.ItemTemplate>
+                            </CarouselView>
+                            <IndicatorView x:Name="ChartIndicator" IndicatorsShape="Circle" IndicatorSize="8" IndicatorColor="#2D3A4F" SelectedIndicatorColor="#00E676" HorizontalOptions="Center" Margin="0,-5,0,5"/>
+                        </VerticalStackLayout>
+
+                        <BoxView HeightRequest="1" Color="#2D3A4F" Margin="20,5"/>
+
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Despesas do Cartão de Crédito" TextColor="#94A3B8" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center"/>
+                            <micro:ChartView Chart="{Binding CreditExpenseChart}" HeightRequest="200" IsVisible="{Binding HasCreditChartData}" BackgroundColor="Transparent"/>
+                            <Label Text="Nenhum gasto no crédito neste mês." IsVisible="{Binding HasCreditChartData, Converter={StaticResource InvertedBoolConverter}}" TextColor="#64748B" FontSize="12" HorizontalOptions="Center" Margin="0,20"/>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Border>
 
             </VerticalStackLayout>
         </ScrollView>
 
-        <Grid BackgroundColor="#CC000000" IsVisible="{Binding IsLoading}">
-            <ActivityIndicator IsRunning="{Binding IsLoading}" Color="#00E676" HeightRequest="50" WidthRequest="50" VerticalOptions="Center" HorizontalOptions="Center"/>
-        </Grid>
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsAlertsPopupVisible}" BackgroundColor="#CC000000" ZIndex="100" InputTransparent="False">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseAlertsCommand}"/>
+            </Grid.GestureRecognizers>
 
+            <Border VerticalOptions="End" BackgroundColor="#1E2A3A" StrokeThickness="0" Margin="0" Padding="20,25,20,0" StrokeShape="RoundRectangle 25,25,0,0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer/>
+                </Border.GestureRecognizers>
+
+                <VerticalStackLayout Spacing="15">
+                    <Grid ColumnDefinitions="*, Auto">
+                        <Label Grid.Column="0" Text="{Binding AlertsPopupTitle}" TextColor="White" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Text="close" FontFamily="MaterialIcons" TextColor="#94A3B8" FontSize="26" VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CloseAlertsCommand}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="#2D3A4F"/>
+
+                    <ScrollView MaximumHeightRequest="400">
+                        <StackLayout BindableLayout.ItemsSource="{Binding CurrentAlertsList}" Spacing="12" Padding="0,0,0,120">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:DashboardAlert">
+                                    <Grid ColumnDefinitions="Auto, *, Auto, Auto" ColumnSpacing="12" Margin="0,0,0,5">
+                                        <Border Grid.Column="0" HeightRequest="36" WidthRequest="36" StrokeShape="RoundRectangle 18" BackgroundColor="{Binding Color}" StrokeThickness="0" VerticalOptions="Center">
+                                            <Label Text="{Binding Icon}" FontFamily="MaterialIcons" TextColor="#001524" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                                            <Label Text="{Binding Description}" TextColor="White" FontSize="14" FontAttributes="Bold" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding FormattedDate, StringFormat='Venc: {0}'}" TextColor="#94A3B8" FontSize="11"/>
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="2" Text="{Binding FormattedAmount}" TextColor="{Binding Color}" FontSize="14" FontAttributes="Bold" VerticalOptions="Center"/>
+                                        <Border Grid.Column="3" BackgroundColor="#00E676" StrokeThickness="0" HeightRequest="32" WidthRequest="32" StrokeShape="RoundRectangle 16" VerticalOptions="Center">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=QuickPayCommand}" CommandParameter="{Binding .}"/>
+                                            </Border.GestureRecognizers>
+                                            <Label Text="check" FontFamily="MaterialIcons" TextColor="#001524" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold"/>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </StackLayout>
+                    </ScrollView>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </Grid>
 </ContentView>

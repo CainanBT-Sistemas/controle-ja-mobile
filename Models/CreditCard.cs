@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using System.Globalization;
-using Microcharts; 
+using Microcharts;
 
 namespace controle_ja_mobile.Models
 {
@@ -33,19 +33,17 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("color")]
         public string Color { get; set; } = "#9C27B0";
 
-        // --- Helpers Visuais ---
-
         [JsonIgnore]
         public decimal UsedAmount => Math.Max(0, TotalLimit - CurrentLimit);
 
         [JsonIgnore]
-        public string FormattedTotalLimit => TotalLimit.ToString("C", new CultureInfo("pt-BR"));
+        public string FormattedTotalLimit => $"R$ {TotalLimit.ToString("N2", new CultureInfo("pt-BR"))}";
 
         [JsonIgnore]
-        public string FormattedAvailable => CurrentLimit.ToString("C", new CultureInfo("pt-BR"));
+        public string FormattedAvailable => $"R$ {CurrentLimit.ToString("N2", new CultureInfo("pt-BR"))}";
 
         [JsonIgnore]
-        public string FormattedUsed => UsedAmount.ToString("C", new CultureInfo("pt-BR"));
+        public string FormattedUsed => $"R$ {UsedAmount.ToString("N2", new CultureInfo("pt-BR"))}";
 
         [JsonIgnore]
         public string InvoiceInfo => $"Fecha dia {CloseDay} • Vence dia {BestDay}";

@@ -26,31 +26,26 @@ namespace controle_ja_mobile
                     fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
                 });
 
-            // =========================================================
-            // MÁGICA PARA REMOVER AS LINHAS ROXAS DO ANDROID
-            // =========================================================
             Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
             {
 #if ANDROID
                 handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
 #endif
             });
-
             Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
             {
 #if ANDROID
                 handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
 #endif
             });
-
             Microsoft.Maui.Handlers.DatePickerHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
             {
 #if ANDROID
                 handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
 #endif
             });
-            // =========================================================
 
+            // Services (Sempre Singleton)
             builder.Services.AddSingleton<BiometricAuthService>();
             builder.Services.AddSingleton<AccountService>();
             builder.Services.AddSingleton<ApiService>();
@@ -60,13 +55,14 @@ namespace controle_ja_mobile
             builder.Services.AddSingleton<DashboardService>();
             builder.Services.AddSingleton<TransactionService>();
             builder.Services.AddSingleton<VehicleService>();
+            builder.Services.AddSingleton<InvoiceService>();
 
-            //ViewModels
+            // ViewModels (Sempre Transient)
+            builder.Services.AddTransient<TransactionAddViewModel>();
             builder.Services.AddTransient<CreditCardsViewModel>();
             builder.Services.AddTransient<DashboardViewModel>();
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<RegisterViewModel>();
-            builder.Services.AddTransient<TransactionAddViewModel>();
             builder.Services.AddTransient<TransactionsViewModel>();
             builder.Services.AddTransient<VehiclesViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
@@ -79,10 +75,11 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddTransient<ChangePasswordViewModel>();
             builder.Services.AddTransient<ItemSelectionViewModel>();
+            builder.Services.AddTransient<InvoiceDetailsViewModel>();
 
-            //Views
-            builder.Services.AddTransient<DashboardPage>();
+            // Views (Sempre Transient)
             builder.Services.AddTransient<TransactionAddPage>();
+            builder.Services.AddTransient<DashboardPage>();
             builder.Services.AddTransient<TransactionsListView>();
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RegisterPage>();
@@ -98,6 +95,7 @@ namespace controle_ja_mobile
             builder.Services.AddTransient<ProfilePage>();
             builder.Services.AddTransient<ChangePasswordPage>();
             builder.Services.AddTransient<ItemSelectionPage>();
+            builder.Services.AddTransient<InvoiceDetailsPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

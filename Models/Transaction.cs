@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace controle_ja_mobile.Models
@@ -27,13 +28,13 @@ namespace controle_ja_mobile.Models
         public bool Paid { get; set; }
 
         [JsonPropertyName("accountId")]
-        public Guid AccountId { get; set; }
+        public Guid? AccountId { get; set; }
 
         [JsonPropertyName("targetAccountId")]
         public Guid? TargetAccountId { get; set; }
 
         [JsonPropertyName("categoryId")]
-        public Guid CategoryId { get; set; }
+        public Guid? CategoryId { get; set; }
 
         [JsonPropertyName("categoryName")]
         public string? CategoryName { get; set; }
@@ -67,6 +68,9 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("creditCardId")]
         public Guid? CreditCardId { get; set; }
 
+        [JsonPropertyName("targetInvoiceId")]
+        public Guid? TargetInvoiceId { get; set; }
+
         [JsonPropertyName("vehicleId")]
         public Guid? VehicleId { get; set; }
 
@@ -86,12 +90,31 @@ namespace controle_ja_mobile.Models
         public double? Efficiency { get; set; }
 
         [JsonIgnore]
-        public string FormattedAmount => string.Format("{0:C}", Amount);
+        public string FormattedAmount => Amount.ToString("C", new CultureInfo("pt-BR"));
 
         [JsonIgnore]
         public DateTime DateTimeObject => DateTimeOffset.FromUnixTimeMilliseconds(Date).DateTime.ToLocalTime();
 
-        // --- MÁGICA VISUAL DO EXTRATO BANCÁRIO ---
+        [JsonIgnore]
+        public double ItemOpacity => Paid ? 0.4 : 1.0;
+
+        [JsonIgnore]
+        public bool IsPending => !Paid;
+
+        [JsonIgnore]
+        public string StatusText => Paid ? "PAGO" : "PENDENTE";
+
+        [JsonIgnore]
+        public Color StatusColor => Paid ? Color.FromArgb("#00E676") : Color.FromArgb("#FF9800");
+
+        
+        [JsonIgnore]
+        public Color AmountColor => (Type == TransactionType.RECEITA || Type == TransactionType.TRANSFERENCIA_ENTRADA)
+            ? Color.FromArgb("#00E676")
+            : Color.FromArgb("#FF5252");
+
+        [JsonIgnore]
+        public bool CanDelete => CategoryName != "Fatura de Cartão";
 
         [JsonIgnore]
         public string ExtratoIcon => Type switch
@@ -108,20 +131,13 @@ namespace controle_ja_mobile.Models
         [JsonIgnore]
         public string ExtratoAmount => (Type == TransactionType.RECEITA || Type == TransactionType.TRANSFERENCIA_ENTRADA)
             ? FormattedAmount
-            : $"- {FormattedAmount}"; // Adiciona o negativo visual nas saídas
-
-        // AJUSTE: COR VERMELHA PARA AS SAÍDAS E VERDE PARA ENTRADAS
-        [JsonIgnore]
-        public string ExtratoAmountColor => (Type == TransactionType.RECEITA || Type == TransactionType.TRANSFERENCIA_ENTRADA)
-            ? "#00E676"  // Verde
-            : "#EF4444"; // Vermelho
+            : $"- {FormattedAmount}";
 
         [JsonIgnore]
         public string ColorHex => (Type == TransactionType.RECEITA || Type == TransactionType.TRANSFERENCIA_ENTRADA)
             ? "#00E676"
-            : "#EF4444";
+            : "#FF5252";
 
-        // AJUSTE: LEGENDA INTELIGENTE DA CONTA
         [JsonIgnore]
         public string SubtitleDisplay
         {
@@ -132,7 +148,6 @@ namespace controle_ja_mobile.Models
 
                 if (Type == TransactionType.TRANSFERENCIA_SAIDA)
                     return $"Saiu de: {accName}";
-
                 if (Type == TransactionType.TRANSFERENCIA_ENTRADA)
                     return $"Entrou em: {accName}";
 

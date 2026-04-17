@@ -5,13 +5,16 @@ using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Maui.Views;
 
 namespace controle_ja_mobile.ViewModels
 {
-    [QueryProperty(nameof(CardId), "id")]
     public partial class CreditCardAddViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
+
+        public Popup? PopupInstance { get; set; }
 
         [ObservableProperty] private string title = "Novo Cartão";
         [ObservableProperty] private string cardId;
@@ -22,37 +25,31 @@ namespace controle_ja_mobile.ViewModels
 
         [ObservableProperty] private bool isEditMode = false;
 
-        public ObservableCollection<string> AvailableIcons { get; } = new(UIConstants.AvailableIcons);
         public ObservableCollection<string> AvailableColors { get; } = new(UIConstants.AvailableColors);
 
-        [ObservableProperty] private string selectedIcon;
+        // Cravado direto na raiz, sem tela de seleção.
+        private readonly string _selectedIcon = "credit_card";
+
         [ObservableProperty] private string selectedColor;
         [ObservableProperty] private bool isColorSelectorOpen;
-        [ObservableProperty] private bool isIconSelectorOpen;
 
         public CreditCardAddViewModel(ApiService apiService)
         {
             _apiService = apiService;
-            SelectedIcon = "credit_card";
             SelectedColor = AvailableColors.FirstOrDefault(c => c == "#9C27B0") ?? AvailableColors.First();
         }
 
-        // --- GATILHO DA MÁSCARA DE DINHEIRO ---
         partial void OnLimitChanged(string value)
         {
             if (string.IsNullOrEmpty(value)) return;
-
-            // Extrai apenas os números do que o usuário digitou
             var digitsOnly = new string(value.Where(char.IsDigit).ToArray());
             if (string.IsNullOrEmpty(digitsOnly)) return;
 
-            // Divide por 100 para criar os centavos e aplica a formatação brasileira
             if (decimal.TryParse(digitsOnly, out decimal parsed))
             {
                 parsed /= 100;
                 string formatted = parsed.ToString("N2", new System.Globalization.CultureInfo("pt-BR"));
 
-                // Previne o loop infinito
                 if (Limit != formatted)
                 {
                     Limit = formatted;
@@ -66,7 +63,7 @@ namespace controle_ja_mobile.ViewModels
             {
                 Title = "Editar Cartão";
                 IsEditMode = true;
-                _ = LoadCardData(value);
+                Task.Run(() => LoadCardData(value));
             }
         }
 
@@ -85,11 +82,9 @@ namespace controle_ja_mobile.ViewModels
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
                             Name = card.Name;
-                            // Carrega o limite do banco já formatado para a tela
                             Limit = card.TotalLimit.ToString("N2", new System.Globalization.CultureInfo("pt-BR"));
                             CloseDay = card.CloseDay.ToString();
                             BestDay = card.BestDay.ToString();
-                            SelectedIcon = card.Icon ?? "credit_card";
                             SelectedColor = card.Color ?? "#9C27B0";
                         });
                     }
@@ -99,9 +94,6 @@ namespace controle_ja_mobile.ViewModels
 
         [RelayCommand] private void OpenColorSelector() => IsColorSelectorOpen = true;
         [RelayCommand] private void CloseColorSelector() => IsColorSelectorOpen = false;
-        [RelayCommand] private void OpenIconSelector() => IsIconSelectorOpen = true;
-        [RelayCommand] private void CloseIconSelector() => IsIconSelectorOpen = false;
-        [RelayCommand] private void SelectIcon(string icon) { SelectedIcon = icon; IsIconSelectorOpen = false; }
         [RelayCommand] private void SelectColor(string color) { SelectedColor = color; IsColorSelectorOpen = false; }
 
         [RelayCommand]
@@ -110,21 +102,20 @@ namespace controle_ja_mobile.ViewModels
             if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Limit) ||
                 string.IsNullOrWhiteSpace(CloseDay) || string.IsNullOrWhiteSpace(BestDay))
             {
-                await Shell.Current.DisplayAlert("Aviso", "Preencha todos os campos.", "OK");
+                await App.Current.MainPage.DisplayAlert("Aviso", "Preencha todos os campos.", "OK");
                 return;
             }
 
-            // Transforma a string com pontos e vírgulas de volta em um número real para o backend
             if (!decimal.TryParse(Limit, System.Globalization.NumberStyles.Number, new System.Globalization.CultureInfo("pt-BR"), out decimal limitValue) || limitValue <= 0)
             {
-                await Shell.Current.DisplayAlert("Erro", "Limite inválido.", "OK");
+                await App.Current.MainPage.DisplayAlert("Erro", "Limite inválido.", "OK");
                 return;
             }
 
             if (!int.TryParse(CloseDay, out int cDay) || cDay < 1 || cDay > 31 ||
                 !int.TryParse(BestDay, out int bDay) || bDay < 1 || bDay > 31)
             {
-                await Shell.Current.DisplayAlert("Erro", "Dias devem ser entre 1 e 31.", "OK");
+                await App.Current.MainPage.DisplayAlert("Erro", "Dias devem ser entre 1 e 31.", "OK");
                 return;
             }
 
@@ -136,7 +127,7 @@ namespace controle_ja_mobile.ViewModels
                     limit = limitValue,
                     closeDay = cDay,
                     bestDay = bDay,
-                    icon = SelectedIcon,
+                    icon = _selectedIcon,
                     color = SelectedColor
                 };
 
@@ -147,14 +138,17 @@ namespace controle_ja_mobile.ViewModels
                     result = await _apiService.PutAsync<object>($"cards/{CardId}", dto);
 
                 if (!string.IsNullOrEmpty(result))
-                    await Shell.Current.GoToAsync("..");
+                {
+                    WeakReferenceMessenger.Default.Send(new GlobalRefreshMessage());
+                    PopupInstance?.Close();
+                }
             });
         }
 
         [RelayCommand]
         private async Task Delete()
         {
-            bool confirm = await Shell.Current.DisplayAlert("Excluir Cartão", $"Deseja apagar o cartão '{Name}'?", "Sim", "Não");
+            bool confirm = await App.Current.MainPage.DisplayAlert("Excluir Cartão", $"Deseja apagar o cartão '{Name}'?", "Sim", "Não");
             if (!confirm) return;
 
             await ExecuteWithErrorHandlingAsync(async () =>
@@ -162,12 +156,13 @@ namespace controle_ja_mobile.ViewModels
                 var result = await _apiService.DeleteAsync($"cards/{CardId}");
                 if (!string.IsNullOrEmpty(result))
                 {
-                    await Shell.Current.GoToAsync("..");
+                    WeakReferenceMessenger.Default.Send(new GlobalRefreshMessage());
+                    PopupInstance?.Close();
                 }
             });
         }
 
         [RelayCommand]
-        private async Task GoBack() => await Shell.Current.GoToAsync("..");
+        private void GoBack() => PopupInstance?.Close();
     }
 }

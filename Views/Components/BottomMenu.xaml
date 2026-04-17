@@ -6,8 +6,64 @@
 
     <Grid VerticalOptions="Fill" HorizontalOptions="Fill">
 
-        <Grid VerticalOptions="End" HeightRequest="120" ZIndex="2">
+        <BoxView x:Name="FabOverlay" BackgroundColor="Black" Opacity="0" IsVisible="False" ZIndex="3" VerticalOptions="Fill" HorizontalOptions="Fill">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnCloseFabMenuTapped"/>
+            </BoxView.GestureRecognizers>
+        </BoxView>
 
+        <VerticalStackLayout x:Name="FabMenuContainer" IsVisible="False" Opacity="0" Spacing="15" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,105" ZIndex="4" TranslationY="20">
+
+            <HorizontalStackLayout Spacing="15" HorizontalOptions="End">
+                <Border BackgroundColor="#B3000000" StrokeThickness="0" Padding="12,6" StrokeShape="RoundRectangle 8" VerticalOptions="Center">
+                    <Label Text="Transferência" TextColor="White" FontSize="13" FontAttributes="Bold"/>
+                </Border>
+                <Border WidthRequest="48" HeightRequest="48" StrokeShape="RoundRectangle 24" BackgroundColor="#3B82F6" StrokeThickness="0" VerticalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNewTransferClicked"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="{x:Static icons:MaterialIcons.Repeat}" FontFamily="MaterialIcons" TextColor="White" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+                </Border>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="15" HorizontalOptions="End">
+                <Border BackgroundColor="#B3000000" StrokeThickness="0" Padding="12,6" StrokeShape="RoundRectangle 8" VerticalOptions="Center">
+                    <Label Text="Receita" TextColor="White" FontSize="13" FontAttributes="Bold"/>
+                </Border>
+                <Border WidthRequest="48" HeightRequest="48" StrokeShape="RoundRectangle 24" BackgroundColor="#00E676" StrokeThickness="0" VerticalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNewIncomeClicked"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="{x:Static icons:MaterialIcons.TrendingUp}" FontFamily="MaterialIcons" TextColor="#001524" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True" FontAttributes="Bold"/>
+                </Border>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="15" HorizontalOptions="End">
+                <Border BackgroundColor="#B3000000" StrokeThickness="0" Padding="12,6" StrokeShape="RoundRectangle 8" VerticalOptions="Center">
+                    <Label Text="Despesa no Cartão" TextColor="White" FontSize="13" FontAttributes="Bold"/>
+                </Border>
+                <Border WidthRequest="48" HeightRequest="48" StrokeShape="RoundRectangle 24" BackgroundColor="#9333EA" StrokeThickness="0" VerticalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNewCreditCardExpenseClicked"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="{x:Static icons:MaterialIcons.CreditCard}" FontFamily="MaterialIcons" TextColor="White" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True" FontAttributes="Bold"/>
+                </Border>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="15" HorizontalOptions="End">
+                <Border BackgroundColor="#B3000000" StrokeThickness="0" Padding="12,6" StrokeShape="RoundRectangle 8" VerticalOptions="Center">
+                    <Label Text="Despesa" TextColor="White" FontSize="13" FontAttributes="Bold"/>
+                </Border>
+                <Border WidthRequest="48" HeightRequest="48" StrokeShape="RoundRectangle 24" BackgroundColor="#FF5252" StrokeThickness="0" VerticalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNewExpenseClicked"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="{x:Static icons:MaterialIcons.TrendingDown}" FontFamily="MaterialIcons" TextColor="White" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True" FontAttributes="Bold"/>
+                </Border>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <Grid VerticalOptions="End" HeightRequest="120" ZIndex="2">
             <Grid.Shadow>
                 <Shadow Brush="Black" Offset="0,-5" Radius="15" Opacity="0.5"/>
             </Grid.Shadow>
@@ -16,7 +72,6 @@
 
             <Border BackgroundColor="#0A0F17" VerticalOptions="End" HeightRequest="70" StrokeThickness="0" StrokeShape="RoundRectangle 15,15,0,0">
                 <Grid ColumnDefinitions="*,*,*,*,*" Padding="0,5,0,0">
-
                     <Grid Grid.Column="0" HorizontalOptions="Center" VerticalOptions="Center">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnHomeClicked"/>
@@ -47,7 +102,7 @@
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnSettingsClicked"/>
                         </Grid.GestureRecognizers>
-                        <Label x:Name="IconSettings" Text="menu" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center"/>
+                        <Label x:Name="IconSettings" Text="{x:Static icons:MaterialIcons.Person}" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="26" HorizontalOptions="Center"/>
                         <Label x:Name="LblSettings" Text="Mais" TextColor="#64748B" FontSize="10" Margin="0,30,0,0" HorizontalOptions="Center"/>
                     </Grid>
                 </Grid>

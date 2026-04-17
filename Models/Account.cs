@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json.Serialization;
+using System.Globalization;
 
 namespace controle_ja_mobile.Models
 {
@@ -20,7 +21,6 @@ namespace controle_ja_mobile.Models
         [JsonPropertyName("currentBalance")]
         public decimal Balance { get; set; }
 
-        // IMPORTANTE: Adicione esses campos no seu Java (AccountDTO e AccountResponseDTO)
         [JsonPropertyName("icon")]
         public string Icon { get; set; } = "account_balance_wallet";
 
@@ -31,7 +31,7 @@ namespace controle_ja_mobile.Models
         public bool IsDefault { get; set; }
 
         [JsonIgnore]
-        public string FormattedBalance => $"{(Balance >= 0 ? "" : "-")}R$ {Math.Abs(Balance):N2}";
+        public string FormattedBalance => $"{(Balance >= 0 ? "" : "-")}R$ {Math.Abs(Balance).ToString("N2", new CultureInfo("pt-BR"))}";
 
         [JsonIgnore]
         public string TypeDisplay => Type.ToString() switch

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
              xmlns:models="clr-namespace:controle_ja_mobile.Models"
+             xmlns:components="clr-namespace:controle_ja_mobile.Views.Components"
              x:Class="controle_ja_mobile.Views.Privates.Tabs.CreditCardsView">
 
     <Grid RowDefinitions="Auto, *" BackgroundColor="#001524">
@@ -17,7 +18,13 @@
             </Border>
         </Grid>
 
-        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCardsAsyncCommand}" RefreshColor="#00E676">
+        <VerticalStackLayout Grid.Row="1" IsVisible="{Binding IsLoading}" Spacing="0" Padding="0,10,0,0">
+            <components:SkeletonItem />
+            <components:SkeletonItem />
+            <components:SkeletonItem />
+        </VerticalStackLayout>
+
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCardsAsyncCommand}" RefreshColor="#00E676" IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
             <CollectionView ItemsSource="{Binding Cards}" Margin="0,10,0,0">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical" ItemSpacing="0"/>

@@ -9,4 +9,17 @@ public partial class ItemSelectionPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is ItemSelectionViewModel vm)
+        {
+            if (vm.ReloadCategoriesCommand.CanExecute(null))
+            {
+                await vm.ReloadCategoriesCommand.ExecuteAsync(null);
+            }
+        }
+    }
 }

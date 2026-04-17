@@ -1,8 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using controle_ja_mobile.Helpers;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
-using controle_ja_mobile.Views.Privates.Management;
 using Microcharts;
 using SkiaSharp;
 using System.Collections.ObjectModel;
@@ -12,6 +14,9 @@ namespace controle_ja_mobile.ViewModels
     public partial class VehiclesViewModel : BaseViewModel
     {
         private readonly VehicleService _vehicleService;
+
+        public Popup? PopupInstance { get; set; }
+
         public ObservableCollection<Vehicle> Vehicles { get; } = new();
 
         [ObservableProperty] private bool isRefreshing;
@@ -19,6 +24,15 @@ namespace controle_ja_mobile.ViewModels
         public VehiclesViewModel(VehicleService vehicleService)
         {
             _vehicleService = vehicleService;
+
+            // MÁGICA: Escuta quando alguém salva/deleta um veículo e recarrega a lista sozinho!
+            WeakReferenceMessenger.Default.Register<GlobalRefreshMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    _ = LoadVehicles();
+                });
+            });
         }
 
         [RelayCommand]
@@ -46,10 +60,8 @@ namespace controle_ja_mobile.ViewModels
 
         private void CalculateStatsAndChart(Vehicle vehicle)
         {
-            // MOCK: Dados de custo mensal fictícios
             vehicle.MonthlyCost = "R$ 450,00";
 
-            // Gráfico de Barras: Gastos últimos 3 meses (Simulado)
             var entries = new List<ChartEntry>
             {
                 new ChartEntry(320) { Label = "Dez", ValueLabel = "320", Color = SKColor.Parse("#FFAB00") },
@@ -68,20 +80,31 @@ namespace controle_ja_mobile.ViewModels
             };
         }
 
-        [RelayCommand]
-        public async Task GoToAddPage()
+        private void ShowVehiclePopup(string? vehicleId = null)
         {
-            // Ajuste o nome da View se estiver em outra pasta, assumindo que está em Views.Privates.Management
-            await Shell.Current.GoToAsync(nameof(VehicleAddPage));
+            var vm = IPlatformApplication.Current?.Services.GetService<VehicleAddViewModel>();
+            if (vm != null)
+            {
+                if (!string.IsNullOrEmpty(vehicleId)) vm.VehicleId = vehicleId;
+
+                var popup = new Views.Popups.VehicleAddPopup(vm);
+                Shell.Current.ShowPopup(popup);
+            }
         }
 
         [RelayCommand]
-        public async Task OpenVehicleDetails(Vehicle vehicle)
+        public void GoToAddPage()
         {
-            await Shell.Current.GoToAsync($"{nameof(VehicleAddPage)}?id={vehicle.Id}");
+            ShowVehiclePopup();
         }
 
         [RelayCommand]
-        public async Task GoBack() => await Shell.Current.GoToAsync("..");
+        public void OpenVehicleDetails(Vehicle vehicle)
+        {
+            if (vehicle != null) ShowVehiclePopup(vehicle.Id.ToString());
+        }
+
+        [RelayCommand]
+        public void GoBack() => PopupInstance?.Close();
     }
 }

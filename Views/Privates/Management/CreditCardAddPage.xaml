@@ -9,147 +9,96 @@
              BackgroundColor="#001524" 
              NavigationPage.HasNavigationBar="False">
 
-    <Grid>
-        <Grid RowDefinitions="Auto, *, Auto">
+    <Grid RowDefinitions="Auto, *, Auto">
 
-            <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="15,20,15,10">
-                <ImageButton Grid.Column="0" Source="arrow_back_36dp.png" Command="{Binding GoBackCommand}" HeightRequest="24" HorizontalOptions="Start" Aspect="AspectFit">
-                    <ImageButton.Behaviors>
-                        <toolkit:IconTintColorBehavior TintColor="White" />
-                    </ImageButton.Behaviors>
-                </ImageButton>
-                <Label Grid.Column="1" Text="{Binding Title}" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
-            </Grid>
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="15,20,15,10">
+            <ImageButton Grid.Column="0" Source="arrow_back_36dp.png" Command="{Binding GoBackCommand}" HeightRequest="24" HorizontalOptions="Start" Aspect="AspectFit">
+                <ImageButton.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="White" />
+                </ImageButton.Behaviors>
+            </ImageButton>
+            <Label Grid.Column="1" Text="{Binding Title}" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+        </Grid>
 
-            <ScrollView Grid.Row="1">
-                <VerticalStackLayout Padding="20,10,20,20" Spacing="25">
+        <ScrollView Grid.Row="1" x:Name="MainForm">
+            <VerticalStackLayout Padding="20,10,20,20" Spacing="25">
 
-                    <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
-                        <Label Text="Pré-visualização" TextColor="#64748B" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
-                        <Border HeightRequest="80" WidthRequest="80" StrokeShape="RoundRectangle 8" BackgroundColor="{Binding SelectedColor}" StrokeThickness="0">
-                            <Label Text="{Binding SelectedIcon}" FontFamily="MaterialIcons" TextColor="White" FontSize="40" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Nome do Cartão" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
-                        <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 8" Padding="15,0">
-                            <Entry Text="{Binding Name}" Placeholder="Ex: Nubank, Inter..." PlaceholderColor="#64748B" TextColor="White" FontSize="16" BackgroundColor="Transparent"/>
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Limite Total" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
-                        <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 8" Padding="15,0">
-                            <Entry Text="{Binding Limit}" Keyboard="Numeric" Placeholder="0.00" PlaceholderColor="#64748B" TextColor="#00E676" FontAttributes="Bold" FontSize="16" BackgroundColor="Transparent">
-                                <Entry.Behaviors>
-                                    <behaviors:CurrencyMaskBehavior />
-                                </Entry.Behaviors>
-                            </Entry>
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
-                        <VerticalStackLayout Grid.Column="0" Spacing="5">
-                            <Label Text="Dia Fechamento" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
-                            <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 8" Padding="15,0">
-                                <Entry Text="{Binding CloseDay}" Keyboard="Numeric" MaxLength="2" Placeholder="Ex: 5" PlaceholderColor="#64748B" TextColor="White" FontSize="16" BackgroundColor="Transparent"/>
-                            </Border>
-                        </VerticalStackLayout>
-
-                        <VerticalStackLayout Grid.Column="1" Spacing="5">
-                            <Label Text="Dia Vencimento" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
-                            <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 8" Padding="15,0">
-                                <Entry Text="{Binding BestDay}" Keyboard="Numeric" MaxLength="2" Placeholder="Ex: 12" PlaceholderColor="#64748B" TextColor="White" FontSize="16" BackgroundColor="Transparent"/>
-                            </Border>
-                        </VerticalStackLayout>
-                    </Grid>
-
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Cor de Identificação" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
-                        <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 8" Padding="15,0">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding OpenColorSelectorCommand}"/>
-                            </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="Auto, *, Auto">
-                                <Border Grid.Column="0" HeightRequest="30" WidthRequest="30" StrokeShape="RoundRectangle 15" BackgroundColor="{Binding SelectedColor}" StrokeThickness="0" VerticalOptions="Center"/>
-                                <Label Grid.Column="1" Text="Alterar Cor" TextColor="White" FontSize="16" VerticalOptions="Center" Margin="10,0,0,0"/>
-                                <Label Grid.Column="2" Text="▼" TextColor="#64748B" FontSize="14" VerticalOptions="Center"/>
-                            </Grid>
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Ícone" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
-                        <Border BackgroundColor="#1E2A3A" StrokeThickness="0" HeightRequest="55" StrokeShape="RoundRectangle 8" Padding="15,0">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding OpenIconSelectorCommand}"/>
-                            </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="Auto, *, Auto">
-                                <Label Grid.Column="0" Text="{Binding SelectedIcon}" FontFamily="MaterialIcons" TextColor="White" FontSize="26" VerticalOptions="Center"/>
-                                <Label Grid.Column="1" Text="Alterar Ícone" TextColor="White" FontSize="16" VerticalOptions="Center" Margin="10,0,0,0"/>
-                                <Label Grid.Column="2" Text="▼" TextColor="#64748B" FontSize="14" VerticalOptions="Center"/>
-                            </Grid>
-                        </Border>
-                    </VerticalStackLayout>
-
+                <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <Label Text="Pré-visualização" TextColor="#64748B" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                    <Frame HasShadow="False" HeightRequest="80" WidthRequest="80" CornerRadius="8" BackgroundColor="{Binding SelectedColor}" BorderColor="Transparent" Padding="0">
+                        <Label Text="{Binding SelectedIcon}" FontFamily="MaterialIcons" TextColor="White" FontSize="40" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Frame>
                 </VerticalStackLayout>
-            </ScrollView>
 
-            <VerticalStackLayout Grid.Row="2" Padding="20,0,20,20" Spacing="10">
-                <Button Text="Salvar Cartão" Command="{Binding SaveCommand}" BackgroundColor="#00E676" TextColor="#001524" FontAttributes="Bold" FontSize="16" HeightRequest="55" CornerRadius="12"/>
-                <Button Text="Excluir Cartão" Command="{Binding DeleteCommand}" IsVisible="{Binding IsEditMode}" BackgroundColor="Transparent" TextColor="#FF5252" BorderColor="#FF5252" BorderWidth="1" FontAttributes="Bold" FontSize="14" HeightRequest="50" CornerRadius="12"/>
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Nome do Cartão" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
+                    <Frame HasShadow="False" BackgroundColor="#1E2A3A" BorderColor="Transparent" HeightRequest="55" CornerRadius="8" Padding="15,0">
+                        <Entry Text="{Binding Name}" Placeholder="Ex: Nubank, Inter..." PlaceholderColor="#64748B" TextColor="White" FontSize="16" BackgroundColor="Transparent"/>
+                    </Frame>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Limite Total" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
+                    <Frame HasShadow="False" BackgroundColor="#1E2A3A" BorderColor="Transparent" HeightRequest="55" CornerRadius="8" Padding="15,0">
+                        <Entry Text="{Binding Limit}" Keyboard="Numeric" Placeholder="0.00" PlaceholderColor="#64748B" TextColor="#00E676" FontAttributes="Bold" FontSize="16" BackgroundColor="Transparent">
+                            <Entry.Behaviors>
+                                <behaviors:CurrencyMaskBehavior />
+                            </Entry.Behaviors>
+                        </Entry>
+                    </Frame>
+                </VerticalStackLayout>
+
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
+                    <VerticalStackLayout Grid.Column="0" Spacing="5">
+                        <Label Text="Dia Fechamento" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
+                        <Frame HasShadow="False" BackgroundColor="#1E2A3A" BorderColor="Transparent" HeightRequest="55" CornerRadius="8" Padding="15,0">
+                            <Entry Text="{Binding CloseDay}" Keyboard="Numeric" MaxLength="2" Placeholder="Ex: 5" PlaceholderColor="#64748B" TextColor="White" FontSize="16" BackgroundColor="Transparent"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Column="1" Spacing="5">
+                        <Label Text="Dia Vencimento" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
+                        <Frame HasShadow="False" BackgroundColor="#1E2A3A" BorderColor="Transparent" HeightRequest="55" CornerRadius="8" Padding="15,0">
+                            <Entry Text="{Binding BestDay}" Keyboard="Numeric" MaxLength="2" Placeholder="Ex: 12" PlaceholderColor="#64748B" TextColor="White" FontSize="16" BackgroundColor="Transparent"/>
+                        </Frame>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Cor de Identificação" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
+                    <Frame HasShadow="False" BackgroundColor="#1E2A3A" BorderColor="Transparent" HeightRequest="55" CornerRadius="8" Padding="15,0">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenColorSelectorCommand}"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *, Auto">
+                            <Frame Grid.Column="0" HasShadow="False" HeightRequest="30" WidthRequest="30" CornerRadius="15" BackgroundColor="{Binding SelectedColor}" BorderColor="Transparent" Padding="0" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Alterar Cor" TextColor="White" FontSize="16" VerticalOptions="Center" Margin="10,0,0,0"/>
+                            <Label Grid.Column="2" Text="▼" TextColor="#64748B" FontSize="14" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Ícone" TextColor="#A1A1AA" FontSize="14" FontAttributes="Bold"/>
+                    <Frame HasShadow="False" BackgroundColor="#1E2A3A" BorderColor="Transparent" HeightRequest="55" CornerRadius="8" Padding="15,0">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenIconSelectorCommand}"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto, *, Auto">
+                            <Label Grid.Column="0" Text="{Binding SelectedIcon}" FontFamily="MaterialIcons" TextColor="White" FontSize="26" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="Alterar Ícone" TextColor="White" FontSize="16" VerticalOptions="Center" Margin="10,0,0,0"/>
+                            <Label Grid.Column="2" Text="▼" TextColor="#64748B" FontSize="14" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+                </VerticalStackLayout>
+
             </VerticalStackLayout>
+        </ScrollView>
 
-        </Grid>
+        <VerticalStackLayout Grid.Row="2" x:Name="ActionButtons" Padding="20,0,20,20" Spacing="10">
+            <Button Text="Salvar Cartão" Command="{Binding SaveCommand}" BackgroundColor="#00E676" TextColor="#001524" FontAttributes="Bold" FontSize="16" HeightRequest="55" CornerRadius="12"/>
+            <Button Text="Excluir Cartão" Command="{Binding DeleteCommand}" IsVisible="{Binding IsEditMode}" BackgroundColor="Transparent" TextColor="#FF5252" BorderColor="#FF5252" BorderWidth="1" FontAttributes="Bold" FontSize="14" HeightRequest="50" CornerRadius="12"/>
+        </VerticalStackLayout>
 
-        <Grid BackgroundColor="#B3000000" IsVisible="{Binding IsColorSelectorOpen}" InputTransparent="False">
-            <Grid.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding CloseColorSelectorCommand}"/>
-            </Grid.GestureRecognizers>
-            <Border VerticalOptions="End" BackgroundColor="#151E28" StrokeThickness="0" Margin="0" Padding="20,25,20,40" StrokeShape="RoundRectangle 25,25,0,0">
-                <VerticalStackLayout Spacing="20">
-                    <Label Text="Selecione uma Cor" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
-                    <ScrollView MaximumHeightRequest="400">
-                        <FlexLayout BindableLayout.ItemsSource="{Binding AvailableColors}" Wrap="Wrap" JustifyContent="Center">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="x:String">
-                                    <Border HeightRequest="50" WidthRequest="50" StrokeShape="RoundRectangle 25" BackgroundColor="{Binding .}" StrokeThickness="0" Margin="10">
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Path=BindingContext.SelectColorCommand, Source={x:Reference RootPage}}" CommandParameter="{Binding .}"/>
-                                        </Border.GestureRecognizers>
-                                    </Border>
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </FlexLayout>
-                    </ScrollView>
-                </VerticalStackLayout>
-            </Border>
-        </Grid>
-
-        <Grid BackgroundColor="#B3000000" IsVisible="{Binding IsIconSelectorOpen}" InputTransparent="False">
-            <Grid.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding CloseIconSelectorCommand}"/>
-            </Grid.GestureRecognizers>
-            <Border VerticalOptions="End" BackgroundColor="#151E28" StrokeThickness="0" Margin="0" Padding="20,25,20,40" StrokeShape="RoundRectangle 25,25,0,0">
-                <VerticalStackLayout Spacing="20">
-                    <Label Text="Selecione um Ícone" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
-                    <ScrollView MaximumHeightRequest="400">
-                        <FlexLayout BindableLayout.ItemsSource="{Binding AvailableIcons}" Wrap="Wrap" JustifyContent="Center">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="x:String">
-                                    <Border HeightRequest="60" WidthRequest="60" StrokeShape="RoundRectangle 12" BackgroundColor="#1E2A3A" StrokeThickness="0" Margin="8">
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Path=BindingContext.SelectIconCommand, Source={x:Reference RootPage}}" CommandParameter="{Binding .}"/>
-                                        </Border.GestureRecognizers>
-                                        <Label Text="{Binding .}" FontFamily="MaterialIcons" TextColor="White" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                    </Border>
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </FlexLayout>
-                    </ScrollView>
-                </VerticalStackLayout>
-            </Border>
-        </Grid>
     </Grid>
 </ContentPage>

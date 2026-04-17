@@ -40,6 +40,7 @@ namespace controle_ja_mobile
             Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
             Routing.RegisterRoute(nameof(ChangePasswordPage), typeof(ChangePasswordPage));
             Routing.RegisterRoute(nameof(ItemSelectionPage), typeof(ItemSelectionPage));
+            Routing.RegisterRoute(nameof(InvoiceDetailsPage), typeof(InvoiceDetailsPage));
         }
 
         // Esse método é chamado toda vez que você troca de tela

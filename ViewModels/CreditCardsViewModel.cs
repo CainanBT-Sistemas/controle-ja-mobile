@@ -1,8 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using controle_ja_mobile.Helpers;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
-using controle_ja_mobile.Views.Privates.Management;
 using Microcharts;
 using SkiaSharp;
 using System.Collections.ObjectModel;
@@ -14,6 +16,9 @@ namespace controle_ja_mobile.ViewModels
     public partial class CreditCardsViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
+
+        public Popup? PopupInstance { get; set; }
+
         public ObservableCollection<CreditCard> Cards { get; } = new();
 
         [ObservableProperty] private bool isRefreshing;
@@ -21,6 +26,15 @@ namespace controle_ja_mobile.ViewModels
         public CreditCardsViewModel(ApiService apiService)
         {
             _apiService = apiService;
+
+            // MÁGICA: Escuta quando alguém salva/deleta um cartão e recarrega a lista sozinho!
+            WeakReferenceMessenger.Default.Register<GlobalRefreshMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    _ = LoadCardsAsync();
+                });
+            });
         }
 
         [RelayCommand]
@@ -42,7 +56,7 @@ namespace controle_ja_mobile.ViewModels
                         {
                             foreach (var card in list)
                             {
-                                GenerateCardChart(card); // Gerando o gráfico novamente
+                                GenerateCardChart(card);
                                 Cards.Add(card);
                             }
                         }
@@ -58,6 +72,7 @@ namespace controle_ja_mobile.ViewModels
             {
                 card.HasChartData = true;
                 var colors = new[] { SKColor.Parse("#00E676"), SKColor.Parse("#2979FF"), SKColor.Parse("#FFAB00"), SKColor.Parse("#FF5252") };
+
                 var entries = new List<ChartEntry>
                 {
                     new ChartEntry((float)(card.UsedAmount * 0.4m)) { Label = "Mercado", ValueLabel = "40%", Color = colors[0], ValueLabelColor = colors[0] },
@@ -81,19 +96,31 @@ namespace controle_ja_mobile.ViewModels
             }
         }
 
-        [RelayCommand]
-        public async Task GoToAddCard()
+        private void ShowCardPopup(string? cardId = null)
         {
-            await Shell.Current.GoToAsync(nameof(CreditCardAddPage));
+            var vm = IPlatformApplication.Current?.Services.GetService<CreditCardAddViewModel>();
+            if (vm != null)
+            {
+                if (!string.IsNullOrEmpty(cardId)) vm.CardId = cardId;
+
+                var popup = new Views.Popups.CreditCardAddPopup(vm);
+                Shell.Current.ShowPopup(popup);
+            }
         }
 
         [RelayCommand]
-        public async Task OpenCardDetails(CreditCard card)
+        public void GoToAddCard()
         {
-            await Shell.Current.GoToAsync($"{nameof(CreditCardAddPage)}?id={card.Id}");
+            ShowCardPopup();
         }
 
         [RelayCommand]
-        public async Task GoBack() => await Shell.Current.GoToAsync("..");
+        public void OpenCardDetails(CreditCard card)
+        {
+            if (card != null) ShowCardPopup(card.Id.ToString());
+        }
+
+        [RelayCommand]
+        public void GoBack() => PopupInstance?.Close();
     }
 }

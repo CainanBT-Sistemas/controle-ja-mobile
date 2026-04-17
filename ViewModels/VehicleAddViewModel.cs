@@ -3,15 +3,20 @@ using CommunityToolkit.Mvvm.Input;
 using controle_ja_mobile.Models;
 using controle_ja_mobile.Services;
 using System.Text.Json;
-using System.Text.RegularExpressions; // Necessário para a Placa
+using System.Text.RegularExpressions;
+using CommunityToolkit.Mvvm.Messaging;
+using controle_ja_mobile.Helpers;
+using CommunityToolkit.Maui.Views;
 
 namespace controle_ja_mobile.ViewModels
 {
-    [QueryProperty(nameof(VehicleId), "id")]
     public partial class VehicleAddViewModel : BaseViewModel
     {
         private readonly VehicleService _vehicleService;
         private readonly ApiService _apiService;
+
+        // NOVO: Referência para fechar o Popup
+        public Popup? PopupInstance { get; set; }
 
         [ObservableProperty] private string title = "Novo Veículo";
         [ObservableProperty] private string vehicleId;
@@ -29,7 +34,6 @@ namespace controle_ja_mobile.ViewModels
             _apiService = apiService;
         }
 
-        // Gatilho da máscara de quilometragem
         partial void OnCurrentOdometerChanged(string value)
         {
             if (string.IsNullOrEmpty(value)) return;
@@ -46,11 +50,9 @@ namespace controle_ja_mobile.ViewModels
             }
         }
 
-        // Gatilho da máscara de Placa (Mercosul e Antiga)
         partial void OnPlateChanged(string value)
         {
             if (string.IsNullOrEmpty(value)) return;
-
             var cleaned = new string(value.ToUpper().Where(char.IsLetterOrDigit).ToArray());
             if (cleaned.Length > 7) cleaned = cleaned.Substring(0, 7);
             if (cleaned.Length == 0) return;
@@ -78,7 +80,7 @@ namespace controle_ja_mobile.ViewModels
             {
                 Title = "Editar Veículo";
                 IsEditMode = true;
-                _ = LoadVehicleData(value);
+                Task.Run(() => LoadVehicleData(value));
             }
         }
 
@@ -99,7 +101,6 @@ namespace controle_ja_mobile.ViewModels
                             Name = vehicle.Name;
                             Brand = vehicle.Brand;
                             Model = vehicle.Model;
-                            // Se vier 0, coloca o ano atual, senão pega o do banco
                             Year = vehicle.Year == 0 ? DateTime.Now.Year.ToString() : vehicle.Year.ToString();
                             Plate = vehicle.Plate;
                             CurrentOdometer = vehicle.CurrentOdometer.ToString("N0", new System.Globalization.CultureInfo("pt-BR"));
@@ -114,7 +115,7 @@ namespace controle_ja_mobile.ViewModels
         {
             if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Model) || string.IsNullOrWhiteSpace(CurrentOdometer) || string.IsNullOrWhiteSpace(Plate))
             {
-                await Shell.Current.DisplayAlert("Aviso", "Preencha Nome, Modelo, Placa e KM Atual.", "OK");
+                await App.Current.MainPage.DisplayAlert("Aviso", "Preencha Nome, Modelo, Placa e KM Atual.", "OK");
                 return;
             }
 
@@ -123,7 +124,7 @@ namespace controle_ja_mobile.ViewModels
             {
                 if (!int.TryParse(Year, out yearValue) || yearValue < 1900 || yearValue > DateTime.Now.Year + 1)
                 {
-                    await Shell.Current.DisplayAlert("Erro", $"Ano inválido (mínimo 1900).", "OK");
+                    await App.Current.MainPage.DisplayAlert("Erro", $"Ano inválido (mínimo 1900).", "OK");
                     return;
                 }
             }
@@ -136,7 +137,7 @@ namespace controle_ja_mobile.ViewModels
             string unformattedPlate = new string(Plate.Where(char.IsLetterOrDigit).ToArray()).ToUpper();
             if (unformattedPlate.Length != 7 || (!Regex.IsMatch(unformattedPlate, "^[A-Z]{3}[0-9]{4}$") && !Regex.IsMatch(unformattedPlate, "^[A-Z]{3}[0-9]{1}[A-Z]{1}[0-9]{2}$")))
             {
-                await Shell.Current.DisplayAlert("Erro", "Formato de placa inválido (necessário ABC-1234 ou ABC1D23).", "OK");
+                await App.Current.MainPage.DisplayAlert("Erro", "Formato de placa inválido (necessário ABC-1234 ou ABC1D23).", "OK");
                 return;
             }
 
@@ -164,26 +165,32 @@ namespace controle_ja_mobile.ViewModels
                 }
 
                 if (success)
-                    await Shell.Current.GoToAsync("..");
+                {
+                    WeakReferenceMessenger.Default.Send(new GlobalRefreshMessage());
+                    PopupInstance?.Close(); // Fecha o Popup!
+                }
                 else
-                    await Shell.Current.DisplayAlert("Erro", "Falha ao salvar veículo.", "OK");
+                {
+                    await App.Current.MainPage.DisplayAlert("Erro", "Falha ao salvar veículo.", "OK");
+                }
             });
         }
 
         [RelayCommand]
         private async Task Delete()
         {
-            bool confirm = await Shell.Current.DisplayAlert("Excluir Veículo", $"Deseja apagar o veículo '{Name}'?", "Sim", "Não");
+            bool confirm = await App.Current.MainPage.DisplayAlert("Excluir Veículo", $"Deseja apagar o veículo '{Name}'?", "Sim", "Não");
             if (!confirm) return;
 
             var success = await _vehicleService.DeleteVehicleAsync(VehicleId);
             if (success)
             {
-                await Shell.Current.GoToAsync("..");
+                WeakReferenceMessenger.Default.Send(new GlobalRefreshMessage());
+                PopupInstance?.Close(); // Fecha o Popup!
             }
         }
 
         [RelayCommand]
-        private async Task GoBack() => await Shell.Current.GoToAsync("..");
+        private void GoBack() => PopupInstance?.Close(); // Fecha o Popup!
     }
 }

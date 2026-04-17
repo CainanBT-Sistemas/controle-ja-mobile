@@ -3,21 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:controle_ja_mobile.ViewModels"
              xmlns:models="clr-namespace:controle_ja_mobile.Models"
-             xmlns:converters="clr-namespace:controle_ja_mobile.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="controle_ja_mobile.Views.Privates.Management.ManageCategoriesPage"
-             x:Name="BrowseCategoriesPage"
-             BackgroundColor="#001524" 
+             x:DataType="vm:CategoriesViewModel"
+             Title="Gerenciar Categorias"
+             BackgroundColor="#0F172A"
              NavigationPage.HasNavigationBar="False">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <converters:BoolToArrowConverter x:Key="BoolToArrowConverter" />
-            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
     <Grid RowDefinitions="Auto, Auto, *">
+
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="15,20,15,10">
             <ImageButton Grid.Column="0" Source="arrow_back_36dp.png" Command="{Binding GoBackCommand}" HeightRequest="24" HorizontalOptions="Start" Aspect="AspectFit">
                 <ImageButton.Behaviors>
@@ -27,87 +21,83 @@
             <Label Grid.Column="1" Text="Categorias" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
             <Border Grid.Column="2" BackgroundColor="#00E676" StrokeThickness="0" HeightRequest="36" WidthRequest="36" StrokeShape="RoundRectangle 18">
                 <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToAddRootCategoryCommand}"/>
+                    <TapGestureRecognizer Command="{Binding AddCategoryCommand}"/>
                 </Border.GestureRecognizers>
                 <Label Text="+" TextColor="#001524" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" FontSize="22" Margin="0,-2,0,0"/>
             </Border>
         </Grid>
 
-        <Border Grid.Row="1" Margin="20,0,20,15" StrokeThickness="0" BackgroundColor="#1E2A3A" HeightRequest="45" StrokeShape="RoundRectangle 22">
-            <Grid ColumnDefinitions="*, *">
-                <Grid Grid.Column="0">
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding SwitchTabCommand}" CommandParameter="DESPESA"/>
-                    </Grid.GestureRecognizers>
-                    <Border x:Name="TabExpense" StrokeThickness="0" BackgroundColor="Transparent" StrokeShape="RoundRectangle 22">
-                        <Label Text="DESPESAS" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" 
-                               TextColor="{Binding IsExpensesSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='True'}"/>
-                        <Border.Triggers>
-                            <DataTrigger TargetType="Border" Binding="{Binding IsExpensesSelected}" Value="True">
-                                <Setter Property="BackgroundColor" Value="#2D3B4E"/>
+        <VerticalStackLayout Grid.Row="1" Spacing="15" Padding="20,10">
+            <Border BackgroundColor="#1E293B" StrokeThickness="0" StrokeShape="RoundRectangle 25" HeightRequest="50" Padding="5">
+                <Grid ColumnDefinitions="*, *">
+                    <Button Grid.Column="0" Text="DESPESAS" Command="{Binding ShowExpensesCommand}" CornerRadius="20" FontSize="12" FontAttributes="Bold">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsShowingExpenses}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#2D3B4E" />
+                                <Setter Property="TextColor" Value="#FF5252" />
                             </DataTrigger>
-                        </Border.Triggers>
-                    </Border>
-                </Grid>
-                <Grid Grid.Column="1">
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding SwitchTabCommand}" CommandParameter="RECEITA"/>
-                    </Grid.GestureRecognizers>
-                    <Border x:Name="TabIncome" StrokeThickness="0" BackgroundColor="Transparent" StrokeShape="RoundRectangle 22">
-                        <Label Text="RECEITAS" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" 
-                               TextColor="{Binding IsExpensesSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='False'}"/>
-                        <Border.Triggers>
-                            <DataTrigger TargetType="Border" Binding="{Binding IsExpensesSelected}" Value="False">
-                                <Setter Property="BackgroundColor" Value="#2D3B4E"/>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsShowingExpenses}" Value="False">
+                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                <Setter Property="TextColor" Value="#64748B" />
                             </DataTrigger>
-                        </Border.Triggers>
-                    </Border>
+                        </Button.Triggers>
+                    </Button>
+                    <Button Grid.Column="1" Text="RECEITAS" Command="{Binding ShowIncomesCommand}" CornerRadius="20" FontSize="12" FontAttributes="Bold">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsShowingIncomes}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#2D3B4E" />
+                                <Setter Property="TextColor" Value="#00E676" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsShowingIncomes}" Value="False">
+                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                <Setter Property="TextColor" Value="#64748B" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
                 </Grid>
-            </Grid>
-        </Border>
+            </Border>
+        </VerticalStackLayout>
 
-        <RefreshView Grid.Row="2" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCategoriesCommand}" RefreshColor="#00E676">
-            <CollectionView ItemsSource="{Binding DisplayedCategories}" Margin="0">
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="0"/>
-                </CollectionView.ItemsLayout>
-
+        <RefreshView Grid.Row="2" Command="{Binding LoadCategoriesCommand}" IsRefreshing="{Binding IsRefreshing}">
+            <CollectionView ItemsSource="{Binding DisplayedCategories}" SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Category">
-                        <VerticalStackLayout>
+                        <VerticalStackLayout Spacing="5" Margin="20,0,20,15">
 
-                            <Border StrokeThickness="0" BackgroundColor="Transparent" HeightRequest="70">
+                            <Border StrokeThickness="0" BackgroundColor="#1E293B" StrokeShape="RoundRectangle 16" HeightRequest="75">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CategoriesViewModel}}, Path=OpenCategoryDetailsCommand}" CommandParameter="{Binding .}"/>
                                 </Border.GestureRecognizers>
-
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal" />
-                                        <VisualState x:Name="Pressed">
-                                            <VisualState.Setters>
-                                                <Setter Property="BackgroundColor" Value="#151F2D" />
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
-
-                                <Grid ColumnDefinitions="70, *, Auto, 40" Padding="15,0">
-                                    <Border Grid.Column="0" HeightRequest="44" WidthRequest="44" StrokeShape="RoundRectangle 22" BackgroundColor="{Binding Color}" StrokeThickness="0" HorizontalOptions="Start" VerticalOptions="Center">
-                                        <Label Text="{Binding Icon}" FontFamily="MaterialIcons" TextColor="#001524" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                <Grid ColumnDefinitions="70, *, Auto, 45">
+                                    <Border Grid.Column="0" HeightRequest="44" WidthRequest="44" StrokeShape="RoundRectangle 22" BackgroundColor="{Binding Color}" StrokeThickness="0" VerticalOptions="Center" HorizontalOptions="Center">
+                                        <Label Text="{Binding Icon}" FontFamily="MaterialIcons" TextColor="White" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"/>
                                     </Border>
-
-                                    <Label Grid.Column="1" Text="{Binding Name}" TextColor="White" FontSize="16" FontAttributes="Bold" VerticalOptions="Center"/>
-
-                                    <Border Grid.Column="2" BackgroundColor="#2D3B4E" StrokeThickness="0" StrokeShape="RoundRectangle 12" HeightRequest="24" Padding="8,0" Margin="0,0,5,0" VerticalOptions="Center" IsVisible="{Binding HasChildren}">
-                                        <Label Text="{Binding ChildrenCount}" TextColor="#A1A1AA" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                    </Border>
-
-                                    <Label Grid.Column="3" Text="&#xe5cc;" FontFamily="MaterialIcons" TextColor="#64748B" FontSize="24" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Name}" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                                        <Label Text="{Binding ChildrenCount, StringFormat='{0} subcategorias'}" TextColor="#64748B" FontSize="11" IsVisible="{Binding HasChildren}"/>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="3" Text="edit" FontFamily="MaterialIcons" TextColor="#475569" FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
                                 </Grid>
                             </Border>
 
-                            <BoxView HeightRequest="1" Color="#1E2A3A" Margin="15,0,15,0"/>
+                            <StackLayout BindableLayout.ItemsSource="{Binding SubCategories}" Margin="30,0,0,0" Spacing="0" IsVisible="{Binding HasChildren}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:Category">
+                                        <Grid ColumnDefinitions="40, Auto, *, Auto" HeightRequest="50">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CategoriesViewModel}}, Path=OpenCategoryDetailsCommand}" CommandParameter="{Binding .}"/>
+                                            </Grid.GestureRecognizers>
+
+                                            <Label Grid.Column="0" Text="subdirectory_arrow_right" FontFamily="MaterialIcons" TextColor="{Binding ParentColor}" FontSize="24" VerticalOptions="Center" HorizontalOptions="Center" Opacity="0.8"/>
+
+                                            <Border Grid.Column="1" HeightRequest="10" WidthRequest="10" StrokeShape="RoundRectangle 5" BackgroundColor="{Binding Color}" StrokeThickness="0" VerticalOptions="Center" Margin="0,0,10,0"/>
+
+                                            <Label Grid.Column="2" Text="{Binding Name}" TextColor="#CBD5E1" FontSize="15" VerticalOptions="Center"/>
+                                            <Label Grid.Column="3" Text="chevron_right" FontFamily="MaterialIcons" TextColor="#334155" FontSize="20" VerticalOptions="Center" Margin="0,0,10,0"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </StackLayout>
 
                         </VerticalStackLayout>
                     </DataTemplate>

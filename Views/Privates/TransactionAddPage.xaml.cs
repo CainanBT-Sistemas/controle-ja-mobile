@@ -1,3 +1,4 @@
+using Microsoft.Maui.Controls;
 using controle_ja_mobile.ViewModels;
 
 namespace controle_ja_mobile.Views.Privates;
@@ -8,14 +9,6 @@ public partial class TransactionAddPage : ContentPage
     {
         InitializeComponent();
         BindingContext = viewModel;
-    }
-
-    private void OnDateSelected(object sender, DateChangedEventArgs e)
-    {
-        if (BindingContext is ViewModels.TransactionAddViewModel vm)
-        {
-            vm.Date = e.NewDate;
-        }
     }
 
     private void OnBackgroundTapped(object sender, TappedEventArgs e)
