@@ -1,7 +1,46 @@
-.vs/
+# Android/Gradle
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/app/build/
+/captures
+.externalNativeBuild/
+.cxx/
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Keystore
+*.jks
+*.keystore
+
+# Generated
+/app/src/main/gen/
+
+# IDE
+*.swp
+*~
+.project
+.settings/
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Old MAUI files (kept in gitignore for safety)
+*.xaml
+*.xaml.cs
+*.csproj
+*.sln
+*.user
 bin/
 obj/
-*.user
+.vs/
 [Dd]ebug/
 [Rr]elease/
-/Configs/AppSecrets.cs
