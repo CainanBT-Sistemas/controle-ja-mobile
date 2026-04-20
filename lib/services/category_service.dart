@@ -11,7 +11,7 @@ class CategoryService {
 
   CategoryService({required ApiClient apiClient}) : _apiClient = apiClient;
 
-  Future<List<Category>> getCategoriesAsync() async {
+  Future<List<Category>> getCategories() async {
     try {
       final response = await _apiClient.dio.get('categories');
       if (response.data != null) {
@@ -28,7 +28,7 @@ class CategoryService {
     }
   }
 
-  Future<Category?> saveCategoryAsync(Category category) async {
+  Future<Category?> saveCategory(Category category) async {
     try {
       final response = await _apiClient.dio.post(
         'categories',

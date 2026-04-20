@@ -82,7 +82,7 @@ class DashboardService {
     }
   }
 
-  Future<DashboardFullSummary?> getFullSummaryAsync(
+  Future<DashboardFullSummary?> getFullSummary(
       int start, int end) async {
     try {
       final response = await _apiClient.dio

@@ -24,7 +24,7 @@ class AuthService {
 
   // --- LOGIN & AUTO-LOGIN ---
 
-  Future<bool> loginAsync(String email, String password) async {
+  Future<bool> login(String email, String password) async {
     try {
       final response = await _dio.post(
         'auth',
@@ -37,7 +37,7 @@ class AuthService {
               : response.data as Map<String, dynamic>,
         );
         if (userResponse.id.isNotEmpty) {
-          await saveAuthTokenAsync(
+          await saveAuthToken(
             token: userResponse.tokens?.accessToken,
             refreshToken: userResponse.tokens?.refreshToken,
             username: userResponse.username,
@@ -55,7 +55,7 @@ class AuthService {
     }
   }
 
-  Future<bool> loginWithTokenAsync(String token) async {
+  Future<bool> loginWithToken(String token) async {
     try {
       final response = await _dio.post(
         'auth/auto-login',
@@ -69,7 +69,7 @@ class AuthService {
         );
         if (userResponse.tokens != null &&
             userResponse.tokens!.accessToken.isNotEmpty) {
-          await saveAuthTokenAsync(
+          await saveAuthToken(
             token: userResponse.tokens!.accessToken,
             refreshToken: userResponse.tokens!.refreshToken,
             username: userResponse.username,
@@ -82,7 +82,7 @@ class AuthService {
       return false;
     } on DioException catch (e) {
       if (e.response?.data?.toString().contains('Token inválido') ?? false) {
-        await saveAuthTokenAsync();
+        await saveAuthToken();
       }
       return false;
     } catch (_) {
@@ -92,7 +92,7 @@ class AuthService {
 
   // --- REGISTRO ---
 
-  Future<bool> registerAsync(
+  Future<bool> register(
       String username, String email, String password) async {
     try {
       final response = await _dio.post(
@@ -128,7 +128,7 @@ class AuthService {
 
   // --- GESTÃO DE PERFIL, SENHA E EXCLUSÃO ---
 
-  Future<bool> changePasswordAsync(
+  Future<bool> changePassword(
       String currentPassword, String newPassword) async {
     try {
       final response = await _dio.put(
@@ -145,7 +145,7 @@ class AuthService {
     }
   }
 
-  Future<bool> updateProfileAsync(String newUsername) async {
+  Future<bool> updateProfile(String newUsername) async {
     try {
       final response = await _dio.put(
         'users/profile',
@@ -162,7 +162,7 @@ class AuthService {
     }
   }
 
-  Future<bool> deleteAccountAsync() async {
+  Future<bool> deleteAccount() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('UserId') ?? '';
@@ -188,7 +188,7 @@ class AuthService {
 
   // --- PERSISTÊNCIA DE TOKENS ---
 
-  Future<void> saveAuthTokenAsync({
+  Future<void> saveAuthToken({
     String? token,
     String? refreshToken,
     String? username,
@@ -229,12 +229,12 @@ class AuthService {
   }
 
   /// Lê o token armazenado para uso em auto-login.
-  Future<String?> getStoredTokenAsync() async {
+  Future<String?> getStoredToken() async {
     return await _secureStorage.read(key: 'auth_token');
   }
 
   /// Lê o refresh token armazenado.
-  Future<String?> getStoredRefreshTokenAsync() async {
+  Future<String?> getStoredRefreshToken() async {
     return await _secureStorage.read(key: 'refresh_token');
   }
 }

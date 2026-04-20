@@ -11,7 +11,7 @@ class CreditCardService {
 
   CreditCardService({required ApiClient apiClient}) : _apiClient = apiClient;
 
-  Future<List<CreditCard>> getCreditCardsAsync() async {
+  Future<List<CreditCard>> getCreditCards() async {
     try {
       final response = await _apiClient.dio.get('cards');
       if (response.data != null) {
@@ -28,7 +28,7 @@ class CreditCardService {
     }
   }
 
-  Future<bool> saveCreditCardAsync(CreditCard card) async {
+  Future<bool> saveCreditCard(CreditCard card) async {
     try {
       final response = await _apiClient.dio.post(
         'cards',

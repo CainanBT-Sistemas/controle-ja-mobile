@@ -11,7 +11,7 @@ class TransactionService {
 
   TransactionService({required ApiClient apiClient}) : _apiClient = apiClient;
 
-  Future<List<Transaction>> getTransactionsAsync({
+  Future<List<Transaction>> getTransactions({
     int? start,
     int? end,
   }) async {
@@ -35,7 +35,7 @@ class TransactionService {
     }
   }
 
-  Future<bool> saveTransactionAsync(Transaction transaction) async {
+  Future<bool> saveTransaction(Transaction transaction) async {
     try {
       final response = await _apiClient.dio.post(
         'transactions',
@@ -47,7 +47,7 @@ class TransactionService {
     }
   }
 
-  Future<bool> updateTransactionAsync(
+  Future<bool> updateTransaction(
     String id,
     Transaction transaction, {
     bool updateFuture = false,
@@ -63,7 +63,7 @@ class TransactionService {
     }
   }
 
-  Future<bool> deleteTransactionAsync(
+  Future<bool> deleteTransaction(
     String id, {
     bool cancelFuture = false,
   }) async {

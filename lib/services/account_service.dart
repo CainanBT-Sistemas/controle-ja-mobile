@@ -11,7 +11,7 @@ class AccountService {
 
   AccountService({required ApiClient apiClient}) : _apiClient = apiClient;
 
-  Future<List<Account>> getAccountsAsync() async {
+  Future<List<Account>> getAccounts() async {
     try {
       final response = await _apiClient.dio.get('accounts');
       if (response.data != null) {
@@ -28,7 +28,7 @@ class AccountService {
     }
   }
 
-  Future<bool> saveAccountAsync(Account account) async {
+  Future<bool> saveAccount(Account account) async {
     try {
       final response = await _apiClient.dio.post(
         'accounts',

@@ -11,7 +11,7 @@ class VehicleService {
 
   VehicleService({required ApiClient apiClient}) : _apiClient = apiClient;
 
-  Future<List<Vehicle>> getVehiclesAsync() async {
+  Future<List<Vehicle>> getVehicles() async {
     try {
       final response = await _apiClient.dio.get('vehicles');
       if (response.data != null) {
@@ -28,7 +28,7 @@ class VehicleService {
     }
   }
 
-  Future<bool> saveVehicleAsync(Vehicle vehicle) async {
+  Future<bool> saveVehicle(Vehicle vehicle) async {
     try {
       final response = await _apiClient.dio.post(
         'vehicles',
@@ -40,7 +40,7 @@ class VehicleService {
     }
   }
 
-  Future<bool> updateVehicleAsync(String id, Vehicle vehicle) async {
+  Future<bool> updateVehicle(String id, Vehicle vehicle) async {
     try {
       final response = await _apiClient.dio.put(
         'vehicles/$id',
@@ -52,7 +52,7 @@ class VehicleService {
     }
   }
 
-  Future<bool> deleteVehicleAsync(String id) async {
+  Future<bool> deleteVehicle(String id) async {
     try {
       final response = await _apiClient.dio.delete('vehicles/$id');
       return response.data != null;

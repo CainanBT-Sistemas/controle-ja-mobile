@@ -11,7 +11,7 @@ class InvoiceService {
 
   InvoiceService({required ApiClient apiClient}) : _apiClient = apiClient;
 
-  Future<InvoiceDetailsDTO?> getInvoiceDetailsAsync(
+  Future<InvoiceDetailsDTO?> getInvoiceDetails(
       String cardId, int month, int year) async {
     try {
       final response = await _apiClient.dio
@@ -32,7 +32,7 @@ class InvoiceService {
     }
   }
 
-  Future<List<AdvanceablePurchaseDTO>> getAdvanceablePurchasesAsync(
+  Future<List<AdvanceablePurchaseDTO>> getAdvanceablePurchases(
       String cardId, int month, int year) async {
     try {
       final response = await _apiClient.dio.get(
@@ -52,7 +52,7 @@ class InvoiceService {
     }
   }
 
-  Future<bool> processRefundAsync(
+  Future<bool> processRefund(
       String invoiceId, RefundRequestDTO dto) async {
     try {
       final response = await _apiClient.dio.post(
@@ -66,7 +66,7 @@ class InvoiceService {
     }
   }
 
-  Future<bool> advanceInstallmentsAsync(
+  Future<bool> advanceInstallments(
       String invoiceId, AdvanceRequestDTO dto) async {
     try {
       final response = await _apiClient.dio.post(
