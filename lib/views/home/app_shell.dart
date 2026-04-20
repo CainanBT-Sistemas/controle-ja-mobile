@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'home_view.dart';
+import 'transactions_tab.dart';
+import 'settings_tab.dart';
+import '../modals/transaction_add_sheet.dart';
 
 /// Índice da aba ativa (provider simples).
 final activeTabProvider = StateProvider<int>((ref) => 0);
@@ -23,10 +26,10 @@ class AppShell extends ConsumerWidget {
         index: activeTab,
         children: const [
           HomeView(),
-          _PlaceholderTab(label: 'Transações'),
+          TransactionsTab(),
           _PlaceholderTab(label: 'Cartões'),
           _PlaceholderTab(label: 'Planejamento'),
-          _PlaceholderTab(label: 'Mais'),
+          SettingsTab(),
         ],
       ),
       bottomNavigationBar: _buildBottomBar(context, ref, activeTab),
@@ -106,15 +109,65 @@ class AppShell extends ConsumerWidget {
         backgroundColor: const Color(0xFF00E676),
         elevation: 6,
         shape: const CircleBorder(),
-        onPressed: () {
-          // TODO: Abrir popup de nova transação (Sprint 5)
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Nova transação estará disponível em breve.')),
-          );
-        },
+        onPressed: () => _showTransactionTypeSheet(context),
         child: const Icon(Icons.add, color: Color(0xFF121214), size: 36),
       ),
+    );
+  }
+
+  void _showTransactionTypeSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF0A0F17),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40, height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF334155),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
+                child: Text(
+                  'Novo Lançamento',
+                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              _txTypeItem(context, Icons.trending_down, 'Despesa', const Color(0xFFFF5252), 'Despesa'),
+              _txTypeItem(context, Icons.credit_card, 'Despesa no Cartão', const Color(0xFF9333EA), 'Despesa no Cartão'),
+              _txTypeItem(context, Icons.trending_up, 'Receita', const Color(0xFF00E676), 'Receita'),
+              _txTypeItem(context, Icons.swap_horiz, 'Transferência', const Color(0xFF3B82F6), 'Transferência'),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _txTypeItem(BuildContext context, IconData icon, String label, Color color, String type) {
+    return ListTile(
+      leading: CircleAvatar(backgroundColor: color.withAlpha(40), child: Icon(icon, color: color)),
+      title: Text(label, style: const TextStyle(color: Colors.white)),
+      onTap: () {
+        Navigator.of(context).pop();
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => TransactionAddSheet(transactionType: type),
+        );
+      },
     );
   }
 }
