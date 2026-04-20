@@ -46,4 +46,40 @@ class AccountService {
       return false;
     }
   }
+
+  Future<Account?> getAccountById(String id) async {
+    try {
+      final response = await _apiClient.dio.get('accounts/$id');
+      if (response.data != null) {
+        final parsed = response.data is String
+            ? jsonDecode(response.data as String) as Map<String, dynamic>
+            : response.data as Map<String, dynamic>;
+        return Account.fromJson(parsed);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool> updateAccount(String id, Map<String, dynamic> data) async {
+    try {
+      final response = await _apiClient.dio.put(
+        'accounts/$id',
+        data: data,
+      );
+      return response.data != null;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> deleteAccount(String id) async {
+    try {
+      final response = await _apiClient.dio.delete('accounts/$id');
+      return response.data != null;
+    } catch (e) {
+      return false;
+    }
+  }
 }

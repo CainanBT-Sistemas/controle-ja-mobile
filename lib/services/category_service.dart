@@ -45,4 +45,40 @@ class CategoryService {
       return null;
     }
   }
+
+  Future<Category?> getCategoryById(String id) async {
+    try {
+      final response = await _apiClient.dio.get('categories/$id');
+      if (response.data != null) {
+        final parsed = response.data is String
+            ? jsonDecode(response.data as String) as Map<String, dynamic>
+            : response.data as Map<String, dynamic>;
+        return Category.fromJson(parsed);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool> updateCategory(String id, Map<String, dynamic> data) async {
+    try {
+      final response = await _apiClient.dio.put(
+        'categories/$id',
+        data: data,
+      );
+      return response.data != null;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> deleteCategory(String id) async {
+    try {
+      final response = await _apiClient.dio.delete('categories/$id');
+      return response.data != null;
+    } catch (e) {
+      return false;
+    }
+  }
 }

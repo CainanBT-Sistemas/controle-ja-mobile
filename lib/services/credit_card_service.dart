@@ -46,4 +46,40 @@ class CreditCardService {
       return false;
     }
   }
+
+  Future<CreditCard?> getCreditCardById(String id) async {
+    try {
+      final response = await _apiClient.dio.get('cards/$id');
+      if (response.data != null) {
+        final parsed = response.data is String
+            ? jsonDecode(response.data as String) as Map<String, dynamic>
+            : response.data as Map<String, dynamic>;
+        return CreditCard.fromJson(parsed);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool> updateCreditCard(String id, Map<String, dynamic> data) async {
+    try {
+      final response = await _apiClient.dio.put(
+        'cards/$id',
+        data: data,
+      );
+      return response.data != null;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> deleteCreditCard(String id) async {
+    try {
+      final response = await _apiClient.dio.delete('cards/$id');
+      return response.data != null;
+    } catch (e) {
+      return false;
+    }
+  }
 }
