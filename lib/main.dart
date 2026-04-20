@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'routes/app_router.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: ControleJaApp()));
 }
 
-class ControleJaApp extends StatelessWidget {
+class ControleJaApp extends ConsumerWidget {
   const ControleJaApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
       title: 'Controle Já',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -21,11 +25,7 @@ class ControleJaApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Controle Já - Em construção'),
-        ),
-      ),
+      routerConfig: router,
     );
   }
 }
