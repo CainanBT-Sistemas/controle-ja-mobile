@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../views/home/app_shell.dart';
 import '../views/public/splash_page.dart';
 import '../views/public/welcome_page.dart';
 import '../views/public/login_page.dart';
@@ -15,6 +16,7 @@ class AppRoutes {
   static const String welcome = '/welcome';
   static const String login = '/login';
   static const String register = '/register';
+  static const String home = '/home';
 }
 
 /// Provider do GoRouter.
@@ -37,6 +39,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.register,
         builder: (context, state) => const RegisterPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.home,
+        builder: (context, state) => const AppShell(),
       ),
     ],
   );

@@ -32,8 +32,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final success = await notifier.login();
 
     if (success && mounted) {
-      // TODO: Navegar para AppShell/Home quando implementada (Sprint 4+)
-      context.go(AppRoutes.welcome);
+      context.go(AppRoutes.home);
     }
   }
 

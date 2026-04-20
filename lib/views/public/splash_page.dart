@@ -34,9 +34,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       if (refreshToken != null && refreshToken.isNotEmpty) {
         final success = await authService.loginWithToken(refreshToken);
         if (success && mounted) {
-          // TODO: Navegar para AppShell/Home quando implementada (Sprint 4+)
-          // Por enquanto vai para welcome
-          context.go(AppRoutes.welcome);
+          context.go(AppRoutes.home);
           return;
         }
       }
