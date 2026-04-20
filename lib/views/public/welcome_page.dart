@@ -70,6 +70,12 @@ class WelcomePage extends ConsumerWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         // TODO: Implementar Google OAuth (Sprint futuro)
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Login com Google estará disponível em breve.'),
+                          ),
+                        );
                       },
                       icon: const Icon(Icons.g_mobiledata,
                           color: Colors.white, size: 28),

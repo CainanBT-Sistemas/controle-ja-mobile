@@ -69,11 +69,11 @@ class DashboardService {
   }
 
   Future<List<ChartData>> getEvolution(
-      int start, int end, String? uuid) async {
+      int start, int end, String? categoryId) async {
     try {
       String endpoint = 'dashboard/evolution?start=$start&end=$end';
-      if (uuid != null && uuid.isNotEmpty) {
-        endpoint += '&categoryId=$uuid';
+      if (categoryId != null && categoryId.isNotEmpty) {
+        endpoint += '&categoryId=$categoryId';
       }
       final response = await _apiClient.dio.get(endpoint);
       return _parseChartDataList(response.data);

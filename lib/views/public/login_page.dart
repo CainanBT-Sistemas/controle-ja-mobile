@@ -137,7 +137,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         onTap: () {
                           _showError(
                             'Recuperar Senha',
-                            'Funcionalidade de recuperação será enviada para seu e-mail.',
+                            'Esta funcionalidade estará disponível em breve.',
                           );
                         },
                         child: const Text(
